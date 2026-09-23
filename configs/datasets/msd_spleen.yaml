@@ -17,7 +17,10 @@ label_path: labelsTr/{stem}.nii.gz     # ground truth for a scan. {stem} = image
                                        # {parent} = folder the image is in (for layouts like case_x/imaging.nii.gz)
 case_id: stem                          # how a scan is named in results: stem or parent
 
-# Which ground-truth label values together form the organ (a union, e.g. kidney + tumour + cyst for KiTS).
-organ_labels: [1]
+# Ground-truth definition(s) of the organ: which label values together form it (a union), and optionally
+# which label values are left out of the Dice computation (ignore_labels). organ_definition picks one.
+organ_definitions:
+  spleen: {organ_labels: [1]}
+organ_definition: spleen
 # Which TotalSegmentator classes together form the same organ (their probabilities are added up).
 totalseg_classes: [spleen]

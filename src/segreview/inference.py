@@ -11,7 +11,7 @@ and throw the rest away. Only those small maps are kept and saved.
 
 Steps for one scan (they copy what TotalSegmentator itself does):
 1. Reorient to canonical (RAS) orientation.
-2. Resample to the network's voxel size (3 mm in fast mode, 1.5 mm in full mode).
+2. Resample to the network's voxel size (6 mm 'fastest', 3 mm 'fast', 1.5 mm 'full').
 3. nnU-Net preprocessing (CT intensity normalisation) and sliding-window prediction -> logits.
 4. Reduce logits to organ maps (see reduce_logits).
 5. Resample the organ maps back to the original voxel grid, so they line up with the ground truth.
@@ -74,15 +74,16 @@ def reduce_logits(logits: torch.Tensor, organ_channels: list[int], chunk: int) -
 class OrganSegmenter:
     """Loads the pretrained network once and predicts the organ for any number of scans."""
 
-    def __init__(self, cfg: dict, device: torch.device):
+    def __init__(self, cfg: dict, device: torch.device, resolution: str | None = None):
         """Set up the nnU-Net predictor from the config.
 
-        Input: the loaded config and the torch device to run on.
+        Input: the loaded config, the torch device to run on, and optionally another resolution than
+               model.resolution (used for the second model, e.g. 'fastest' = 6 mm).
         """
         from nnunetv2.inference.predict_from_raw_data import nnUNetPredictor
 
         self.cfg = cfg
-        self.spec: ModelSpec = model_spec(cfg)
+        self.spec: ModelSpec = model_spec(cfg, resolution)
         folder = model_folder(cfg, self.spec)
         folds = cfg["model"]["folds"]
         missing = set(folds) - set(available_folds(folder))

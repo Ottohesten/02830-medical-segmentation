@@ -25,12 +25,14 @@ Every setting that affects runtime, data or file locations lives in one YAML fil
 | File | Meant for | Scans | Model resolution | TTA passes | Perturbations |
 |------|-----------|-------|------------------|------------|---------------|
 | `configs/local.yaml` | Laptop Mac (Intel or Apple Silicon); tests TTA and perturbations | 3 | fast (3 mm) | 3 | 3 |
-| `configs/local_all.yaml` | Laptop Mac, G1 evaluation on all clean scans | all 41 | fast (3 mm) | 0 | none |
+| `configs/local_all.yaml` | Laptop Mac, G1 evaluation on all clean MSD Spleen scans | all 41 | fast (3 mm) | 0 | none |
+| `configs/kits_pilot.yaml` | Laptop Mac, KiTS23 pilot (random scans, fixed seed) | 20 | fast (3 mm) | 0 | none |
 | `configs/hpc.yaml` | DTU HPC with an NVIDIA GPU (not tested yet) | all 41 | full (1.5 mm) | 8 | 9 |
 
 All files have the same structure: `compute` (device, threads), `paths` (data, weights, predictions,
-results), `dataset` (which dataset file, how many scans), `model` (resolution, folds), `uncertainty`
-(border, TTA), `perturbations`, `evaluation` (what counts as a bad segmentation, bootstrap) and `visualisation`.
+results), `dataset` (which dataset file, how many scans, first or random selection), `model` (resolution, folds),
+`uncertainty` (border, TTA, second model), `perturbations`, `evaluation` (what counts as a bad segmentation,
+bootstrap) and `visualisation`. All configs also run the 6 mm model as a second model (see below).
 
 Every script takes the config as its only required argument. To switch environment, switch the file:
 
@@ -50,13 +52,21 @@ uv run python scripts/run_g1.py --config configs/hpc.yaml     # on the HPC
 
 ## Datasets
 
-A dataset is described once in `configs/datasets/<name>.yaml`: where images and labels are, which label
-values form the organ (a union, e.g. kidney + tumour + cyst) and which TotalSegmentator classes match it.
-An environment config points to it with `dataset.file`. Adding a dataset needs a new dataset file (and a
-download step if it is not a .tar archive), not changes to inference, uncertainty or evaluation.
+A dataset is described once in `configs/datasets/<name>.yaml`: where images and labels are, how to download
+them (`tar` archive or `files` = one image + one label per scan), one or more **organ definitions** (which
+ground-truth label values form the organ, as a union, and optionally which are left out of Dice), and which
+TotalSegmentator classes match the organ (their probabilities are added up). An environment config points to it
+with `dataset.file` and chooses `n_cases` and `selection` (`first`, or `random` with the config's seed, drawn from
+the dataset's full scan list, so a larger random selection contains a smaller one). Adding a dataset needs a new
+dataset file, not changes to inference, uncertainty or evaluation.
 
 - **MSD Task09 Spleen** (`configs/datasets/msd_spleen.yaml`): 41 contrast-enhanced CT scans with manual
   spleen masks (Memorial Sloan Kettering), [Medical Segmentation Decathlon](http://medicaldecathlon.com/), CC-BY-SA 4.0.
+- **KiTS23** (`configs/datasets/kits23.yaml`): 489 CT scans of patients with kidney tumours, with kidney (1),
+  tumour (2) and cyst (3) masks; scans from many referring hospitals. [kits-challenge.org](https://kits-challenge.org/kits23/),
+  CC BY-NC-SA 4.0. Only the selected scans are downloaded (median ~50 MB each). Organ definitions:
+  `kidney_tumor_cyst` (used), `kidney_cyst`, `kidney_cyst_ignore_tumor`. Matching TotalSegmentator classes:
+  kidney_left + kidney_right + kidney_cyst_left + kidney_cyst_right.
 - **Model:** TotalSegmentator v2 "total" task, used as released (no training). Only fold 0 is published.
 
 ## Running G1 (uncertainty ranking)
@@ -64,26 +74,31 @@ download step if it is not a .tar archive), not changes to inference, uncertaint
 One command runs everything; finished steps are skipped when it is run again:
 
 ```bash
-uv run python scripts/download_data.py  --config configs/local_all.yaml  # dataset (~1.5 GB for MSD Spleen)
-uv run python scripts/download_model.py --config configs/local_all.yaml  # TotalSegmentator weights
+uv run python scripts/download_data.py  --config configs/local_all.yaml  # dataset (~1.5 GB MSD Spleen; KiTS pilot 2.6 GB)
+uv run python scripts/download_model.py --config configs/local_all.yaml  # TotalSegmentator weights (3 mm + 6 mm)
 uv run python scripts/run_g1.py         --config configs/local_all.yaml  # inference -> TTA -> Dice -> scores -> evaluation
 ```
 
-The steps can also be run one by one: `run_inference.py`, `run_tta.py`, `evaluate.py` (Dice),
-`compute_uncertainty.py`, `evaluate_g1.py`. Extra figures: `plot_dice.py` (Dice histogram) and
+The steps can also be run one by one: `run_inference.py`, `run_tta.py`, `run_second_model.py`, `evaluate.py` (Dice),
+`check_labels.py`, `compute_uncertainty.py`, `evaluate_g1.py`. Extra figures: `plot_dice.py` (Dice histogram) and
 `show_case.py --case <id> [--variant <perturbation>]` (one scan with prediction, ground truth and heatmap).
 
 What G1 computes:
 - **Uncertainty scores per scan**, from the model's own output only (no ground truth). Higher = more uncertain.
   Voxel entropy summed, averaged in the organ + a border, and per organ volume; the soft-Dice gap; and with
   TTA the disagreement between passes. TTA uses small shifts, intensity changes and noise, not mirroring,
-  because the model was trained without mirroring.
+  because the model was trained without mirroring. **Second model:** the 6 mm TotalSegmentator network
+  (`uncertainty.second_model_resolution: fastest`) is run next to the 3 mm one; their disagreement
+  (1 - Dice between the masks, and mean |p_3mm - p_6mm| near the organ) replaces fold disagreement, which is
+  impossible because only one fold is published.
 - **Baselines:** random order and small predicted organ volume. **Oracle:** true Dice (upper bound).
 - **Evaluation** (uses ground truth): Spearman rho with bootstrap CI, partial rho given volume, the review curve
   (share of bad segmentations found vs. share reviewed) and the quality curve (mean Dice after correcting the
   reviewed scans), each summarised by the area under the curve, all methods in one figure.
-- **Heatmap per scan**: `data/predictions/<name>/<variant>/<case>_entropy.nii.gz` (NIfTI, values 0-1 bits),
-  on the same grid as the CT, for the review interface.
+- **Heatmaps per scan**: `data/predictions/<name>/<variant>/<case>_entropy.nii.gz` (entropy, 0-1 bits) and
+  `<case>_m2_diff.nii.gz` (|p_3mm - p_6mm|), NIfTI on the same grid as the CT, for the review interface.
+- **Label check** (datasets with several organ definitions): Dice under each definition and how much of each
+  ground-truth label the model calls organ (`label_check.csv`, `figures/label_check.png`).
 - Clean and perturbed scans are evaluated and reported separately.
 
 Main outputs in `results/<name>/`: `dice.csv`, `scores.csv`, `g1_metrics_clean.csv`, `g1_scores_clean.csv`,

@@ -1,10 +1,10 @@
-# HPC configuration: DTU HPC (Linux with an NVIDIA GPU).
-# Same structure as local.yaml, but full resolution, all scans, TTA and more perturbation strengths.
-# Not tested yet (no GPU access so far).
+# KiTS23 pilot: 20 randomly chosen scans (fixed seed), laptop settings (3 mm model).
+# Used to check the label definition and the natural variation before downloading more scans.
+# TTA and perturbations are off here, because they multiply the runtime.
 # Every setting that changes runtime or data lives here, so scripts never hardcode paths or numbers.
-# Use it with:  uv run python scripts/<script>.py --config configs/hpc.yaml
+# Use it with:  uv run python scripts/<script>.py --config configs/kits_pilot.yaml
 
-name: hpc             # output goes to results/hpc/ and data/predictions/hpc/
+name: kits_pilot        # output goes to results/kits_pilot/ and data/predictions/kits_pilot/
 seed: 42
 
 compute:
@@ -13,27 +13,27 @@ compute:
   reduce_chunk_slices: 16  # slices processed at a time when reducing the 117-class output (lower = less memory)
 
 paths:                # relative paths are relative to the repository root
-  raw_dir: data/raw                 # tip: point these at scratch storage (e.g. /work3/<user>/...) on the HPC
+  raw_dir: data/raw                 # downloaded datasets
   models_dir: models                # pretrained weights
   predictions_dir: data/predictions # model output per scan (masks, probability maps). Not in git
   results_dir: results              # small result files (csv, figures). In git
 
 dataset:
-  file: configs/datasets/msd_spleen.yaml  # which dataset (paths, labels, matching TotalSegmentator class)
-  selection: first    # first = first n in sorted order; random = n drawn with the seed from the full list
-  n_cases: null       # how many scans to use. null = all
+  file: configs/datasets/kits23.yaml  # which dataset (paths, labels, matching TotalSegmentator classes)
+  n_cases: 20         # how many scans to use. null = all
+  selection: random   # first = first n in sorted order; random = n drawn with the seed from the full list
 
 model:
   task: total         # TotalSegmentator task (v2 "total": 117 structures)
-  resolution: full    # fast = 3 mm model (one network), full = 1.5 mm model (the organ part)
+  resolution: fast    # fast = 3 mm model (one network), full = 1.5 mm model (the organ part)
   folds: [0]          # nnU-Net folds to use. The public TotalSegmentator weights only contain fold 0
-  tile_step_size: 0.5 # overlap between sliding-window patches (0.5 = more overlap, slower, nnU-Net default)
+  tile_step_size: 0.8 # overlap between sliding-window patches (0.5 = more overlap, slower, nnU-Net default)
 
 uncertainty:
   border_mm: 5        # the uncertainty region is the predicted organ plus this many mm around it
   second_model_resolution: fastest  # second network for model disagreement: fastest = 6 mm (task 298). null = off
   tta:                # test-time augmentation: run the network again on slightly changed copies of the scan
-    n_passes: 8       # number of extra passes per scan. 0 = no TTA
+    n_passes: 0       # number of extra passes per scan. 0 = no TTA
     max_shift_voxels: 2       # random shift of the scan by up to this many voxels (at the network's resolution)
     intensity_scale: 0.05     # random intensity scaling by up to +-5 %
     intensity_shift_hu: 20    # random intensity offset by up to +-20 Hounsfield units
@@ -41,23 +41,14 @@ uncertainty:
 
 # Controlled perturbations: degraded copies of each scan, to create segmentation errors on purpose.
 # Results on these are reported separately from the clean scans.
-perturbations:
-  - {name: noise_30, type: noise, strength: 30}          # Gaussian noise, standard deviation in HU
-  - {name: noise_60, type: noise, strength: 60}
-  - {name: noise_100, type: noise, strength: 100}
-  - {name: contrast_40, type: contrast, strength: 0.4}   # remove 40 % of the contrast around contrast_level_hu
-  - {name: contrast_60, type: contrast, strength: 0.6}
-  - {name: contrast_80, type: contrast, strength: 0.8}
-  - {name: lowres_5mm, type: lowres, strength: 5}        # blur by down- and upsampling to 5 mm voxels
-  - {name: lowres_8mm, type: lowres, strength: 8}
-  - {name: lowres_12mm, type: lowres, strength: 12}
+perturbations: []   # none here; see local.yaml
 perturbation_settings:
   contrast_level_hu: 40     # grey value that stays fixed when contrast is reduced (soft tissue)
 
 evaluation:
   bad:                # which segmentations count as "bad" in the review curve
     rule: worst_fraction  # worst_fraction = the worst X of the scans; threshold = Dice below X
-    value: 0.1            # the worst 10 % of the scans
+    value: 0.2            # the worst 20 %: with 20 scans that is 4, enough to draw a review curve
   n_bootstrap: 2000   # resamples for the confidence interval of Spearman rho and the curve areas
   ci_level: 0.95
   n_random_orders: 1000  # random review orders averaged for the random baseline
@@ -68,4 +59,4 @@ visualisation:
   dice_bin_width: 0.01  # histogram bin width in the Dice plots
   share_bin_width: 0.05 # histogram bin width for shares (0-1) in the label check plot
   label_worst_n: 3      # how many of the worst scans get their name written in plots
-  dpi: 150
+  dpi: 120

@@ -3,7 +3,7 @@ the entropy heatmap (if computed).
 
 A quick visual check that image, prediction and ground truth line up, and of where the model is unsure.
 The axial slice with the most ground-truth organ voxels is shown.
-Output: results/<config name>/figures/case_<case>[_<variant>].png
+Output: results/<config name>/figures/<case>[_<variant>].png
 
 Usage: uv run python scripts/show_case.py --config configs/local.yaml [--case spleen_10] [--variant noise_60]
 """
@@ -47,7 +47,7 @@ def main():
         spec = next(p for p in cfg["perturbations"] if p["name"] == args.variant)
         image = perturb(image, spec, cfg, index)
     ct = image.get_fdata(dtype=np.float32)
-    truth = load_organ_mask(cfg, case)
+    truth, ignore = load_organ_mask(cfg, case)
     pred = load_map(cfg, args.variant, case.case_id, "mask").astype(bool)
     prob = load_map(cfg, args.variant, case.case_id, "prob")
     has_entropy = map_path(cfg, args.variant, case.case_id, "entropy").exists()
@@ -77,12 +77,12 @@ def main():
         fig.colorbar(shown, ax=axes[2], fraction=0.046)
     for ax in axes:
         ax.axis("off")
-    fig.suptitle(f"Dice (whole scan) = {dice(pred, truth):.3f}   |   config: {cfg['name']}, "
+    fig.suptitle(f"Dice (whole scan) = {dice(pred, truth, ignore):.3f}   |   config: {cfg['name']}, "
                  f"{cfg['model']['resolution']} resolution, variant: {args.variant}")
     fig.tight_layout()
 
     suffix = "" if args.variant == "clean" else f"_{args.variant}"
-    out = figures_dir(cfg) / f"case_{case.case_id}{suffix}.png"
+    out = figures_dir(cfg) / f"{case.case_id}{suffix}.png"
     fig.savefig(out, dpi=vis["dpi"])
     print(f"Figure: {out}")
 

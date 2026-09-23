@@ -1,0 +1,32 @@
+# Dataset description: KiTS23 (2023 Kidney and Kidney Tumor Segmentation Challenge), training set.
+# 489 contrast-enhanced CT scans (corticomedullary or nephrographic phase) of patients with a kidney
+# tumour, with manual masks of kidney, tumour and cyst. Patients were treated at M Health Fairview, but
+# many scans were taken at referring hospitals, so scanners and protocols vary. CC BY-NC-SA 4.0.
+# https://kits-challenge.org/kits23/  --  files: https://huggingface.co/datasets/neheller/KiTS-Challenge-Imaging
+
+name: kits23
+
+download:
+  format: files            # one image + one label file per scan; only the selected scans are fetched
+  list_url: https://huggingface.co/api/datasets/neheller/KiTS-Challenge-Imaging/tree/main/images
+  base_url: https://huggingface.co/datasets/neheller/KiTS-Challenge-Imaging/resolve/main
+  image_file: images/{case_id}.nii.gz
+  label_file: segmentations/{case_id}.nii.gz
+
+# Where the files are after download, relative to paths.raw_dir.
+root: kits23
+image_glob: images/*.nii.gz
+label_path: segmentations/{stem}.nii.gz
+case_id: stem
+
+# Ground-truth labels: 1 = kidney, 2 = tumour, 3 = cyst. Which of them count as "the kidney"?
+# TotalSegmentator has classes for kidney and kidney cyst, but not for kidney tumour, so it is not
+# obvious which definition matches what the model was trained to do. See PROGRESS / the label check.
+organ_definitions:
+  kidney_tumor_cyst: {organ_labels: [1, 2, 3]}                  # the whole kidney incl. all masses (KiTS "kidney + masses")
+  kidney_cyst:       {organ_labels: [1, 3]}                     # tumour counts as background
+  kidney_cyst_ignore_tumor: {organ_labels: [1, 3], ignore_labels: [2]}   # tumour voxels left out of Dice
+organ_definition: kidney_tumor_cyst
+
+# TotalSegmentator classes that together form the same organ (their probabilities are added up).
+totalseg_classes: [kidney_left, kidney_right, kidney_cyst_left, kidney_cyst_right]

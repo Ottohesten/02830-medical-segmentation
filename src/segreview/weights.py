@@ -1,7 +1,8 @@
 """Finding and downloading the pretrained TotalSegmentator weights.
 
-TotalSegmentator is a set of nnU-Net models. Which network we need depends on the
-resolution in the config:
+TotalSegmentator is a set of nnU-Net models. Which network we need depends on the resolution:
+- 'fastest' (6 mm): one network that predicts all 117 structures (task 298). Used as a second,
+  independently trained model whose disagreement with the main model is an uncertainty measure.
 - 'fast' (3 mm): one network that predicts all 117 structures (task 297).
 - 'full' (1.5 mm): five networks, each predicting one group of structures (tasks 291-295).
   We only need the one whose group contains our organ (e.g. task 291 'organs' for the spleen).
@@ -16,8 +17,8 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-# TotalSegmentator calls its two resolutions 'fast' and 'default'. We call them 'fast' and 'full'.
-RESOLUTION_TO_SUBMODE = {"fast": "fast", "full": "default"}
+# TotalSegmentator calls its resolutions 'fastest', 'fast' and 'default'. We call the last one 'full'.
+RESOLUTION_TO_SUBMODE = {"fastest": "fastest", "fast": "fast", "full": "default"}
 
 
 @dataclass
@@ -38,20 +39,21 @@ def _use_models_dir(cfg: dict) -> None:
     os.environ["TOTALSEG_HOME_DIR"] = str(cfg["paths"]["models_dir"] / "totalsegmentator")
 
 
-def model_spec(cfg: dict) -> ModelSpec:
+def model_spec(cfg: dict, resolution: str | None = None) -> ModelSpec:
     """Work out which network to use for the configured task, resolution and organ.
 
     All classes of the organ must be predicted by the same network. In 'full' mode the
     classes are split over five networks, and we pick the one that has all of them.
 
-    Input: the loaded config (model.task, model.resolution, dataset.totalseg_classes).
+    Input: the loaded config (model.task, model.resolution, dataset.totalseg_classes), and optionally
+           another resolution than model.resolution (for the second model).
     Output: a ModelSpec.
     """
     from totalsegmentator.map_tasks_config import TASK_CONFIGS
     from totalsegmentator.map_to_binary import class_map, class_map_5_parts, map_taskid_to_partname_ct
 
     task, classes = cfg["model"]["task"], cfg["dataset"]["totalseg_classes"]
-    sub = TASK_CONFIGS[task]["sub_modes"][RESOLUTION_TO_SUBMODE[cfg["model"]["resolution"]]]
+    sub = TASK_CONFIGS[task]["sub_modes"][RESOLUTION_TO_SUBMODE[resolution or cfg["model"]["resolution"]]]
     task_ids = sub["task_id"] if isinstance(sub["task_id"], list) else [sub["task_id"]]
 
     for task_id in task_ids:
@@ -83,14 +85,15 @@ def available_folds(folder: Path) -> list[int]:
     return sorted(int(p.parent.name.split("_")[1]) for p in folder.glob("fold_*/checkpoint_final.pth"))
 
 
-def download_weights(cfg: dict) -> Path:
+def download_weights(cfg: dict, resolution: str | None = None) -> Path:
     """Download the weights for the configured network (skipped if already present).
 
+    Input: config, and optionally another resolution than model.resolution.
     Output: the model folder.
     """
     _use_models_dir(cfg)
     from totalsegmentator.libs import download_pretrained_weights
 
-    spec = model_spec(cfg)
+    spec = model_spec(cfg, resolution)
     download_pretrained_weights(spec.task_id)
     return model_folder(cfg, spec)

@@ -1,4 +1,5 @@
-"""Figures for the G1 evaluation: review curve, quality curve and score-vs-Dice scatter plots.
+"""Figures for the G1 evaluation: review curve, quality curve, score-vs-Dice scatter plots, and the
+Dice distribution under different ground-truth definitions of the organ.
 
 Colours follow the method, never its rank, so a method has the same colour in every figure.
 Uncertainty measures get distinct colours; the baselines and the oracle are neutral grey/black
@@ -26,6 +27,8 @@ METHODS = {
     "soft_dice_gap":       ("Soft-Dice gap",                        "#eda100", "-"),
     "tta_disagreement":    ("TTA disagreement",                     "#e87ba4", "-"),
     "tta_std_mean_region": ("TTA std, mean in organ + border",      "#4a3aa7", "-"),
+    "model_disagreement":  ("Main vs second model: 1 - Dice",       "#008300", "-"),
+    "model_diff_mean_region": ("Main vs second model: mean |dp| in organ + border", "#e34948", "-"),
     "neg_volume_ml":       ("Baseline: small predicted volume",     "#52514e", "-."),
     "random":              ("Baseline: random order",               "#9a9994", "--"),
     "oracle":              ("Oracle: true Dice (upper bound)",      "#0b0b0b", ":"),
@@ -102,6 +105,56 @@ def plot_scatter(scores: dict[str, np.ndarray], dice: np.ndarray, bad: np.ndarra
         _style(ax)
     for ax in axes.flat[len(methods):]:
         ax.set_visible(False)
+    fig.suptitle(title, color=TEXT, x=0.01, ha="left", fontsize=12)
+    fig.tight_layout()
+    fig.savefig(path, dpi=dpi, facecolor=SURFACE)
+    plt.close(fig)
+
+
+def plot_label_check(df, definitions: list[str], coverage_cols: list[str], dice_bin_width: float,
+                     share_bin_width: float, seed: int, title: str, path: Path, dpi: int) -> None:
+    """Top row: Dice distribution for each organ definition. Bottom row: how much of each ground-truth
+    label the model calls organ (coverage).
+
+    Every panel is a histogram with every scan drawn as a dot below it, so single scans stay visible.
+
+    Input: table with one row per scan and columns dice_<definition> and coverage_label_<v>.
+    """
+    from matplotlib.ticker import MaxNLocator
+
+    rows = [[(f"dice_{d}", f"Dice, definition '{d}'", "Dice", dice_bin_width) for d in definitions],
+            [(c, f"Share of GT label {c.split('_')[-1]} called organ", "share (0-1)", share_bin_width)
+             for c in coverage_cols]]
+    n_cols = max(len(r) for r in rows)
+    fig, axes = plt.subplots(4, n_cols, figsize=(4.4 * n_cols, 8.4), facecolor=SURFACE,
+                             height_ratios=[4, 1, 4, 1], squeeze=False)
+    jitter = np.random.default_rng(seed).uniform(-0.3, 0.3, len(df))
+    for r, panels in enumerate(rows):
+        for i in range(n_cols):
+            ax, strip = axes[2 * r, i], axes[2 * r + 1, i]
+            if i >= len(panels):
+                ax.set_visible(False)
+                strip.set_visible(False)
+                continue
+            col, panel_title, xlabel, width = panels[i]
+            values = df[col].to_numpy(dtype=float)
+            ok = np.isfinite(values)
+            lo = np.floor(np.nanmin(values) / width) * width if ok.any() else 0.0
+            edges = np.arange(min(lo, 1.0 - width), 1.0 + width / 2, width)
+            ax.hist(values[ok], bins=edges, color="#2a78d6", edgecolor=SURFACE, linewidth=1)
+            ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+            stats = (f"min {np.nanmin(values):.3f}  median {np.nanmedian(values):.3f}  max {np.nanmax(values):.3f}"
+                     if ok.any() else "no data")
+            ax.set_title(f"{panel_title}\n{stats}  (n = {int(ok.sum())})", color=TEXT, fontsize=9, loc="left")
+            ax.set_ylabel("number of scans", color=TEXT_MUTED, fontsize=8)
+            strip.scatter(values[ok], jitter[ok], s=22, color="#2a78d6", edgecolor=SURFACE, linewidth=1, zorder=3)
+            strip.set_ylim(-1, 1)
+            strip.set_yticks([])
+            strip.set_xlabel(xlabel, color=TEXT_MUTED, fontsize=8)
+            strip.set_xlim(ax.get_xlim())
+            for a in (ax, strip):
+                _style(a)
+            strip.grid(False)
     fig.suptitle(title, color=TEXT, x=0.01, ha="left", fontsize=12)
     fig.tight_layout()
     fig.savefig(path, dpi=dpi, facecolor=SURFACE)

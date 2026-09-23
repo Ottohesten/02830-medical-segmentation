@@ -1,0 +1,4 @@
+case_id,resolution,seconds,device
+spleen_10,fastest,13.43,cpu
+spleen_12,fastest,21.46,cpu
+spleen_13,fastest,8.7,cpu

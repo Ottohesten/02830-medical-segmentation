@@ -9,6 +9,9 @@ Layout: data/predictions/<config name>/<variant>/<case>_<kind>.nii.gz
               heatmap the review interface shows.
   tta_votes   in how many TTA passes each voxel was predicted as organ (0..n_passes)
   tta_std     standard deviation of prob over the TTA passes (0-0.5)
+  m2_mask     mask of the second model (e.g. the 6 mm model)
+  m2_prob     organ probability of the second model
+  m2_diff     voxel-wise |prob - m2_prob|: heatmap of where the two models disagree (0-1)
 
 All files are NIfTI (.nii.gz) with the scan's own affine, so any viewer (3D Slicer, ITK-SNAP,
 a web viewer) can overlay them on the CT. Values in [0, 1] are stored as whole numbers 0..255
@@ -23,7 +26,7 @@ import nibabel as nib
 import numpy as np
 
 QUANT_LEVELS = 255              # values in [0, 1] are stored as integers 0..255
-QUANTISED = {"prob", "entropy", "tta_std"}
+QUANTISED = {"prob", "entropy", "tta_std", "m2_prob", "m2_diff"}
 
 
 def prediction_dir(cfg: dict, variant: str = "clean") -> Path:

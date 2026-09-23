@@ -8,19 +8,22 @@ because in the real use case (13,000 hospital scans) there is no ground truth.
 import numpy as np
 
 
-def dice(pred: np.ndarray, truth: np.ndarray) -> float:
+def dice(pred: np.ndarray, truth: np.ndarray, ignore: np.ndarray | None = None) -> float:
     """Dice similarity coefficient between two binary masks.
 
     Dice = 2 * |pred AND truth| / (|pred| + |truth|). It is 1 for a perfect match and 0 when
     the masks do not overlap at all. If both masks are empty (organ absent and correctly not
     predicted), we return 1.0, since the model did exactly the right thing.
+    Voxels in 'ignore' (optional) are left out entirely, whatever the prediction says there.
 
-    Input: two boolean or 0/1 arrays of the same shape.
+    Input: two boolean or 0/1 arrays of the same shape, optional boolean ignore mask.
     Output: Dice as a float in [0, 1].
     """
     pred, truth = pred.astype(bool), truth.astype(bool)
     if pred.shape != truth.shape:
         raise ValueError(f"Shape mismatch: prediction {pred.shape} vs ground truth {truth.shape}")
+    if ignore is not None and ignore.any():
+        pred, truth = pred[~ignore], truth[~ignore]
     total = pred.sum() + truth.sum()
     if total == 0:
         return 1.0

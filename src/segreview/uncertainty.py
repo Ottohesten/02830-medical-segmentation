@@ -27,6 +27,13 @@ With TTA (only if TTA maps exist):
 - tta_disagreement     1 - (voxels all passes call organ) / (voxels any pass calls organ), counting the
                        clean prediction as one more pass. 0 = all passes agree. Normalised.
 - tta_std_mean_region  mean standard deviation of p over the passes, inside the uncertainty region.
+With a second model (only if its maps exist; e.g. the 6 mm model next to the 3 mm model):
+- model_disagreement   1 - Dice(mask of main model, mask of second model). The public weights have
+                       only one fold, so we cannot compare folds; the 3 mm and 6 mm networks are two
+                       separately trained models and play that role. Normalised for size.
+- model_diff_mean_region  mean |p_main - p_second| inside the uncertainty region. The voxel-wise
+                       |p_main - p_second| is also saved as a heatmap (m2_diff).
+                       Caveat: the 6 mm model is coarser, so part of the disagreement is just resolution.
 Baseline:
 - neg_volume_ml        minus the predicted organ volume (ml).
 """
@@ -68,11 +75,13 @@ def uncertainty_region(mask: np.ndarray, spacing: tuple[float, float, float], bo
 
 def scan_scores(mask: np.ndarray, prob: np.ndarray, spacing: tuple[float, float, float], border_mm: float,
                 tta_votes: np.ndarray | None = None, tta_std: np.ndarray | None = None,
-                n_tta: int = 0) -> tuple[dict, np.ndarray]:
+                n_tta: int = 0, m2_mask: np.ndarray | None = None,
+                m2_prob: np.ndarray | None = None) -> tuple[dict, np.ndarray]:
     """Compute all scan-level scores of one scan (see module docstring).
 
     Input: predicted mask (0/1), organ probability, voxel size (mm), border (mm), and optionally
-           the TTA vote count and standard deviation maps with the number of TTA passes.
+           the TTA vote count and standard deviation maps with the number of TTA passes, and the
+           second model's mask and probability.
     Output: (dict of scores, voxel-wise entropy map for the heatmap).
     """
     mask = mask.astype(bool)
@@ -100,4 +109,15 @@ def scan_scores(mask: np.ndarray, prob: np.ndarray, spacing: tuple[float, float,
         all_organ = votes == n_total
         scores["tta_disagreement"] = 1.0 - all_organ.sum() / any_organ.sum() if any_organ.any() else 0.0
         scores["tta_std_mean_region"] = float(tta_std[region].mean()) if region.any() else 0.0
+
+    if m2_mask is not None and m2_prob is not None:
+        from segreview.metrics import dice
+        scores["model_disagreement"] = 1.0 - dice(mask, m2_mask)
+        diff = model_difference(prob, m2_prob)
+        scores["model_diff_mean_region"] = float(diff[region].mean()) if region.any() else 0.0
     return scores, entropy
+
+
+def model_difference(prob: np.ndarray, prob2: np.ndarray) -> np.ndarray:
+    """Voxel-wise disagreement between two models: |p_main - p_second| (0 = agree, 1 = opposite)."""
+    return np.abs(prob - prob2)
