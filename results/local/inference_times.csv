@@ -1,0 +1,13 @@
+case_id,variant,seconds,device,resolution,shape,source
+spleen_10,clean,91.96,cpu,fast,512x512x55,run
+spleen_10,contrast_60,87.67,cpu,fast,512x512x55,run
+spleen_10,lowres_8mm,75.99,cpu,fast,512x512x55,run
+spleen_10,noise_60,103.59,cpu,fast,512x512x55,run
+spleen_12,clean,91.39,cpu,fast,512x512x168,run
+spleen_12,contrast_60,89.14,cpu,fast,512x512x168,run
+spleen_12,lowres_8mm,73.76,cpu,fast,512x512x168,run
+spleen_12,noise_60,131.12,cpu,fast,512x512x168,run
+spleen_13,clean,67.79,cpu,fast,512x512x77,run
+spleen_13,contrast_60,48.72,cpu,fast,512x512x77,run
+spleen_13,lowres_8mm,41.3,cpu,fast,512x512x77,run
+spleen_13,noise_60,46.56,cpu,fast,512x512x77,run

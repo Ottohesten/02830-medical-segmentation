@@ -7,7 +7,9 @@ resolution in the config:
   We only need the one whose group contains our organ (e.g. task 291 'organs' for the spleen).
 
 This module turns (resolution, organ) into the right task id, trainer name and the
-organ's label number in that network's output, and downloads the weights into models/.
+organ's channel numbers in that network's output, and downloads the weights into models/.
+The organ comes from the dataset description (dataset.totalseg_classes) and can be a union
+of several TotalSegmentator classes, e.g. kidney_left + kidney_right.
 """
 
 import os
@@ -23,7 +25,7 @@ class ModelSpec:
     """Everything needed to locate and use one pretrained network."""
     task_id: int
     trainer: str
-    organ_label: int        # the organ's channel index in the network output
+    organ_channels: list[int]  # the organ's channel indices in the network output
     spacing_mm: float       # voxel size the network works at
 
 
@@ -39,13 +41,16 @@ def _use_models_dir(cfg: dict) -> None:
 def model_spec(cfg: dict) -> ModelSpec:
     """Work out which network to use for the configured task, resolution and organ.
 
-    Input: the loaded config (model.task, model.resolution, model.organ).
+    All classes of the organ must be predicted by the same network. In 'full' mode the
+    classes are split over five networks, and we pick the one that has all of them.
+
+    Input: the loaded config (model.task, model.resolution, dataset.totalseg_classes).
     Output: a ModelSpec.
     """
     from totalsegmentator.map_tasks_config import TASK_CONFIGS
     from totalsegmentator.map_to_binary import class_map, class_map_5_parts, map_taskid_to_partname_ct
 
-    task, organ = cfg["model"]["task"], cfg["model"]["organ"]
+    task, classes = cfg["model"]["task"], cfg["dataset"]["totalseg_classes"]
     sub = TASK_CONFIGS[task]["sub_modes"][RESOLUTION_TO_SUBMODE[cfg["model"]["resolution"]]]
     task_ids = sub["task_id"] if isinstance(sub["task_id"], list) else [sub["task_id"]]
 
@@ -53,9 +58,9 @@ def model_spec(cfg: dict) -> ModelSpec:
         # A single network uses the full class map; a 'part' network uses its own smaller map.
         labels = class_map[task] if len(task_ids) == 1 else class_map_5_parts[map_taskid_to_partname_ct[task_id]]
         name_to_label = {name: label for label, name in labels.items()}
-        if organ in name_to_label:
-            return ModelSpec(task_id, sub["trainer"], name_to_label[organ], sub["resample"])
-    raise ValueError(f"Organ '{organ}' is not predicted by task '{task}'.")
+        if all(c in name_to_label for c in classes):
+            return ModelSpec(task_id, sub["trainer"], [name_to_label[c] for c in classes], sub["resample"])
+    raise ValueError(f"Classes {classes} are not all predicted by one network of task '{task}'.")
 
 
 def model_folder(cfg: dict, spec: ModelSpec) -> Path:

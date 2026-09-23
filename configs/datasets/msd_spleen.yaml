@@ -1,0 +1,23 @@
+# Dataset description: Medical Segmentation Decathlon (MSD), Task09 Spleen.
+# 41 contrast-enhanced abdominal CT scans with a manual spleen mask (Memorial Sloan Kettering). CC-BY-SA 4.0.
+#
+# To use another dataset, copy this file and fill in the same fields. An environment config
+# (configs/local.yaml etc.) points to a dataset file with dataset.file and chooses n_cases.
+
+name: msd_spleen
+
+download:
+  url: https://msd-for-monai.s3-us-west-2.amazonaws.com/Task09_Spleen.tar
+  format: tar              # the loader unpacks .tar archives; other formats need their own download step
+
+# Where the files are after download, relative to paths.raw_dir.
+root: Task09_Spleen
+image_glob: imagesTr/*.nii.gz          # one CT scan per file (only the training split has ground truth)
+label_path: labelsTr/{stem}.nii.gz     # ground truth for a scan. {stem} = image file name without .nii.gz,
+                                       # {parent} = folder the image is in (for layouts like case_x/imaging.nii.gz)
+case_id: stem                          # how a scan is named in results: stem or parent
+
+# Which ground-truth label values together form the organ (a union, e.g. kidney + tumour + cyst for KiTS).
+organ_labels: [1]
+# Which TotalSegmentator classes together form the same organ (their probabilities are added up).
+totalseg_classes: [spleen]

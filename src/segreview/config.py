@@ -30,11 +30,19 @@ def config_arg_parser(description: str) -> argparse.ArgumentParser:
     return parser
 
 
-def load_config(path: Path) -> dict:
-    """Read a YAML config and turn every entry under 'paths' into an absolute Path.
+def _absolute(path: str) -> Path:
+    """Resolve a path from a config: relative paths are taken from the repository root."""
+    p = Path(path).expanduser()
+    return p if p.is_absolute() else REPO_ROOT / p
 
-    Relative paths are resolved against the repository root, so scripts work no matter
-    which folder they are started from.
+
+def load_config(path: Path) -> dict:
+    """Read a YAML config, merge in its dataset description, and make all paths absolute.
+
+    The environment config (e.g. configs/local.yaml) points to a dataset file with
+    dataset.file. The fields of that file are merged into cfg["dataset"]; fields set in the
+    environment config (such as n_cases) win. This keeps the dataset description in one place,
+    shared by all environments.
 
     Input: path to the YAML file.
     Output: the config as a nested dict.
@@ -42,9 +50,25 @@ def load_config(path: Path) -> dict:
     with open(path) as f:
         cfg = yaml.safe_load(f)
     for key, value in cfg["paths"].items():
-        p = Path(value).expanduser()
-        cfg["paths"][key] = p if p.is_absolute() else REPO_ROOT / p
+        cfg["paths"][key] = _absolute(value)
+    with open(_absolute(cfg["dataset"]["file"])) as f:
+        dataset = yaml.safe_load(f)
+    cfg["dataset"] = {**dataset, **cfg["dataset"]}
     return cfg
+
+
+def results_dir(cfg: dict) -> Path:
+    """Folder for this config's result files, e.g. results/local_all/. Created if missing."""
+    folder = cfg["paths"]["results_dir"] / cfg["name"]
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
+def figures_dir(cfg: dict) -> Path:
+    """Folder for this config's figures, e.g. results/local_all/figures/. Created if missing."""
+    folder = results_dir(cfg) / "figures"
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
 
 
 def pick_device(preference: str) -> torch.device:

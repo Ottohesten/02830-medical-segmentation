@@ -16,7 +16,7 @@ def main():
     spec = model_spec(cfg)
     folder = download_weights(cfg)
     print(f"Task {spec.task_id} ({cfg['model']['resolution']}, {spec.spacing_mm} mm), "
-          f"organ '{cfg['model']['organ']}' = label {spec.organ_label}")
+          f"organ {cfg['dataset']['totalseg_classes']} = channels {spec.organ_channels}")
     print(f"Weights: {folder}")
     print(f"Folds with a checkpoint: {available_folds(folder)}")
 

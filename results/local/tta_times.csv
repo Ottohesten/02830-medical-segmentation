@@ -1,0 +1,4 @@
+case_id,n_passes,seconds,device
+spleen_10,3,230.56,cpu
+spleen_12,3,232.96,cpu
+spleen_13,3,113.29,cpu

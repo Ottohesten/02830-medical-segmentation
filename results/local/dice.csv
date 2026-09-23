@@ -1,0 +1,13 @@
+case_id,variant,dice,pred_voxels,truth_voxels
+spleen_10,clean,0.9593,53182,53071
+spleen_12,clean,0.9698,529659,537685
+spleen_13,clean,0.9655,198712,203903
+spleen_10,contrast_60,0.9603,53620,53071
+spleen_12,contrast_60,0.9713,534698,537685
+spleen_13,contrast_60,0.9661,201374,203903
+spleen_10,lowres_8mm,0.9353,49351,53071
+spleen_12,lowres_8mm,0.938,487797,537685
+spleen_13,lowres_8mm,0.9039,172561,203903
+spleen_10,noise_60,0.9543,53388,53071
+spleen_12,noise_60,0.9681,528682,537685
+spleen_13,noise_60,0.9625,199704,203903

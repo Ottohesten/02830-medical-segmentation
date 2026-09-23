@@ -1,4 +1,0 @@
-case_id,seconds,device,resolution,shape
-spleen_10,91.96,cpu,fast,512x512x55
-spleen_12,91.39,cpu,fast,512x512x168
-spleen_13,67.79,cpu,fast,512x512x77

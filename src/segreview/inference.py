@@ -15,6 +15,9 @@ Steps for one scan (they copy what TotalSegmentator itself does):
 3. nnU-Net preprocessing (CT intensity normalisation) and sliding-window prediction -> logits.
 4. Reduce logits to organ maps (see reduce_logits).
 5. Resample the organ maps back to the original voxel grid, so they line up with the ground truth.
+
+For test-time augmentation (TTA) the same steps run on a slightly changed copy of the scan
+(see augment.py).
 """
 
 from dataclasses import dataclass
@@ -24,6 +27,7 @@ import numpy as np
 import torch
 from acvl_utils.cropping_and_padding.bounding_boxes import insert_crop_into_image
 
+from segreview.augment import TTAPass
 from segreview.weights import ModelSpec, available_folds, model_folder, model_spec
 
 # Value used for the organ "margin" outside the region nnU-Net looked at.
@@ -39,28 +43,31 @@ class OrganPrediction:
     affine: np.ndarray      # voxel -> world coordinates (canonical orientation)
 
 
-def reduce_logits(logits: torch.Tensor, organ_label: int, chunk: int) -> np.ndarray:
+def reduce_logits(logits: torch.Tensor, organ_channels: list[int], chunk: int) -> np.ndarray:
     """Reduce the full logits (one channel per class) to two maps about the organ.
 
-    - prob:   softmax probability of the organ. Softmax turns raw scores into probabilities
-              that sum to 1 over all classes: p_organ = exp(l_organ) / sum_k exp(l_k).
-    - margin: organ logit minus the highest logit of any other class. The model's final mask
+    The organ can consist of several classes (e.g. left and right kidney); call that set S.
+    - prob:   softmax probability of the organ. Softmax turns raw scores (logits) into probabilities
+              that sum to 1 over all classes: p_k = exp(l_k) / sum_j exp(l_j). The organ's
+              probability is the sum over its classes: p_organ = sum_{k in S} p_k.
+    - margin: highest logit inside S minus the highest logit outside S. The model's final mask
               takes the class with the highest score (argmax), so margin > 0 exactly where the
-              model labels the voxel as organ. Unlike the mask, the margin is a smooth number,
-              which lets us resample it to another grid without blocky edges.
+              model labels the voxel as (part of) the organ. Unlike the mask, the margin is a smooth
+              number, which lets us resample it to another grid without blocky edges.
 
     The work is done a few slices at a time (chunk) to keep memory use low.
 
-    Input: logits with shape (classes, x, y, z), the organ's channel index, slices per chunk.
-    Output: float32 array with shape (2, x, y, z): [margin, prob].
+    Input: logits with shape (classes, a, b, c), the organ's channel indices, slices per chunk.
+    Output: float32 array with shape (2, a, b, c): [margin, prob].
     """
+    inside = torch.tensor(organ_channels)
+    outside = torch.tensor([k for k in range(logits.shape[0]) if k not in organ_channels])
     out = np.empty((2, *logits.shape[1:]), dtype=np.float32)
     for start in range(0, logits.shape[-1], chunk):
         block = logits[..., start:start + chunk].float()
-        organ = block[organ_label]
-        others = torch.cat([block[:organ_label], block[organ_label + 1:]])
-        out[0, ..., start:start + chunk] = (organ - others.max(dim=0).values).numpy()
-        out[1, ..., start:start + chunk] = torch.softmax(block, dim=0)[organ_label].numpy()
+        margin = block[inside].max(dim=0).values - block[outside].max(dim=0).values
+        out[0, ..., start:start + chunk] = margin.numpy()
+        out[1, ..., start:start + chunk] = torch.softmax(block, dim=0)[inside].sum(dim=0).numpy()
     return out
 
 
@@ -85,7 +92,7 @@ class OrganSegmenter:
         self.predictor = nnUNetPredictor(
             tile_step_size=cfg["model"]["tile_step_size"],
             use_gaussian=True,
-            use_mirroring=False,  # mirroring-TTA is off here; TTA is handled separately in phase 2
+            use_mirroring=False,  # the model was trained without mirroring; our own TTA is in augment.py
             perform_everything_on_device=device.type != "cpu",
             device=device,
             allow_tqdm=True,
@@ -93,10 +100,12 @@ class OrganSegmenter:
         self.predictor.initialize_from_trained_model_folder(str(folder), use_folds=folds,
                                                             checkpoint_name="checkpoint_final.pth")
 
-    def predict(self, image: nib.Nifti1Image) -> OrganPrediction:
+    def predict(self, image: nib.Nifti1Image, tta: TTAPass | None = None) -> OrganPrediction:
         """Predict the organ for one canonical CT image.
 
-        Input: a nibabel image in canonical orientation.
+        Input: a nibabel image in canonical orientation, and optionally one test-time augmentation
+               (TTA) pass. The augmentation is applied to the resampled scan before the network, and
+               any spatial shift is undone on the output maps, so the result lines up with the scan.
         Output: an OrganPrediction on the same voxel grid as the input image.
         """
         from totalsegmentator.resampling import change_spacing
@@ -111,7 +120,10 @@ class OrganSegmenter:
         # nnU-Net's own resampling does nothing here; it only crops and normalises intensities.
         # nnU-Net's NIfTI reader (the one the model was trained with) flips the axis order from
         # (x, y, z) to (z, y, x), so we do the same; otherwise the network sees the scan sideways.
-        data = np.asanyarray(image_rs.dataobj).transpose(2, 1, 0)[None].astype(np.float32)
+        volume = np.asanyarray(image_rs.dataobj).astype(np.float32)
+        if tta is not None:
+            volume = tta.augment(volume)
+        data = volume.transpose(2, 1, 0)[None]
         props = {"spacing": [spacing] * 3}
         preprocessor = p.configuration_manager.preprocessor_class(verbose=False)
         data_pp, _, props = preprocessor.run_case_npy(data, None, props, p.plans_manager,
@@ -119,7 +131,7 @@ class OrganSegmenter:
         logits = p.predict_logits_from_preprocessed_data(torch.from_numpy(data_pp))
 
         # Step 4: keep only organ information, then free the big logits array.
-        maps = reduce_logits(logits, self.spec.organ_label, self.cfg["compute"]["reduce_chunk_slices"])
+        maps = reduce_logits(logits, self.spec.organ_channels, self.cfg["compute"]["reduce_chunk_slices"])
         del logits
 
         # Undo nnU-Net's cropping and axis transposition, so the maps match image_rs voxel for voxel.
@@ -128,6 +140,8 @@ class OrganSegmenter:
         full = insert_crop_into_image(full, maps, props["bbox_used_for_cropping"])
         full = full.transpose([0, *[i + 1 for i in p.plans_manager.transpose_backward]])
         full = full.transpose(0, 3, 2, 1)  # back from nnU-Net's (z, y, x) to nibabel's (x, y, z)
+        if tta is not None:
+            full = tta.undo_shift(full, fill=[OUTSIDE_MARGIN, 0.0])
 
         # Step 5: resample each map back to the original grid (linear interpolation).
         # force_affine makes the result share the exact affine of the input image.

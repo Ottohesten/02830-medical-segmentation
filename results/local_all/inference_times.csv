@@ -1,0 +1,42 @@
+case_id,variant,seconds,device,resolution,shape,source
+spleen_10,clean,91.96,cpu,fast,512x512x55,copied from local
+spleen_12,clean,91.39,cpu,fast,512x512x168,copied from local
+spleen_13,clean,67.79,cpu,fast,512x512x77,copied from local
+spleen_14,clean,138.48,cpu,fast,512x512x54,run
+spleen_16,clean,260.45,cpu,fast,512x512x61,run
+spleen_17,clean,39.84,cpu,fast,512x512x95,run
+spleen_18,clean,103.0,cpu,fast,512x512x164,run
+spleen_19,clean,113.53,cpu,fast,512x512x51,run
+spleen_2,clean,175.18,cpu,fast,512x512x90,run
+spleen_20,clean,101.08,cpu,fast,512x512x168,run
+spleen_21,clean,46.95,cpu,fast,512x512x89,run
+spleen_22,clean,97.65,cpu,fast,512x512x148,run
+spleen_24,clean,80.69,cpu,fast,512x512x94,run
+spleen_25,clean,42.42,cpu,fast,512x512x87,run
+spleen_26,clean,43.35,cpu,fast,512x512x65,run
+spleen_27,clean,142.43,cpu,fast,512x512x119,run
+spleen_28,clean,74.37,cpu,fast,512x512x44,run
+spleen_29,clean,157.1,cpu,fast,512x512x103,run
+spleen_3,clean,37.87,cpu,fast,512x512x40,run
+spleen_31,clean,41.18,cpu,fast,512x512x56,run
+spleen_32,clean,167.77,cpu,fast,512x512x104,run
+spleen_33,clean,142.53,cpu,fast,512x512x83,run
+spleen_38,clean,150.1,cpu,fast,512x512x100,run
+spleen_40,clean,81.41,cpu,fast,512x512x93,run
+spleen_41,clean,160.72,cpu,fast,512x512x94,run
+spleen_44,clean,151.01,cpu,fast,512x512x92,run
+spleen_45,clean,167.98,cpu,fast,512x512x112,run
+spleen_46,clean,49.82,cpu,fast,512x512x99,run
+spleen_47,clean,151.59,cpu,fast,512x512x88,run
+spleen_49,clean,65.92,cpu,fast,512x512x61,run
+spleen_52,clean,150.18,cpu,fast,512x512x112,run
+spleen_53,clean,159.52,cpu,fast,512x512x156,run
+spleen_56,clean,42.41,cpu,fast,512x512x33,run
+spleen_59,clean,77.84,cpu,fast,512x512x50,run
+spleen_6,clean,92.17,cpu,fast,512x512x135,run
+spleen_60,clean,153.89,cpu,fast,512x512x97,run
+spleen_61,clean,150.03,cpu,fast,512x512x101,run
+spleen_62,clean,101.11,cpu,fast,512x512x80,run
+spleen_63,clean,91.0,cpu,fast,512x512x60,run
+spleen_8,clean,105.07,cpu,fast,512x512x31,run
+spleen_9,clean,49.28,cpu,fast,512x512x41,run

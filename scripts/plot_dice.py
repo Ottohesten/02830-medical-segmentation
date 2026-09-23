@@ -3,14 +3,12 @@
 G1 ranks scans by uncertainty and checks whether that ranking matches the ranking by true Dice.
 That only makes sense if Dice actually differs between scans, so this is the first thing to check.
 
-Reads the newest results/dice_<config name>_<date>.csv (made by scripts/evaluate.py) and writes:
-- results/dice_summary_<config name>_<date>.csv : n, min, max, median, mean, std, quartiles
-- results/figures/dice_hist_<config name>_<date>.png : histogram with every scan shown as a dot below it
+Reads results/<config name>/dice.csv (made by scripts/evaluate.py), clean scans only, and writes:
+- results/<config name>/dice_summary.csv : n, min, max, median, mean, std, quartiles
+- results/<config name>/figures/dice_hist.png : histogram with every scan shown as a dot below it
 
 Usage: uv run python scripts/plot_dice.py --config configs/local_all.yaml
 """
-
-from datetime import date
 
 import matplotlib
 
@@ -20,7 +18,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.ticker import MaxNLocator
 
-from segreview.config import config_arg_parser, load_config
+from segreview.config import config_arg_parser, figures_dir, load_config, results_dir
 
 # Colours: one series, so one colour. Text and axes stay neutral grey/black so the data stands out.
 BAR = "#2a78d6"
@@ -34,19 +32,17 @@ def main():
     args = config_arg_parser(__doc__).parse_args()
     cfg = load_config(args.config)
     vis = cfg["visualisation"]
-    results = cfg["paths"]["results_dir"]
-
-    files = sorted(results.glob(f"dice_{cfg['name']}_*.csv"))
-    if not files:
-        raise FileNotFoundError(f"No dice_{cfg['name']}_*.csv in {results}. Run scripts/evaluate.py first.")
-    df = pd.read_csv(files[-1])
+    source = results_dir(cfg) / "dice.csv"
+    if not source.exists():
+        raise FileNotFoundError(f"No {source}. Run scripts/evaluate.py first.")
+    df = pd.read_csv(source)
+    df = df[df["variant"] == "clean"].reset_index(drop=True)
     d = df["dice"]
 
     summary = {"n": len(d), "min": d.min(), "q25": d.quantile(0.25), "median": d.median(),
                "q75": d.quantile(0.75), "max": d.max(), "mean": d.mean(), "std": d.std()}
-    today = date.today().isoformat()
-    pd.DataFrame([summary]).round(4).to_csv(results / f"dice_summary_{cfg['name']}_{today}.csv", index=False)
-    print(f"Source: {files[-1].name}")
+    pd.DataFrame([summary]).round(4).to_csv(results_dir(cfg) / "dice_summary.csv", index=False)
+    print(f"Source: {source} (clean scans)")
     for key, value in summary.items():
         print(f"  {key:>6}: {value:.4f}" if key != "n" else f"  {key:>6}: {value}")
 
@@ -63,7 +59,7 @@ def main():
                 xytext=(4, -12), textcoords="offset points", ha="left", color=TEXT_MUTED, fontsize=9)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))  # counts are whole numbers
     ax.set_ylabel("number of scans", color=TEXT_MUTED)
-    ax.set_title(f"Dice per scan, {cfg['model']['organ']}, config '{cfg['name']}' "
+    ax.set_title(f"Dice per scan, {cfg['dataset']['name']}, config '{cfg['name']}' "
                  f"({cfg['model']['resolution']} resolution, n = {len(d)})", color=TEXT, loc="left")
     ax.grid(axis="y", color=GRID, linewidth=0.8)
 
@@ -91,8 +87,7 @@ def main():
     strip.spines["left"].set_visible(False)
     fig.tight_layout()
 
-    out = results / "figures" / f"dice_hist_{cfg['name']}_{today}.png"
-    out.parent.mkdir(parents=True, exist_ok=True)
+    out = figures_dir(cfg) / "dice_hist.png"
     fig.savefig(out, dpi=vis["dpi"], facecolor=SURFACE)
     print(f"Figure: {out}")
 

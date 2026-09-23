@@ -1,9 +1,10 @@
 # Local configuration: a laptop Mac (Intel or Apple Silicon).
-# Small and fast: a few scans, the low-resolution model, no TTA.
-# Every setting that changes runtime lives here, so scripts never hardcode paths or numbers.
+# Small and fast: 3 scans, the low-resolution model. Also used to test TTA and perturbations,
+# because those need extra network passes per scan.
+# Every setting that changes runtime or data lives here, so scripts never hardcode paths or numbers.
 # Use it with:  uv run python scripts/<script>.py --config configs/local.yaml
 
-name: local           # used in result filenames, so local and HPC results never overwrite each other
+name: local           # output goes to results/local/ and data/predictions/local/
 seed: 42
 
 compute:
@@ -18,24 +19,44 @@ paths:                # relative paths are relative to the repository root
   results_dir: results              # small result files (csv, figures). In git
 
 dataset:
-  name: msd_spleen    # Medical Segmentation Decathlon, Task09 Spleen (41 CT scans with ground truth)
-  url: https://msd-for-monai.s3-us-west-2.amazonaws.com/Task09_Spleen.tar
-  gt_label: 1         # value of the organ in the ground-truth masks
+  file: configs/datasets/msd_spleen.yaml  # which dataset (paths, labels, matching TotalSegmentator class)
   n_cases: 3          # how many scans to use (first n in sorted order). null = all
 
 model:
   task: total         # TotalSegmentator task (v2 "total": 117 structures)
   resolution: fast    # fast = 3 mm model (one network), full = 1.5 mm model (the organ part)
-  organ: spleen       # TotalSegmentator class name of the organ we segment and review
   folds: [0]          # nnU-Net folds to use. The public TotalSegmentator weights only contain fold 0
   tile_step_size: 0.8 # overlap between sliding-window patches (0.5 = more overlap, slower, nnU-Net default)
 
 uncertainty:
-  n_tta: 0            # number of test-time augmentation passes (used from phase 2)
+  border_mm: 5        # the uncertainty region is the predicted organ plus this many mm around it
+  tta:                # test-time augmentation: run the network again on slightly changed copies of the scan
+    n_passes: 3       # number of extra passes per scan. 0 = no TTA
+    max_shift_voxels: 2       # random shift of the scan by up to this many voxels (at the network's resolution)
+    intensity_scale: 0.05     # random intensity scaling by up to +-5 %
+    intensity_shift_hu: 20    # random intensity offset by up to +-20 Hounsfield units
+    noise_std_hu: 10          # Gaussian noise with this standard deviation (HU)
+
+# Controlled perturbations: degraded copies of each scan, to create segmentation errors on purpose.
+# Results on these are reported separately from the clean scans.
+perturbations:
+  - {name: noise_60, type: noise, strength: 60}          # Gaussian noise, standard deviation in HU
+  - {name: contrast_60, type: contrast, strength: 0.6}   # remove 60 % of the contrast around contrast_level_hu
+  - {name: lowres_8mm, type: lowres, strength: 8}        # blur by down- and upsampling to 8 mm voxels
+perturbation_settings:
+  contrast_level_hu: 40     # grey value that stays fixed when contrast is reduced (soft tissue)
+
+evaluation:
+  bad:                # which segmentations count as "bad" in the review curve
+    rule: worst_fraction  # worst_fraction = the worst X of the scans; threshold = Dice below X
+    value: 0.34           # with 3 scans: the single worst one
+  n_bootstrap: 2000   # resamples for the confidence interval of Spearman rho and the curve areas
+  ci_level: 0.95
+  n_random_orders: 1000  # random review orders averaged for the random baseline
 
 visualisation:
   ct_window_level: 40   # soft-tissue CT window in Hounsfield units (centre)
   ct_window_width: 400  # (width)
-  dice_bin_width: 0.01  # histogram bin width in scripts/plot_dice.py
-  label_worst_n: 3      # how many of the worst scans get their name written in the Dice plot
+  dice_bin_width: 0.01  # histogram bin width in the Dice plot
+  label_worst_n: 3      # how many of the worst scans get their name written in plots
   dpi: 120
