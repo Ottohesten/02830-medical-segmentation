@@ -1,7 +1,41 @@
 [project]
 name = "02830-medical-segmentation"
 version = "0.1.0"
-description = "Add your description here"
+description = "Where to Look First: prioritising human review of AI medical image segmentation"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "matplotlib>=3.11.2",
+    "nibabel>=5.4.2",
+    "nnunetv2>=2.8.1",
+    "numpy<2",
+    "pandas>=3.0.6",
+    "pyyaml>=6.0.3",
+    "scipy>=1.17.1",
+    "torch==2.2.2",
+    "totalsegmentator>=2.18.0",
+]
+
+[tool.uv]
+# Resolve one lock file that works on all machines the group uses:
+# Intel Macs, Apple Silicon Macs and DTU HPC (Linux x86_64 with CUDA).
+environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
+# Fail the lock if a package has no wheel for one of these platforms.
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
+
+# The reusable code in src/segreview is installed into the environment as a package,
+# so every script can simply "import segreview".
+[build-system]
+requires = ["uv_build>=0.12,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "segreview"
