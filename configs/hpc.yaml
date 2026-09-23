@@ -35,4 +35,6 @@ uncertainty:
 visualisation:
   ct_window_level: 40   # soft-tissue CT window in Hounsfield units (centre)
   ct_window_width: 400  # (width)
+  dice_bin_width: 0.01  # histogram bin width in scripts/plot_dice.py
+  label_worst_n: 3      # how many of the worst scans get their name written in the Dice plot
   dpi: 150

@@ -1,9 +1,9 @@
-# Local configuration: a laptop Mac (Intel or Apple Silicon).
-# Small and fast: a few scans, the low-resolution model, no TTA.
+# Local configuration with ALL scans: same settings as local.yaml (fast mode, laptop), but every scan.
+# Used for G1 evaluation, which needs many scans for a rank correlation. About 1 hour on an Intel Mac.
 # Every setting that changes runtime lives here, so scripts never hardcode paths or numbers.
-# Use it with:  uv run python scripts/<script>.py --config configs/local.yaml
+# Use it with:  uv run python scripts/<script>.py --config configs/local_all.yaml
 
-name: local           # used in result filenames, so local and HPC results never overwrite each other
+name: local_all         # used in result filenames, so local and HPC results never overwrite each other
 seed: 42
 
 compute:
@@ -21,7 +21,7 @@ dataset:
   name: msd_spleen    # Medical Segmentation Decathlon, Task09 Spleen (41 CT scans with ground truth)
   url: https://msd-for-monai.s3-us-west-2.amazonaws.com/Task09_Spleen.tar
   gt_label: 1         # value of the organ in the ground-truth masks
-  n_cases: 3          # how many scans to use (first n in sorted order). null = all
+  n_cases: null       # how many scans to use (first n in sorted order). null = all
 
 model:
   task: total         # TotalSegmentator task (v2 "total": 117 structures)
