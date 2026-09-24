@@ -133,7 +133,7 @@ def download_dataset(cfg: dict) -> Path:
     return target
 
 
-def list_cases(cfg: dict) -> list[Case]:
+def list_cases(cfg: dict, splits: list[str] | None = None) -> list[Case]:
     """List the scans to use (selection from the config), with their image and label paths.
 
     Image files are found with dataset.image_glob. The matching label file is dataset.label_path,
@@ -141,7 +141,8 @@ def list_cases(cfg: dict) -> list[Case]:
     the image is in. Hidden files (starting with '.', e.g. macOS '._' metadata files) are skipped.
     If the dataset has a case_list.txt (partial downloads), the selection is drawn from that full list.
 
-    Input: the loaded config.
+    Input: the loaded config, and optionally a list of splits to keep (e.g. ["dev"]); only those scans
+           then have to be downloaded.
     Output: a list of Case objects, sorted by id.
     """
     ds = cfg["dataset"]
@@ -157,11 +158,37 @@ def list_cases(cfg: dict) -> list[Case]:
     if not all_ids:
         raise FileNotFoundError(f"No scans matching {root / ds['image_glob']}. Run scripts/download_data.py first.")
     selected = select_case_ids(cfg, all_ids)
+    if splits is not None:
+        selected = [i for i in selected if case_split(cfg, i) in splits]
     missing = [i for i in selected if i not in local]
     if missing:
         raise FileNotFoundError(f"{len(missing)} selected scans are not downloaded (e.g. {missing[0]}). "
                                 f"Run scripts/download_data.py with this config.")
     return [local[i] for i in selected]
+
+
+def case_split(cfg: dict, case_id: str) -> str:
+    """Which split a scan belongs to: 'dev' if listed in dataset.split.dev, else 'test'.
+
+    Datasets without a split return 'all'. The development set is where every choice is made; the
+    test set is only evaluated once, after the choices are locked (see evaluation.splits).
+    """
+    split = cfg["dataset"].get("split")
+    if not split:
+        return "all"
+    return "dev" if case_id in split["dev"] else "test"
+
+
+def evaluation_cases(cfg: dict) -> list[Case]:
+    """The scans whose ground truth may be used now: those in the splits listed in evaluation.splits.
+
+    Keeping the test set out of evaluation.splits until all choices are locked makes it impossible to
+    look at test-set Dice by accident. Datasets without a split: all selected scans.
+    """
+    allowed = cfg["evaluation"].get("splits")
+    if not cfg["dataset"].get("split") or allowed is None:
+        return list_cases(cfg)
+    return list_cases(cfg, splits=allowed)
 
 
 def load_canonical(path: Path) -> nib.Nifti1Image:

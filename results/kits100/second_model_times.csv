@@ -1,0 +1,101 @@
+case_id,resolution,seconds,device,source
+case_00000,fastest,60.13,cpu,
+case_00020,fastest,22.69,cpu,
+case_00026,fastest,45.58,cpu,
+case_00033,fastest,46.33,cpu,
+case_00040,fastest,20.26,cpu,run in kits_pilot (same settings)
+case_00044,fastest,23.92,cpu,
+case_00045,fastest,6.61,cpu,
+case_00046,fastest,26.46,cpu,
+case_00051,fastest,11.65,cpu,run in kits_pilot (same settings)
+case_00053,fastest,54.05,cpu,
+case_00055,fastest,21.31,cpu,
+case_00061,fastest,9.27,cpu,
+case_00077,fastest,10.83,cpu,
+case_00079,fastest,13.18,cpu,
+case_00080,fastest,11.34,cpu,
+case_00083,fastest,16.76,cpu,
+case_00091,fastest,83.75,cpu,
+case_00096,fastest,65.36,cpu,
+case_00100,fastest,50.28,cpu,
+case_00107,fastest,8.31,cpu,
+case_00115,fastest,27.29,cpu,
+case_00120,fastest,26.67,cpu,
+case_00124,fastest,25.1,cpu,
+case_00131,fastest,13.18,cpu,
+case_00132,fastest,51.73,cpu,
+case_00135,fastest,63.23,cpu,run in kits_pilot (same settings)
+case_00138,fastest,6.98,cpu,
+case_00140,fastest,24.97,cpu,
+case_00145,fastest,13.71,cpu,
+case_00152,fastest,4.66,cpu,
+case_00154,fastest,39.75,cpu,
+case_00159,fastest,77.61,cpu,
+case_00164,fastest,8.97,cpu,
+case_00168,fastest,19.61,cpu,
+case_00178,fastest,23.55,cpu,run in kits_pilot (same settings)
+case_00180,fastest,15.8,cpu,
+case_00184,fastest,30.34,cpu,
+case_00185,fastest,29.73,cpu,
+case_00192,fastest,22.36,cpu,
+case_00198,fastest,23.08,cpu,
+case_00203,fastest,59.57,cpu,
+case_00211,fastest,12.33,cpu,
+case_00217,fastest,25.5,cpu,
+case_00222,fastest,9.58,cpu,
+case_00228,fastest,10.22,cpu,
+case_00231,fastest,25.46,cpu,
+case_00236,fastest,12.08,cpu,run in kits_pilot (same settings)
+case_00246,fastest,61.39,cpu,
+case_00247,fastest,32.57,cpu,
+case_00249,fastest,23.5,cpu,run in kits_pilot (same settings)
+case_00258,fastest,12.53,cpu,
+case_00259,fastest,19.52,cpu,
+case_00260,fastest,5.04,cpu,
+case_00261,fastest,71.13,cpu,run in kits_pilot (same settings)
+case_00271,fastest,36.17,cpu,run in kits_pilot (same settings)
+case_00280,fastest,21.29,cpu,
+case_00283,fastest,31.19,cpu,
+case_00284,fastest,20.31,cpu,
+case_00291,fastest,28.33,cpu,run in kits_pilot (same settings)
+case_00292,fastest,18.76,cpu,
+case_00293,fastest,50.49,cpu,
+case_00295,fastest,53.98,cpu,run in kits_pilot (same settings)
+case_00298,fastest,57.3,cpu,run in kits_pilot (same settings)
+case_00406,fastest,19.81,cpu,
+case_00407,fastest,22.03,cpu,
+case_00426,fastest,21.71,cpu,
+case_00436,fastest,11.55,cpu,
+case_00438,fastest,10.39,cpu,
+case_00443,fastest,10.96,cpu,
+case_00453,fastest,11.75,cpu,
+case_00456,fastest,10.42,cpu,run in kits_pilot (same settings)
+case_00457,fastest,15.95,cpu,
+case_00460,fastest,9.99,cpu,
+case_00465,fastest,22.01,cpu,run in kits_pilot (same settings)
+case_00467,fastest,14.61,cpu,run in kits_pilot (same settings)
+case_00470,fastest,4.59,cpu,
+case_00481,fastest,9.3,cpu,
+case_00482,fastest,24.03,cpu,
+case_00487,fastest,28.15,cpu,
+case_00511,fastest,19.22,cpu,
+case_00516,fastest,7.57,cpu,
+case_00525,fastest,12.45,cpu,
+case_00526,fastest,23.63,cpu,
+case_00528,fastest,57.2,cpu,run in kits_pilot (same settings)
+case_00536,fastest,9.06,cpu,
+case_00544,fastest,65.16,cpu,run in kits_pilot (same settings)
+case_00546,fastest,5.1,cpu,
+case_00550,fastest,4.67,cpu,
+case_00554,fastest,5.67,cpu,
+case_00559,fastest,49.85,cpu,run in kits_pilot (same settings)
+case_00562,fastest,52.29,cpu,
+case_00563,fastest,18.35,cpu,run in kits_pilot (same settings)
+case_00566,fastest,16.51,cpu,
+case_00574,fastest,9.67,cpu,run in kits_pilot (same settings)
+case_00575,fastest,34.13,cpu,
+case_00579,fastest,26.05,cpu,
+case_00580,fastest,16.32,cpu,
+case_00582,fastest,27.68,cpu,run in kits_pilot (same settings)
+case_00585,fastest,27.4,cpu,
+case_00587,fastest,9.7,cpu,

@@ -28,5 +28,8 @@ organ_definitions:
   kidney_cyst_ignore_tumor: {organ_labels: [1, 3], ignore_labels: [2]}   # tumour voxels left out of Dice
 organ_definition: kidney_tumor_cyst
 
+# Paired organ (left + right)? Then a GT-free plausibility check compares the two sides.
+paired_organ: true
+
 # TotalSegmentator classes that together form the same organ (their probabilities are added up).
 totalseg_classes: [kidney_left, kidney_right, kidney_cyst_left, kidney_cyst_right]

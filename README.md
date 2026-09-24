@@ -26,13 +26,13 @@ Every setting that affects runtime, data or file locations lives in one YAML fil
 |------|-----------|-------|------------------|------------|---------------|
 | `configs/local.yaml` | Laptop Mac (Intel or Apple Silicon); tests TTA and perturbations | 3 | fast (3 mm) | 3 | 3 |
 | `configs/local_all.yaml` | Laptop Mac, G1 evaluation on all clean MSD Spleen scans | all 41 | fast (3 mm) | 0 | none |
-| `configs/kits_pilot.yaml` | Laptop Mac, KiTS23 pilot (random scans, fixed seed) | 20 | fast (3 mm) | 0 | none |
+| `configs/kits100.yaml` | Laptop Mac (overnight), KiTS23: 20 development + 80 test scans (random, fixed seed) | 100 | fast (3 mm) | 0 | none |
 | `configs/hpc.yaml` | DTU HPC with an NVIDIA GPU (not tested yet) | all 41 | full (1.5 mm) | 8 | 9 |
 
 All files have the same structure: `compute` (device, threads), `paths` (data, weights, predictions,
 results), `dataset` (which dataset file, how many scans, first or random selection), `model` (resolution, folds),
-`uncertainty` (border, TTA, second model), `perturbations`, `evaluation` (what counts as a bad segmentation,
-bootstrap) and `visualisation`. All configs also run the 6 mm model as a second model (see below).
+`uncertainty` (border, TTA, second model), `plausibility`, `perturbations`, `evaluation` (which splits may be
+evaluated, one or more rules for a bad segmentation, rank combinations, bootstrap) and `visualisation`. All configs also run the 6 mm model as a second model (see below).
 
 Every script takes the config as its only required argument. To switch environment, switch the file:
 
@@ -67,6 +67,10 @@ dataset file, not changes to inference, uncertainty or evaluation.
   CC BY-NC-SA 4.0. Only the selected scans are downloaded (median ~50 MB each). Organ definitions:
   `kidney_tumor_cyst` (used), `kidney_cyst`, `kidney_cyst_ignore_tumor`. Matching TotalSegmentator classes:
   kidney_left + kidney_right + kidney_cyst_left + kidney_cyst_right.
+
+**Development and test split.** A dataset config can list the development scans (`dataset.split.dev`); all other
+selected scans are the test set. Ground truth is only read for the splits in `evaluation.splits`. All choices are
+made on `dev`; `test` is added once, after they are locked, so the test result cannot influence them.
 - **Model:** TotalSegmentator v2 "total" task, used as released (no training). Only fold 0 is published.
 
 ## Running G1 (uncertainty ranking)
@@ -97,12 +101,17 @@ What G1 computes:
   reviewed scans), each summarised by the area under the curve, all methods in one figure.
 - **Heatmaps per scan**: `data/predictions/<name>/<variant>/<case>_entropy.nii.gz` (entropy, 0-1 bits) and
   `<case>_m2_diff.nii.gz` (|p_3mm - p_6mm|), NIfTI on the same grid as the CT, for the review interface.
+- **Plausibility check** (paired organs such as the kidneys; GT-free, `src/segreview/plausibility.py`): splits the
+  predicted organ at the body's midline and flags a missing side (`plaus_missing_side`) or a large left/right
+  difference (`plaus_asymmetry`). It catches confident mistakes, e.g. a missed kidney, that uncertainty cannot see.
+  `evaluation.combinations` merges it with an uncertainty score by rank.
 - **Label check** (datasets with several organ definitions): Dice under each definition and how much of each
   ground-truth label the model calls organ (`label_check.csv`, `figures/label_check.png`).
 - Clean and perturbed scans are evaluated and reported separately.
 
-Main outputs in `results/<name>/`: `dice.csv`, `scores.csv`, `g1_metrics_clean.csv`, `g1_scores_clean.csv`,
-`figures/g1_curves_clean.png`, `figures/g1_scatter_clean.png` (and `_perturbed` versions if perturbations are configured).
+Main outputs in `results/<name>/`: `dice.csv`, `scores.csv`, `g1_metrics_<set>.csv` (one row per method and
+"bad" rule), `g1_scores_<set>.csv`, `figures/g1_curves_<set>_<rule>.png`, `figures/g1_scatter_<set>_<rule>.png`.
+`<set>` is `clean` (or `clean_dev` / `clean_test` with a split) and `perturbed` if perturbations are configured.
 
 ## Layout
 

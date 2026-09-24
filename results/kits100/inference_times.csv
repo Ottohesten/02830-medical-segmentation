@@ -1,0 +1,101 @@
+case_id,variant,seconds,device,resolution,shape,source
+case_00000,clean,293.84,cpu,fast,512x512x611,run
+case_00020,clean,410.05,cpu,fast,512x512x96,run
+case_00026,clean,595.62,cpu,fast,512x512x302,run
+case_00033,clean,264.17,cpu,fast,512x512x423,run
+case_00040,clean,88.75,cpu,fast,512x512x207,run in kits_pilot (same settings)
+case_00044,clean,233.55,cpu,fast,512x512x101,run
+case_00045,clean,48.38,cpu,fast,512x512x62,run
+case_00046,clean,221.36,cpu,fast,512x512x159,run
+case_00051,clean,79.19,cpu,fast,512x512x68,run in kits_pilot (same settings)
+case_00053,clean,168.32,cpu,fast,512x512x553,run
+case_00055,clean,212.9,cpu,fast,512x512x101,run
+case_00061,clean,126.56,cpu,fast,512x512x29,run
+case_00077,clean,113.48,cpu,fast,512x512x88,run
+case_00079,clean,101.51,cpu,fast,512x512x124,run
+case_00080,clean,119.77,cpu,fast,512x512x88,run
+case_00083,clean,112.66,cpu,fast,512x512x94,run
+case_00091,clean,341.0,cpu,fast,512x512x735,run
+case_00096,clean,179.39,cpu,fast,512x512x683,run
+case_00100,clean,261.6,cpu,fast,512x512x470,run
+case_00107,clean,107.65,cpu,fast,512x512x84,run
+case_00115,clean,67.26,cpu,fast,512x512x325,run
+case_00120,clean,100.73,cpu,fast,512x512x285,run
+case_00124,clean,128.16,cpu,fast,512x512x262,run
+case_00131,clean,77.68,cpu,fast,512x512x159,run
+case_00132,clean,95.17,cpu,fast,512x512x532,run
+case_00135,clean,145.96,cpu,fast,512x512x634,run in kits_pilot (same settings)
+case_00138,clean,44.62,cpu,fast,512x512x76,run
+case_00140,clean,93.4,cpu,fast,512x512x279,run
+case_00145,clean,77.82,cpu,fast,512x512x86,run
+case_00152,clean,36.11,cpu,fast,512x512x38,run
+case_00154,clean,107.19,cpu,fast,512x512x470,run
+case_00159,clean,212.52,cpu,fast,512x512x719,run
+case_00164,clean,87.34,cpu,fast,512x512x88,run
+case_00168,clean,149.9,cpu,fast,512x512x83,run
+case_00178,clean,169.38,cpu,fast,512x512x88,run in kits_pilot (same settings)
+case_00180,clean,81.57,cpu,fast,512x512x137,run
+case_00184,clean,225.88,cpu,fast,512x512x146,run
+case_00185,clean,171.22,cpu,fast,512x512x235,run
+case_00192,clean,255.77,cpu,fast,512x512x133,run
+case_00198,clean,138.63,cpu,fast,512x512x269,run
+case_00203,clean,118.7,cpu,fast,512x512x620,run
+case_00211,clean,84.2,cpu,fast,512x512x95,run
+case_00217,clean,157.49,cpu,fast,512x512x139,run
+case_00222,clean,84.14,cpu,fast,512x512x91,run
+case_00228,clean,87.08,cpu,fast,512x512x102,run
+case_00231,clean,193.52,cpu,fast,512x512x165,run
+case_00236,clean,78.92,cpu,fast,512x512x64,run in kits_pilot (same settings)
+case_00246,clean,130.12,cpu,fast,512x512x598,run
+case_00247,clean,179.13,cpu,fast,512x512x284,run
+case_00249,clean,84.35,cpu,fast,512x512x258,run in kits_pilot (same settings)
+case_00258,clean,84.38,cpu,fast,512x512x107,run
+case_00259,clean,155.55,cpu,fast,512x512x82,run
+case_00260,clean,44.28,cpu,fast,512x512x54,run
+case_00261,clean,130.11,cpu,fast,512x512x615,run in kits_pilot (same settings)
+case_00271,clean,58.68,cpu,fast,512x512x468,run in kits_pilot (same settings)
+case_00280,clean,132.92,cpu,fast,512x512x79,run
+case_00283,clean,94.17,cpu,fast,512x512x337,run
+case_00284,clean,128.68,cpu,fast,512x512x244,run
+case_00291,clean,226.47,cpu,fast,512x512x131,run in kits_pilot (same settings)
+case_00292,clean,161.77,cpu,fast,512x512x95,run
+case_00293,clean,80.6,cpu,fast,512x512x591,run
+case_00295,clean,112.34,cpu,fast,512x512x564,run in kits_pilot (same settings)
+case_00298,clean,87.26,cpu,fast,512x512x617,run in kits_pilot (same settings)
+case_00406,clean,162.17,cpu,fast,512x512x91,run
+case_00407,clean,148.51,cpu,fast,512x512x95,run
+case_00426,clean,175.68,cpu,fast,512x512x97,run
+case_00436,clean,72.0,cpu,fast,512x512x47,run
+case_00438,clean,156.01,cpu,fast,512x512x96,run
+case_00443,clean,79.93,cpu,fast,512x512x63,run
+case_00453,clean,118.27,cpu,fast,512x512x125,run
+case_00456,clean,80.03,cpu,fast,512x512x98,run in kits_pilot (same settings)
+case_00457,clean,85.2,cpu,fast,512x512x132,run
+case_00460,clean,78.59,cpu,fast,512x512x91,run
+case_00465,clean,145.7,cpu,fast,512x512x95,run in kits_pilot (same settings)
+case_00467,clean,75.54,cpu,fast,512x512x100,run in kits_pilot (same settings)
+case_00470,clean,35.97,cpu,fast,512x512x44,run
+case_00481,clean,51.84,cpu,fast,512x512x116,run
+case_00482,clean,85.44,cpu,fast,512x512x266,run
+case_00487,clean,164.15,cpu,fast,512x512x209,run
+case_00511,clean,164.53,cpu,fast,512x512x97,run
+case_00516,clean,22.12,cpu,fast,512x512x98,run
+case_00525,clean,86.98,cpu,fast,512x512x103,run
+case_00526,clean,157.03,cpu,fast,512x512x163,run
+case_00528,clean,206.46,cpu,fast,512x512x499,run in kits_pilot (same settings)
+case_00536,clean,72.72,cpu,fast,512x512x90,run
+case_00544,clean,193.82,cpu,fast,512x512x540,run in kits_pilot (same settings)
+case_00546,clean,35.5,cpu,fast,512x512x30,run
+case_00550,clean,31.28,cpu,fast,512x512x37,run
+case_00554,clean,41.37,cpu,fast,512x512x63,run
+case_00559,clean,113.45,cpu,fast,512x512x511,run in kits_pilot (same settings)
+case_00562,clean,182.85,cpu,fast,512x512x460,run
+case_00563,clean,128.78,cpu,fast,512x512x215,run in kits_pilot (same settings)
+case_00566,clean,91.93,cpu,fast,512x512x151,run
+case_00574,clean,71.72,cpu,fast,512x512x53,run in kits_pilot (same settings)
+case_00575,clean,183.9,cpu,fast,512x512x253,run
+case_00579,clean,250.61,cpu,fast,512x512x190,run
+case_00580,clean,98.19,cpu,fast,512x512x202,run
+case_00582,clean,233.87,cpu,fast,512x512x163,run in kits_pilot (same settings)
+case_00585,clean,153.16,cpu,fast,512x512x178,run
+case_00587,clean,74.33,cpu,fast,512x512x48,run

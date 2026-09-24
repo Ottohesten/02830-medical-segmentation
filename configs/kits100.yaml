@@ -1,10 +1,10 @@
-# KiTS23 pilot: 20 randomly chosen scans (fixed seed), laptop settings (3 mm model).
-# Used to check the label definition and the natural variation before downloading more scans.
-# TTA and perturbations are off here, because they multiply the runtime.
+# KiTS23, 100 randomly chosen scans (fixed seed), laptop settings (3 mm + 6 mm model, no TTA).
+# Split: the 20 pilot scans are the DEVELOPMENT set (all choices are made on them), the other 80 are the
+# TEST set (evaluated once, after every choice is locked in PROGRESS.md). The final G1 result is the test set.
 # Every setting that changes runtime or data lives here, so scripts never hardcode paths or numbers.
-# Use it with:  uv run python scripts/<script>.py --config configs/kits_pilot.yaml
+# Use it with:  uv run python scripts/<script>.py --config configs/kits100.yaml
 
-name: kits_pilot        # output goes to results/kits_pilot/ and data/predictions/kits_pilot/
+name: kits100           # output goes to results/kits100/ and data/predictions/kits100/
 seed: 42
 
 compute:
@@ -20,8 +20,14 @@ paths:                # relative paths are relative to the repository root
 
 dataset:
   file: configs/datasets/kits23.yaml  # which dataset (paths, labels, matching TotalSegmentator classes)
-  n_cases: 20         # how many scans to use. null = all
+  n_cases: 100        # how many scans to use. null = all
   selection: random   # first = first n in sorted order; random = n drawn with the seed from the full list
+  # Development / test split. dev = the 20 scans of the pilot (the first 20 of the same seeded draw);
+  # test = every other selected scan (80). Listed explicitly so the split can never shift.
+  split:
+    dev: [case_00040, case_00051, case_00135, case_00178, case_00236, case_00249, case_00261, case_00271,
+          case_00291, case_00295, case_00298, case_00456, case_00465, case_00467, case_00528, case_00544,
+          case_00559, case_00563, case_00574, case_00582]
 
 model:
   task: total         # TotalSegmentator task (v2 "total": 117 structures)
@@ -39,6 +45,10 @@ uncertainty:
     intensity_shift_hu: 20    # random intensity offset by up to +-20 Hounsfield units
     noise_std_hu: 10          # Gaussian noise with this standard deviation (HU)
 
+plausibility:        # anatomical check for paired organs (only if the dataset file sets paired_organ: true)
+  body_threshold_hu: -500   # voxels above this CT value count as body when finding the left-right midline
+  min_component_ml: 20      # a side counts as "organ found" if its largest connected piece is at least this big
+
 # Controlled perturbations: degraded copies of each scan, to create segmentation errors on purpose.
 # Results on these are reported separately from the clean scans.
 perturbations: []   # none here; see local.yaml
@@ -46,12 +56,16 @@ perturbation_settings:
   contrast_level_hu: 40     # grey value that stays fixed when contrast is reduced (soft tissue)
 
 evaluation:
-  bad:                # which segmentations count as "bad" in the review curve
-    rule: worst_fraction  # worst_fraction = the worst X of the scans; threshold = Dice below X
-    value: 0.2            # the worst 20 %: with 20 scans that is 4, enough to draw a review curve
+  splits: [dev, test] # splits whose ground truth may be used. 'test' was added 24/9 after the choices were locked (01:43)
+  bad_rules:          # which segmentations count as "bad" in the review curve; every rule is reported
+    - {name: worst10, rule: worst_fraction, value: 0.1}      # the worst 10 % of the scans
+    - {name: dice_below_083, rule: threshold, value: 0.83}   # fixed Dice limit, chosen on the development set
   n_bootstrap: 2000   # resamples for the confidence interval of Spearman rho and the curve areas
   ci_level: 0.95
   n_random_orders: 1000  # random review orders averaged for the random baseline
+  combinations:       # GT-free scores merged by rank. LOCKED on the development set (see PROGRESS.md):
+    # mean rank of the best dev uncertainty measure and the missing-side plausibility flag.
+    - {name: combo_mean_missing, rule: mean_rank, scores: [model_diff_mean_region, plaus_missing_side]}
 
 visualisation:
   ct_window_level: 40   # soft-tissue CT window in Hounsfield units (centre)

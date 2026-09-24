@@ -1,0 +1,7 @@
+measure,count,min,median,max,mean
+dice_kidney_tumor_cyst,100.0,0.0027,0.9094,0.9567,0.8657
+dice_kidney_cyst,100.0,0.0298,0.8683,0.9405,0.8206
+dice_kidney_cyst_ignore_tumor,100.0,0.0299,0.9088,0.9558,0.8878
+coverage_label_1,100.0,0.0152,0.8401,0.9337,0.8237
+coverage_label_2,100.0,0.0002,0.8414,0.9937,0.735
+coverage_label_3,45.0,0.0345,0.6244,1.0,0.6053

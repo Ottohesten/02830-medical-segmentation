@@ -22,5 +22,8 @@ case_id: stem                          # how a scan is named in results: stem or
 organ_definitions:
   spleen: {organ_labels: [1]}
 organ_definition: spleen
+# Paired organ (left + right)? Then a GT-free plausibility check compares the two sides.
+paired_organ: false
+
 # Which TotalSegmentator classes together form the same organ (their probabilities are added up).
 totalseg_classes: [spleen]

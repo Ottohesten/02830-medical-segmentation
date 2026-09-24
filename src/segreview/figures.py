@@ -29,6 +29,12 @@ METHODS = {
     "tta_std_mean_region": ("TTA std, mean in organ + border",      "#4a3aa7", "-"),
     "model_disagreement":  ("Main vs second model: 1 - Dice",       "#008300", "-"),
     "model_diff_mean_region": ("Main vs second model: mean |dp| in organ + border", "#e34948", "-"),
+    "plaus_asymmetry":     ("Plausibility: left/right asymmetry",   "#e87ba4", "--"),
+    "plaus_missing_side":  ("Plausibility: organ side missing",     "#e87ba4", ":"),
+    "combo_mean_asym":     ("Combination: mean rank (with asymmetry)", "#4a3aa7", "-."),
+    "combo_max_asym":      ("Combination: max rank (with asymmetry)",  "#4a3aa7", "--"),
+    "combo_mean_missing":  ("Combination: mean rank (with missing side)", "#4a3aa7", ":"),
+    "combo_max_missing":   ("Combination: max rank (with missing side)",  "#4a3aa7", "-"),
     "neg_volume_ml":       ("Baseline: small predicted volume",     "#52514e", "-."),
     "random":              ("Baseline: random order",               "#9a9994", "--"),
     "oracle":              ("Oracle: true Dice (upper bound)",      "#0b0b0b", ":"),
@@ -57,7 +63,8 @@ def plot_curves(rows: list[dict], curves: dict, title: str, path: Path, dpi: int
 
     The legend lists each method with the area under the curve (AUC), best first.
     """
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5), facecolor=SURFACE)
+    # Room below the panels for one legend line per method, so the legend never covers the curves.
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5.0 + 0.2 * len(curves)), facecolor=SURFACE)
     auc = {r["method"]: (r["review_auc"], r["quality_auc"]) for r in rows}
     panels = [("Review curve: bad segmentations found", "share of bad segmentations found", 0),
               ("Quality curve: mean Dice after correcting reviewed scans", "mean Dice of whole dataset", 1)]
@@ -72,7 +79,7 @@ def plot_curves(rows: list[dict], curves: dict, title: str, path: Path, dpi: int
         ax.set_ylabel(ylabel, color=TEXT_MUTED)
         ax.set_xlim(0, 1)
         _style(ax)
-        ax.legend(frameon=False, fontsize=8, labelcolor=TEXT, loc="lower right")
+        ax.legend(frameon=False, fontsize=8, labelcolor=TEXT, loc="upper left", bbox_to_anchor=(0.0, -0.13))
     fig.suptitle(title, color=TEXT, x=0.01, ha="left", fontsize=12)
     fig.tight_layout()
     fig.savefig(path, dpi=dpi, facecolor=SURFACE)

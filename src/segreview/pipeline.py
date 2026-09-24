@@ -33,16 +33,19 @@ import torch
 
 from segreview.augment import perturb, sample_tta_passes
 from segreview.config import figures_dir, results_dir
-from segreview.data import list_cases, load_canonical, load_label_map, load_organ_mask, organ_definition, organ_from_labels
-from segreview.evaluation import bad_mask, evaluate_methods
+from segreview.data import (case_split, evaluation_cases, list_cases, load_canonical, load_label_map, load_organ_mask,
+                            organ_definition, organ_from_labels)
+from segreview.evaluation import bad_mask, combine_scores, evaluate_methods
 from segreview.figures import plot_curves, plot_label_check, plot_scatter
 from segreview.io import affine_of, has_prediction, load_map, map_path, save_map, voxel_spacing
 from segreview.metrics import dice
+from segreview.plausibility import paired_organ_check
 from segreview.uncertainty import model_difference, scan_scores
 
 CLEAN = "clean"
-# Columns in scores.csv that are information, not ranking methods.
-INFO_COLUMNS = {"case_id", "variant", "pred_volume_ml"}
+# Columns in scores.csv / dice.csv that are information, not ranking methods.
+INFO_COLUMNS = {"case_id", "variant", "split", "pred_volume_ml", "n_sides_found", "left_ml", "right_ml",
+                "n_components", "dice", "pred_voxels", "truth_voxels"}
 
 
 def variants(cfg: dict) -> list[str]:
@@ -179,12 +182,12 @@ def step_label_check(cfg: dict) -> pd.DataFrame | None:
     label_values = sorted({v for d in definitions for key in ("organ_labels", "ignore_labels")
                            for v in organ_definition(cfg, d)[key]})
     rows = []
-    for case in list_cases(cfg):
+    for case in evaluation_cases(cfg):
         if not has_prediction(cfg, CLEAN, case.case_id):
             continue
         labels = load_label_map(case)
         pred = load_map(cfg, CLEAN, case.case_id, "mask").astype(bool)
-        row = {"case_id": case.case_id}
+        row = {"case_id": case.case_id, "split": case_split(cfg, case.case_id)}
         for d in definitions:
             truth, ignore = organ_from_labels(labels, organ_definition(cfg, d))
             row[f"dice_{d}"] = round(dice(pred, truth, ignore), 4)
@@ -214,15 +217,17 @@ def step_dice(cfg: dict) -> pd.DataFrame:
     """True Dice of every saved prediction (all variants) against ground truth -> dice.csv.
 
     Perturbed scans are on the same voxel grid as the originals, so the same ground truth is used.
+    Only scans in evaluation.splits are read (the test set stays untouched until it is unlocked).
     """
     rows = []
-    for case in list_cases(cfg):
+    for case in evaluation_cases(cfg):
         truth, ignore = load_organ_mask(cfg, case)
         for variant in variants(cfg):
             if not has_prediction(cfg, variant, case.case_id):
                 continue
             pred = load_map(cfg, variant, case.case_id, "mask")
-            rows.append({"case_id": case.case_id, "variant": variant, "dice": round(dice(pred, truth, ignore), 4),
+            rows.append({"case_id": case.case_id, "variant": variant, "split": case_split(cfg, case.case_id),
+                         "dice": round(dice(pred, truth, ignore), 4),
                          "pred_voxels": int(pred.sum()), "truth_voxels": int(truth.sum())})
     df = pd.DataFrame(rows).sort_values(["variant", "case_id"])
     df.to_csv(results_dir(cfg) / "dice.csv", index=False)
@@ -231,13 +236,18 @@ def step_dice(cfg: dict) -> pd.DataFrame:
 
 
 def step_uncertainty(cfg: dict) -> pd.DataFrame:
-    """GT-free scores for every saved prediction, and the entropy heatmap per scan -> scores.csv.
+    """GT-free scores for every saved prediction, and the heatmaps per scan -> scores.csv.
 
-    Uses only the saved mask and probability (and TTA / second-model maps, if present). No ground truth.
+    Uses only the saved mask and probability (and TTA / second-model maps, if present), and for a paired
+    organ (dataset.paired_organ) the CT image for the plausibility check. No ground truth.
+    Runs on the scans in evaluation.splits (it does not need ground truth, but there is no reason to
+    score scans that are not evaluated yet).
     """
     n_tta = cfg["uncertainty"]["tta"]["n_passes"]
+    paired = cfg["dataset"].get("paired_organ", False)
     rows = []
-    for case in list_cases(cfg):
+    for case in evaluation_cases(cfg):
+        ct = load_canonical(case.image_path).get_fdata(dtype=np.float32) if paired else None
         for variant in variants(cfg):
             if not has_prediction(cfg, variant, case.case_id):
                 continue
@@ -257,7 +267,11 @@ def step_uncertainty(cfg: dict) -> pd.DataFrame:
             save_map(cfg, variant, case.case_id, "entropy", entropy, affine)
             if has_m2:  # second heatmap: where the two models disagree
                 save_map(cfg, variant, case.case_id, "m2_diff", model_difference(prob, m2_prob), affine)
-            rows.append({"case_id": case.case_id, "variant": variant, **scores})
+            if paired:  # perturbations keep the voxel grid, so the original CT gives the body midline
+                scores.update(paired_organ_check(mask, ct, voxel_spacing(cfg, variant, case.case_id),
+                                                 cfg["plausibility"]))
+            rows.append({"case_id": case.case_id, "variant": variant, "split": case_split(cfg, case.case_id),
+                         **scores})
     df = pd.DataFrame(rows).sort_values(["variant", "case_id"])
     df.to_csv(results_dir(cfg) / "scores.csv", index=False)
     print(f"[uncertainty] {len(df)} predictions -> {results_dir(cfg) / 'scores.csv'} (+ entropy heatmaps)")
@@ -265,39 +279,58 @@ def step_uncertainty(cfg: dict) -> pd.DataFrame:
 
 
 def step_evaluate(cfg: dict) -> None:
-    """Evaluate every score on the clean scans and, separately, on the perturbed scans.
+    """Evaluate every score on each set of scans separately, for every definition of "bad".
 
-    A method is only evaluated on a set if it has a value for every scan in that set
+    Sets: clean scans per split (e.g. clean_dev, clean_test; just "clean" without a split), and the
+    perturbed scans. Combinations (evaluation.combinations) are computed within each set from the
+    GT-free scores. A method is only evaluated on a set if it has a value for every scan in that set
     (e.g. TTA scores only exist where TTA was run).
+
+    Files: g1_scores_<set>.csv (scores, Dice, one bad_<rule> column per rule),
+           g1_metrics_<set>.csv (one row per method and rule), figures/g1_curves_<set>_<rule>.png,
+           figures/g1_scatter_<set>_<rule>.png.
     """
     out = results_dir(cfg)
-    merged = pd.read_csv(out / "scores.csv").merge(pd.read_csv(out / "dice.csv"), on=["case_id", "variant"])
-    sets = {"clean": merged[merged.variant == CLEAN], "perturbed": merged[merged.variant != CLEAN]}
+    merged = pd.read_csv(out / "scores.csv").merge(pd.read_csv(out / "dice.csv").drop(columns="split"),
+                                                  on=["case_id", "variant"])
     ev = cfg["evaluation"]
+    clean = merged[merged.variant == CLEAN]
+    sets = ({f"clean_{sp}": clean[clean.split == sp] for sp in sorted(clean.split.unique())}
+            if cfg["dataset"].get("split") else {"clean": clean})
+    sets["perturbed"] = merged[merged.variant != CLEAN]
 
     for set_name, df in sets.items():
         if df.empty:
             continue
         df = df.reset_index(drop=True)
         d = df["dice"].to_numpy()
-        methods = [c for c in df.columns if c not in INFO_COLUMNS | {"dice", "pred_voxels", "truth_voxels"}
-                   and df[c].notna().all()]
+        methods = [c for c in df.columns if c not in INFO_COLUMNS and df[c].notna().all()]
         scores = {m: df[m].to_numpy(dtype=float) for m in methods}
-        rows, curves = evaluate_methods(scores, d, cfg)
+        for spec in ev.get("combinations") or []:
+            if all(name in scores for name in spec["scores"]):
+                scores[spec["name"]] = combine_scores(scores, spec)
+                df[spec["name"]] = scores[spec["name"]]
 
-        bad = bad_mask(d, ev["bad"]["rule"], ev["bad"]["value"])
-        df.assign(bad=bad).to_csv(out / f"g1_scores_{set_name}.csv", index=False)
-        pd.DataFrame(rows).round(4).to_csv(out / f"g1_metrics_{set_name}.csv", index=False)
-
-        ids = df["case_id"] if set_name == CLEAN else df["case_id"] + " / " + df["variant"]
+        ids = list(df["case_id"] if set_name.startswith(CLEAN) else df["case_id"] + " / " + df["variant"])
         note = "  -- only a pipeline test, too few scans to interpret" if len(df) < 10 else ""
-        title = (f"G1 on {set_name} scans, config '{cfg['name']}' (n = {len(df)}, bad = {int(bad.sum())} by "
-                 f"{ev['bad']['rule']} {ev['bad']['value']}){note}")
-        plot_curves(rows, curves, title, figures_dir(cfg) / f"g1_curves_{set_name}.png", cfg["visualisation"]["dpi"])
-        plot_scatter({**scores}, d, bad, list(ids), rows, title,
-                     figures_dir(cfg) / f"g1_scatter_{set_name}.png", cfg["visualisation"]["dpi"])
-        print(f"[evaluate] {set_name}: n = {len(df)}, bad = {int(bad.sum())} -> {out / f'g1_metrics_{set_name}.csv'}")
-        cols = ["method", "spearman_rho", "rho_ci_low", "rho_ci_high", "partial_rho_given_volume",
-                "review_auc", "quality_auc",
-                "quality_auc_minus_volume", "quality_auc_minus_volume_ci_low", "quality_auc_minus_volume_ci_high"]
-        print(pd.DataFrame(rows)[cols].round(3).to_string(index=False))
+        all_rows = []
+        for rule in ev["bad_rules"]:
+            bad = bad_mask(d, rule["rule"], rule["value"])
+            df[f"bad_{rule['name']}"] = bad
+            rows, curves = evaluate_methods(scores, d, cfg, rule)
+            all_rows += [{"bad_rule": rule["name"], "n_bad": int(bad.sum()), **r} for r in rows]
+            title = (f"G1 on {set_name} scans, config '{cfg['name']}' (n = {len(df)}, bad = {int(bad.sum())}: "
+                     f"{rule['rule']} {rule['value']}){note}")
+            plot_curves(rows, curves, title, figures_dir(cfg) / f"g1_curves_{set_name}_{rule['name']}.png",
+                        cfg["visualisation"]["dpi"])
+            plot_scatter(scores, d, bad, ids, rows, title,
+                         figures_dir(cfg) / f"g1_scatter_{set_name}_{rule['name']}.png", cfg["visualisation"]["dpi"])
+        df.to_csv(out / f"g1_scores_{set_name}.csv", index=False)
+        metrics = pd.DataFrame(all_rows).round(4)
+        metrics.to_csv(out / f"g1_metrics_{set_name}.csv", index=False)
+
+        print(f"[evaluate] {set_name}: n = {len(df)} -> {out / f'g1_metrics_{set_name}.csv'}")
+        cols = ["bad_rule", "n_bad", "method", "spearman_rho", "rho_ci_low", "rho_ci_high", "review_auc",
+                "review_auc_minus_volume_ci_low", "review_auc_minus_volume_ci_high", "quality_auc",
+                "quality_auc_minus_volume_ci_low", "quality_auc_minus_volume_ci_high"]
+        print(metrics[cols].round(3).to_string(index=False))

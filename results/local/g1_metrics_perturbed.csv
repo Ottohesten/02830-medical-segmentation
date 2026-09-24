@@ -1,8 +1,8 @@
-method,spearman_rho,rho_ci_low,rho_ci_high,rho_p_value,partial_rho_given_volume,partial_rho_ci_low,partial_rho_ci_high,review_auc,review_auc_ci_low,review_auc_ci_high,review_auc_norm,quality_auc,quality_auc_ci_low,quality_auc_ci_high,quality_auc_norm,review_auc_minus_volume,review_auc_minus_volume_ci_low,review_auc_minus_volume_ci_high,quality_auc_minus_volume,quality_auc_minus_volume_ci_low,quality_auc_minus_volume_ci_high
-neg_volume_ml,-0.8167,-1.0,-0.2522,0.0072,,,,0.6852,0.2778,0.9444,0.5503,0.9794,0.9722,0.9837,0.7152,0.0,0.0,0.0,0.0,0.0,0.0
-entropy_sum_ml,0.0167,-0.7193,0.7044,0.9661,-0.6484,-0.9765,0.3189,0.6852,0.3889,0.9444,0.5503,0.9765,0.9681,0.9817,0.1729,-0.0,-0.4444,0.5556,-0.0029,-0.008,0.0022
-entropy_mean_region,-0.9667,-1.0,-0.7368,0.0,-0.9209,-1.0,-0.5371,0.7963,0.6111,0.9444,0.8876,0.9803,0.9732,0.9838,0.8892,0.1111,0.0,0.4444,0.0009,0.0,0.0029
-entropy_per_volume,-0.8667,-1.0,-0.3503,0.0025,-0.5226,-0.9535,0.141,0.7222,0.4444,0.9444,0.6627,0.9797,0.9725,0.9837,0.7753,0.037,0.0,0.2222,0.0003,-0.0001,0.0014
-soft_dice_gap,-0.8,-1.0,-0.211,0.0096,0.0291,0.0148,0.2197,0.6852,0.2778,0.9444,0.5503,0.9793,0.9722,0.9837,0.7101,0.0,0.0,0.0,-0.0,-0.0001,0.0
-oracle,-1.0,-1.0,-1.0,0.0,-1.0,-1.0,-1.0,0.8333,0.6667,0.9444,1.0,0.9809,0.9748,0.9839,1.0,0.1481,0.0,0.5556,0.0015,0.0,0.0035
-random,,,,,,,,0.5039,0.2037,0.7593,0.0,0.9756,0.9718,0.9792,0.0,,,,,,
+bad_rule,n_bad,method,spearman_rho,rho_ci_low,rho_ci_high,rho_p_value,partial_rho_given_volume,partial_rho_ci_low,partial_rho_ci_high,review_auc,review_auc_ci_low,review_auc_ci_high,review_auc_norm,quality_auc,quality_auc_ci_low,quality_auc_ci_high,quality_auc_norm,review_auc_minus_volume,review_auc_minus_volume_ci_low,review_auc_minus_volume_ci_high,quality_auc_minus_volume,quality_auc_minus_volume_ci_low,quality_auc_minus_volume_ci_high
+worst1of3,3,neg_volume_ml,-0.8167,-1.0,-0.2522,0.0072,,,,0.6852,0.2778,0.9444,0.5503,0.9794,0.9722,0.9837,0.7152,0.0,0.0,0.0,0.0,0.0,0.0
+worst1of3,3,entropy_sum_ml,0.0167,-0.7193,0.7044,0.9661,-0.6484,-0.9765,0.3189,0.6852,0.3889,0.9444,0.5503,0.9765,0.9681,0.9817,0.1729,-0.0,-0.4444,0.5556,-0.0029,-0.008,0.0022
+worst1of3,3,entropy_mean_region,-0.9667,-1.0,-0.7368,0.0,-0.9209,-1.0,-0.5371,0.7963,0.6111,0.9444,0.8876,0.9803,0.9732,0.9838,0.8892,0.1111,0.0,0.4444,0.0009,0.0,0.0029
+worst1of3,3,entropy_per_volume,-0.8667,-1.0,-0.3503,0.0025,-0.5226,-0.9535,0.141,0.7222,0.4444,0.9444,0.6627,0.9797,0.9725,0.9837,0.7753,0.037,0.0,0.2222,0.0003,-0.0001,0.0014
+worst1of3,3,soft_dice_gap,-0.8,-1.0,-0.211,0.0096,0.0291,0.0148,0.2197,0.6852,0.2778,0.9444,0.5503,0.9793,0.9722,0.9837,0.7101,0.0,0.0,0.0,-0.0,-0.0001,0.0
+worst1of3,3,oracle,-1.0,-1.0,-1.0,0.0,-1.0,-1.0,-1.0,0.8333,0.6667,0.9444,1.0,0.9809,0.9748,0.9839,1.0,0.1481,0.0,0.5556,0.0015,0.0,0.0035
+worst1of3,3,random,,,,,,,,0.5039,0.2037,0.7593,0.0,0.9756,0.9718,0.9792,0.0,,,,,,

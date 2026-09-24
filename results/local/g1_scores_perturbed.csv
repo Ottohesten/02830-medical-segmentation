@@ -1,4 +1,4 @@
-case_id,variant,pred_volume_ml,neg_volume_ml,entropy_sum_ml,entropy_mean_region,entropy_per_volume,soft_dice_gap,tta_disagreement,tta_std_mean_region,model_disagreement,model_diff_mean_region,dice,pred_voxels,truth_voxels,bad
+case_id,variant,pred_volume_ml,neg_volume_ml,entropy_sum_ml,entropy_mean_region,entropy_per_volume,soft_dice_gap,tta_disagreement,tta_std_mean_region,model_disagreement,model_diff_mean_region,dice,pred_voxels,truth_voxels,bad_worst1of3
 spleen_10,contrast_60,255.67983454099436,-255.67983454099436,92.00681329126758,0.2367730289697647,0.359851661576837,0.0565338951515141,,,,,0.9603,53620,53071,False
 spleen_12,contrast_60,455.8628815783737,-455.8628815783737,130.96563508360006,0.1967249065637588,0.2872917282278969,0.0459252547030204,,,,,0.9713,534698,537685,False
 spleen_13,contrast_60,277.31364216164025,-277.31364216164025,96.54333578163772,0.2253037691116333,0.3481377080084817,0.0554497160355845,,,,,0.9661,201374,203903,False

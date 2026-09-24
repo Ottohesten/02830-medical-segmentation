@@ -33,10 +33,14 @@ For every ranking method (uncertainty scores, baselines, oracle) we compute:
 Methods:
 - random: random review order, averaged over many random orders.
 - oracle: ranks by true Dice (worst first). Uses ground truth, so it is only an upper bound.
+- combinations (evaluation.combinations): two GT-free scores merged by their ranks, see combine_scores.
+
+"Bad" segmentations can be defined by several rules at once (evaluation.bad_rules); every rule gets
+its own review curve. Spearman rho and the quality curve do not depend on the rule.
 """
 
 import numpy as np
-from scipy.stats import spearmanr
+from scipy.stats import rankdata, spearmanr
 
 
 def bad_mask(dice: np.ndarray, rule: str, value: float) -> np.ndarray:
@@ -55,19 +59,72 @@ def bad_mask(dice: np.ndarray, rule: str, value: float) -> np.ndarray:
     raise ValueError(f"Unknown 'bad' rule '{rule}'")
 
 
+def combine_scores(scores: dict[str, np.ndarray], spec: dict) -> np.ndarray:
+    """Merge several GT-free scores into one by their ranks (no fitted weights, so nothing to overfit).
+
+    Each score is turned into its rank among the scans being reviewed, scaled to 0-1 (1 = most suspicious).
+    - mean_rank: average of the ranks. A scan must be suspicious on both scores to reach the top.
+    - max_rank:  the highest of the ranks. A scan reaches the top if EITHER score finds it suspicious,
+                 e.g. a confident miss that only the plausibility check notices.
+
+    Input: {score name: values}, and one entry of evaluation.combinations (rule, scores).
+    Output: the combined score per scan (higher = review first).
+    """
+    ranks = np.array([rankdata(scores[name]) / len(scores[name]) for name in spec["scores"]])
+    if spec["rule"] == "mean_rank":
+        return ranks.mean(axis=0)
+    if spec["rule"] == "max_rank":
+        return ranks.max(axis=0)
+    raise ValueError(f"Unknown combination rule '{spec['rule']}'")
+
+
 def review_order(score: np.ndarray) -> np.ndarray:
     """Indices of the scans from most to least uncertain (highest score first). Ties keep list order."""
     return np.argsort(-score, kind="stable")
 
 
+def expected_top_k_sums(score: np.ndarray, values: np.ndarray) -> np.ndarray:
+    """Sum of 'values' over the k highest-scoring scans, for k = 0..n, averaged over random tie-breaking.
+
+    If several scans have the same score (e.g. a yes/no plausibility flag), their order in the queue is
+    arbitrary. Instead of letting the file order decide, we use the expected result over all orders:
+    reviewing j of the m tied scans gives, on average, j/m of their summed value. For scores without
+    ties this is simply the running sum in score order.
+    """
+    order = np.argsort(-score, kind="stable")
+    s_sorted, v_sorted = score[order], values[order].astype(float)
+    out = np.zeros(len(score) + 1)
+    start = 0
+    while start < len(score):
+        end = start
+        while end < len(score) and s_sorted[end] == s_sorted[start]:
+            end += 1
+        group_total = v_sorted[start:end].sum()
+        size = end - start
+        for j in range(1, size + 1):
+            out[start + j] = out[start] + group_total * j / size
+        start = end
+    return out
+
+
+def review_curve_from_score(score: np.ndarray, bad: np.ndarray) -> np.ndarray:
+    """y-values of the review curve for x = 0, 1/n, ..., 1 (share of bad scans found), ties handled fairly."""
+    return expected_top_k_sums(score, bad) / max(bad.sum(), 1)
+
+
+def quality_curve_from_score(score: np.ndarray, dice: np.ndarray) -> np.ndarray:
+    """y-values of the quality curve (mean Dice after correcting the top k to Dice 1), ties handled fairly."""
+    return (dice.sum() + expected_top_k_sums(score, 1.0 - dice)) / len(dice)
+
+
 def review_curve(order: np.ndarray, bad: np.ndarray) -> np.ndarray:
-    """y-values of the review curve for x = 0, 1/n, ..., 1 (share of bad scans found)."""
+    """Review curve for a fixed review order (used for the random baseline)."""
     found = np.concatenate([[0], np.cumsum(bad[order])])
     return found / max(bad.sum(), 1)
 
 
 def quality_curve(order: np.ndarray, dice: np.ndarray) -> np.ndarray:
-    """y-values of the quality curve for x = 0, 1/n, ..., 1 (mean Dice after correcting the top k)."""
+    """Quality curve for a fixed review order (used for the random baseline)."""
     n = len(dice)
     gain = np.concatenate([[0.0], np.cumsum(1.0 - dice[order])])  # correcting a scan raises its Dice to 1
     return (dice.sum() + gain) / n
@@ -80,9 +137,8 @@ def area(y: np.ndarray) -> float:
 
 
 def curves_for(score: np.ndarray, dice: np.ndarray, bad: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Review and quality curve for one ranking score."""
-    order = review_order(score)
-    return review_curve(order, bad), quality_curve(order, dice)
+    """Review and quality curve for one ranking score (expected curves if the score has ties)."""
+    return review_curve_from_score(score, bad), quality_curve_from_score(score, dice)
 
 
 def random_curves(dice: np.ndarray, bad: np.ndarray, n_orders: int, rng: np.random.Generator):
@@ -117,11 +173,13 @@ def _ci(values: np.ndarray, level: float) -> tuple[float, float]:
     return float(np.percentile(values, tail)), float(np.percentile(values, 100.0 - tail))
 
 
-def evaluate_methods(scores: dict[str, np.ndarray], dice: np.ndarray, cfg: dict) -> tuple[list[dict], dict]:
-    """Evaluate every ranking method on one set of scans.
+def evaluate_methods(scores: dict[str, np.ndarray], dice: np.ndarray, cfg: dict,
+                     bad_rule: dict) -> tuple[list[dict], dict]:
+    """Evaluate every ranking method on one set of scans, for one definition of "bad".
 
     Input: {method name: score per scan} (GT-free scores; must include 'neg_volume_ml', whose
-           negative is the predicted volume), true Dice per scan, and the config (evaluation, seed).
+           negative is the predicted volume), true Dice per scan, the config (evaluation, seed) and one
+           entry of evaluation.bad_rules.
     Output: (one row of metrics per method, {method: (review curve, quality curve)} for plotting).
             The rows include 'random' and 'oracle'.
     """
@@ -129,7 +187,7 @@ def evaluate_methods(scores: dict[str, np.ndarray], dice: np.ndarray, cfg: dict)
     rng = np.random.default_rng(cfg["seed"])
     n = len(dice)
     volume = -scores["neg_volume_ml"]
-    bad = bad_mask(dice, ev["bad"]["rule"], ev["bad"]["value"])
+    bad = bad_mask(dice, bad_rule["rule"], bad_rule["value"])
 
     # Random baseline: average curve; its CI is the spread over random orders.
     rand_review, rand_quality, (rand_r_aucs, rand_q_aucs) = random_curves(dice, bad, ev["n_random_orders"], rng)
@@ -151,7 +209,7 @@ def evaluate_methods(scores: dict[str, np.ndarray], dice: np.ndarray, cfg: dict)
             ok = np.ptp(sc) > 0 and np.ptp(d) > 0
             rho.append(spearmanr(sc, d).statistic if ok else np.nan)
             prho.append(partial_spearman(sc, d, volume[idx]) if ok and np.ptp(volume[idx]) > 0 else np.nan)
-            r, q = curves_for(sc, d, b) if b.any() else (np.full(n + 1, np.nan), quality_curve(review_order(sc), d))
+            r, q = curves_for(sc, d, b) if b.any() else (np.full(n + 1, np.nan), quality_curve_from_score(sc, d))
             r_auc.append(area(r))
             q_auc.append(area(q))
         return {"rho": np.array(rho), "partial_rho": np.array(prho),

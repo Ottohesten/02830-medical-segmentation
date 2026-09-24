@@ -5,7 +5,7 @@ kidney + cyst), and the share of each ground-truth label that the model calls or
 the tumour TotalSegmentator calls kidney or kidney cyst). Writes results/<config name>/label_check.csv,
 label_check_summary.csv and figures/label_check.png.
 
-Usage: uv run python scripts/check_labels.py --config configs/kits_pilot.yaml
+Usage: uv run python scripts/check_labels.py --config configs/kits100.yaml
 """
 
 from segreview.config import config_arg_parser, load_config
