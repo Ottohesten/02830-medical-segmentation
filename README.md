@@ -117,26 +117,41 @@ Main outputs in `results/<name>/`: `dice.csv`, `scores.csv`, `g1_metrics_<set>.c
 
 A browser-based viewer built on [NiiVue](https://github.com/niivue/niivue) (stored in `ui/vendor/niivue`, so no internet
 is needed) with a small local Python server. Settings are in `configs/study.yaml` (scan selection, time limit,
-heatmap, colours, brush sizes).
+heatmap, colours, brush sizes, trackpad behaviour). The study runs in **Google Chrome** on a MacBook with a
+**trackpad**; other browsers are not supported (painting does not work in Firefox).
 
 ```bash
 uv run python scripts/prepare_study.py --config configs/study.yaml   # once: pick scans, write viewer files
 uv run python scripts/run_ui.py        --config configs/study.yaml   # start the server and open the browser
 ```
 
-- **Study mode:** enter a participant id (P01, P02, ...). The participant gets a practice scan and then 6 scans,
-  3 with and 3 without the uncertainty heatmap, in a balanced order (the number in the id sets the order; use a
-  multiple of 4 participants). Each scan has a time limit; the clock starts when the scan is ready and stops at
-  "Færdig" or when the time is up. The corrected mask and a log (times, tools, heatmap use) are saved to
+- **Study mode:** enter a participant id (P01, P02, ...). The participant first sees a short guide (an example image of
+  kidneys and a tumour, made from a development scan used nowhere else, and how to use the trackpad), then a
+  practice scan, and after it the correct answer (red = marked and kidney, yellow = kidney not marked, blue = marked
+  but not kidney). Then 6 scans follow, 3 with and 3 without the uncertainty heatmap, in a balanced order (the number
+  in the id sets the order; use a multiple of 4 participants). Each scan has a time limit; the clock starts when the
+  scan is ready and stops at "Done" or when the time is up. Then the scan is locked, saved, and a message says so.
+  The corrected mask and a log (times, strokes, tools, heatmap use) are saved to
   `data/study/<study name>/sessions/<participant>/`. A session can be resumed: finished scans are skipped.
-- **Demo queue:** the test scans ranked by the G1 score, most uncertain first, heatmap always available.
-- **Tools:** brush add/erase, brush size, undo (also Ctrl/Cmd+Z), slice up/down (mouse wheel, arrow keys),
-  two contrast presets, heatmap on/off (only in the "with" condition), "Færdig".
+- **Demo queue:** the test scans ranked by the G1 score, most uncertain first. Heatmap always available, no time
+  limit, and the ground truth can be shown.
+- **Tools:** Add / Erase with a round brush (a circle shows its size), brush size, Undo (also ⌘Z), Move, two contrast
+  presets, uncertainty on/off (only in the "with" condition), Reset view, Done. Slices: arrow keys ↑ ↓, the ▲ ▼
+  buttons or the slider on the right (slice number below it; in the "with" condition the most uncertain slices are
+  marked). Trackpad: press and drag to paint, two-finger swipe to move the image, pinch to zoom. No right-click or
+  mouse wheel is needed.
+- **Layers:** the mask is always drawn on top of the heatmap (a see-through fill with a solid outline). NiiVue's own
+  slice shader puts overlays over the drawing, so `ui/viewer.js` gives NiiVue its own shader.
 - **Heatmap:** voxel entropy, chosen on the KiTS development set because it points best at wrong voxels
   (`scripts/evaluate_heatmaps.py`).
-- **Tests:** `uv run pytest` checks the balancing, the scan selection, the server (files, heatmap access per
-  condition, saving, resuming) and, if Google Chrome is installed, loads the page in a headless browser, paints
-  a square and checks that the saved mask is exactly the original plus that square.
+- **Ground truth:** only the practice scan and the demo queue have it (`truth.nii.gz`); the server refuses it for
+  study scans.
+- **Tests:** `uv run pytest` checks the balancing, the scan selection and the server (files, heatmap and ground-truth
+  access, saving, resuming). If Google Chrome is installed, it also drives the page in a headless Chrome like a
+  participant (trusted mouse, trackpad and key input through the DevTools protocol, `tests/browser.py`): painting and
+  erasing change the saved mask exactly where the brush went, undo works, moving and zooming do not paint, the mask
+  is drawn above the heatmap, and the study flow (guide, practice, time limit, answer, scans without heatmap) works.
+  On a Mac, headless Chrome uses the graphics card and the browser tests take about a minute.
 
 ## Layout
 
@@ -144,7 +159,7 @@ uv run python scripts/run_ui.py        --config configs/study.yaml   # start the
 configs/        one YAML config per environment; configs/datasets/ describes each dataset
 src/segreview/  shared code (config, data, weights, inference, augment, uncertainty, evaluation, figures, pipeline)
 scripts/        runnable pipeline steps
-ui/             review interface (G2): index.html, app.js, style.css, vendor/niivue
+ui/             review interface (G2): index.html, app.js (flow), viewer.js (slice viewer), style.css, vendor/niivue
 tests/          automatic tests (uv run pytest)
 results/        results/<config name>/: small result files (csv, figures)
 data/           scans, ground truth, model output (not in git)

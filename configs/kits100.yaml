@@ -1,6 +1,6 @@
 # KiTS23, 100 randomly chosen scans (fixed seed), laptop settings (3 mm + 6 mm model, no TTA).
 # Split: the 20 pilot scans are the DEVELOPMENT set (all choices are made on them), the other 80 are the
-# TEST set (evaluated once, after every choice is locked in PROGRESS.md). The final G1 result is the test set.
+# TEST set (evaluated once, after every choice was locked on the development set). The final G1 result is the test set.
 # Every setting that changes runtime or data lives here, so scripts never hardcode paths or numbers.
 # Use it with:  uv run python scripts/<script>.py --config configs/kits100.yaml
 
@@ -67,7 +67,7 @@ evaluation:
   n_bootstrap: 2000   # resamples for the confidence interval of Spearman rho and the curve areas
   ci_level: 0.95
   n_random_orders: 1000  # random review orders averaged for the random baseline
-  combinations:       # GT-free scores merged by rank. LOCKED on the development set (see PROGRESS.md):
+  combinations:       # GT-free scores merged by rank. LOCKED on the development set:
     # mean rank of the best dev uncertainty measure and the missing-side plausibility flag.
     - {name: combo_mean_missing, rule: mean_rank, scores: [model_diff_mean_region, plaus_missing_side]}
 

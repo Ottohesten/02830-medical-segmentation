@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nyre-review</title>
+  <title>Kidney review</title>
   <link rel="stylesheet" href="/ui/style.css">
   <!-- Review interface for the user study (G2). NiiVue is served locally from ui/vendor, so no internet is needed. -->
   <script src="/ui/vendor/niivue/niivue.umd.js"></script>
@@ -11,28 +11,68 @@
 <body>
   <!-- Start screen: choose the user study (participant id) or the demo queue -->
   <section id="start" class="screen">
-    <h1>Nyre-review</h1>
-    <p class="lead">Ret AI'ens markering af nyrerne i CT-scanninger.</p>
+    <h1>Kidney review</h1>
+    <p class="lead">Correct an AI's outline of the kidneys in CT scans.</p>
     <div class="card">
-      <h2>Brugerstudie</h2>
-      <label for="participant">Deltager-ID</label>
+      <h2>User study</h2>
+      <label for="participant">Participant ID</label>
       <input id="participant" placeholder="P01" autocomplete="off">
       <button id="start-study" class="primary">Start</button>
       <p id="start-error" class="error" hidden></p>
     </div>
     <div class="card">
-      <h2>Demo: rangeret kø</h2>
-      <p>Scanninger sorteret efter modellens usikkerhed. Mest usikre øverst.</p>
-      <button id="start-queue">Åbn køen</button>
+      <h2>Demo: ranked queue</h2>
+      <p>Scans sorted by the model's uncertainty, most uncertain first. No time limit, and the ground truth can be shown.</p>
+      <button id="start-queue">Open the queue</button>
     </div>
   </section>
 
   <!-- Queue list (demo mode) -->
   <section id="queue" class="screen" hidden>
-    <h1>Rangeret kø</h1>
-    <p class="lead">Mest usikre scanninger øverst. Klik for at åbne.</p>
+    <h1>Ranked queue</h1>
+    <p class="lead">Most uncertain scans first. Click a scan to open it.</p>
     <ol id="queue-list"></ol>
-    <button id="queue-back">Tilbage</button>
+    <button id="queue-back">Back</button>
+  </section>
+
+  <!-- Guide before the practice scan: what kidneys and tumours look like, and how to use the trackpad -->
+  <section id="guide" class="screen wide" hidden>
+    <h1>Before you start</h1>
+    <p class="lead">An AI has marked the kidneys in CT scans in red. It makes mistakes. Your task is to correct the red
+      marking so that it covers the kidneys exactly. First a short guide, then a practice scan that does not count.</p>
+    <figure id="guide-figure" hidden>
+      <img id="guide-image" alt="Left: a CT slice with both kidneys and a kidney tumour outlined and named.
+        Right: the same slice with everything that should be marked filled in red.">
+    </figure>
+    <div class="guide-grid">
+      <div class="card">
+        <h2>What to mark</h2>
+        <ul>
+          <li><b>The kidneys</b> are two bean-shaped organs at the back of the belly, one on each side of the spine.
+            In these scans they are bright, often with a brighter rim.</li>
+          <li><b>A tumour</b> is a round lump that grows from the kidney. It often looks darker or patchy.
+            <b>It counts as kidney: mark it too.</b> So do cysts (round, dark and even).</li>
+          <li>You look at the patient from the feet: <b>the patient's right side is on the left of the screen</b>
+            (marked R).</li>
+          <li>A scan is a stack of slices. Look at the slices above and below too: mistakes are often at the top or
+            bottom end of a kidney.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>How to use the trackpad</h2>
+        <ul>
+          <li><b>Paint:</b> press the trackpad down and keep it pressed while you move your finger (or hold it down
+            with your thumb and move another finger). The circle shows the size of the brush.</li>
+          <li><b>Add</b> paints kidney that is missing. <b>Erase</b> removes red that is not kidney.
+            <b>Undo</b> (or ⌘Z) takes back the last stroke.</li>
+          <li><b>Change slice:</b> the ↑ ↓ arrow keys, the ▲ ▼ buttons, or drag the slider on the right.</li>
+          <li class="move-help"></li>
+          <li>You have <b><span class="limit"></span> minutes</b> per scan. Press <b>Done</b> when you are happy.
+            When the time is up, the scan is locked and saved.</li>
+        </ul>
+      </div>
+    </div>
+    <button id="guide-go" class="primary">Start the practice scan</button>
   </section>
 
   <!-- Intro before each scan: tells the participant the condition and waits for "Start" -->
@@ -40,51 +80,93 @@
     <h1 id="intro-title"></h1>
     <p id="intro-text" class="lead"></p>
     <ul class="howto">
-      <li><b>Tilføj</b>: mal nyrevæv, som mangler i den røde markering.</li>
-      <li><b>Fjern</b>: visk markering ud, som ikke er nyre.</li>
-      <li>Rul med musehjulet eller brug ▲ ▼ for at bladre mellem snit. Højreklik og træk for at flytte billedet.</li>
-      <li>Du har <span id="intro-limit"></span> minutter. Tryk <b>Færdig</b>, når du er tilfreds.</li>
+      <li><b>Add</b>: paint kidney that is missing from the red marking. <b>Erase</b>: remove red that is not kidney.
+        Tumours and cysts count as kidney.</li>
+      <li><b>Paint</b>: press the trackpad down and move your finger while you keep it pressed.</li>
+      <li><b>Slices</b>: ↑ ↓ keys, ▲ ▼ or the slider on the right.</li>
+      <li class="move-help"></li>
+      <li>You have <span class="limit"></span> minutes. Press <b>Done</b> when you are happy.</li>
     </ul>
-    <button id="intro-go" class="primary">Start scanning</button>
+    <button id="intro-go" class="primary">Start scan</button>
   </section>
 
-  <!-- The viewer -->
-  <section id="viewer" class="screen" hidden>
-    <div class="toolbar" role="toolbar" aria-label="Værktøjer">
-      <div class="group" role="group" aria-label="Pensel">
-        <button id="tool-add" class="tool active" aria-pressed="true">Tilføj</button>
-        <button id="tool-erase" class="tool" aria-pressed="false">Fjern</button>
+  <!-- The viewer. data-mode: loading | edit | answer (the correct answer after the practice scan).
+       Which buttons show is set in style.css from data-mode, data-kind (study/practice/queue) and data-heatmap. -->
+  <section id="viewer" class="screen" data-mode="loading" hidden>
+    <div class="toolbar" role="toolbar" aria-label="Tools">
+      <div class="group edit-only paint-only" role="group" aria-label="Tool">
+        <button id="tool-add" class="tool" title="Paint kidney that is missing">Add</button>
+        <button id="tool-erase" class="tool" title="Remove red that is not kidney">Erase</button>
       </div>
-      <div class="group" role="group" aria-label="Penselstørrelse">
-        <span class="label">Størrelse</span>
-        <span id="pen-sizes"></span>
+      <button id="tool-move" class="tool edit-only" title="Drag to move the image">Move</button>
+      <div class="group edit-only paint-only" role="group" aria-label="Brush size">
+        <span class="label">Brush</span>
+        <span id="pen-sizes" class="group"></span>
       </div>
-      <button id="undo">Fortryd</button>
-      <div class="group" role="group" aria-label="Snit">
-        <button id="slice-up" title="Næste snit (Page Up)">▲</button>
-        <button id="slice-down" title="Forrige snit (Page Down)">▼</button>
+      <button id="undo" class="edit-only paint-only" title="Take back the last stroke (⌘Z)">Undo</button>
+      <div class="group" role="group" aria-label="Contrast">
+        <span class="label">Contrast</span>
+        <span id="window-presets" class="group"></span>
       </div>
-      <div class="group" role="group" aria-label="Kontrast">
-        <span class="label">Kontrast</span>
-        <span id="window-presets"></span>
-      </div>
-      <button id="heatmap-toggle" aria-pressed="true" hidden>Usikkerhed: til</button>
+      <button id="heatmap-toggle" class="edit-only heatmap-only" aria-pressed="true">Uncertainty: on</button>
+      <button id="truth-toggle" class="edit-only queue-only" aria-pressed="false">Show ground truth</button>
+      <button id="reset-view" title="Fit the image to the window again">Reset view</button>
       <span class="spacer"></span>
-      <span id="scan-label" class="label"></span>
-      <span id="timer" class="timer" aria-live="polite"></span>
-      <button id="done" class="primary">Færdig</button>
+      <span id="timer" class="timer edit-only"></span>
+      <button id="done" class="primary edit-only">Done</button>
+      <button id="answer-continue" class="primary answer-only">Continue to the study</button>
     </div>
-    <div class="canvas-wrap"><canvas id="gl"></canvas></div>
-    <p id="status" class="status" aria-live="polite"></p>
+
+    <div class="main">
+    <div class="stage">
+      <div class="canvas-wrap">
+        <canvas id="gl"></canvas>
+        <div id="brush" class="brush" hidden></div>
+      </div>
+      <span class="orient r" title="The patient's right side">R</span>
+      <span class="orient l" title="The patient's left side">L</span>
+      <div id="loading" class="loading">Loading scan …</div>
+      <div id="legend" class="legend" hidden>
+        <span><i style="background: var(--correct)"></i>Marked and kidney</span>
+        <span><i style="background: var(--missed)"></i>Kidney, not marked</span>
+        <span><i style="background: var(--extra)"></i>Marked, but not kidney</span>
+      </div>
+      <div id="lock" class="modal" role="alertdialog" aria-labelledby="lock-title" aria-describedby="lock-text" hidden>
+        <div class="modal-box">
+          <h2 id="lock-title"></h2>
+          <p id="lock-text"></p>
+          <button id="lock-button" class="primary"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slice navigation: the top of the slider is towards the head -->
+    <nav class="slice-nav" aria-label="Slices">
+      <span class="end-label">Head</span>
+      <button id="slice-up" title="One slice towards the head (↑ key)">▲</button>
+      <div id="slice-track" class="slice-track" role="slider" aria-orientation="vertical" aria-label="Slice">
+        <canvas id="slice-marks"></canvas>
+        <div id="slice-thumb" class="slice-thumb"></div>
+      </div>
+      <button id="slice-down" title="One slice towards the feet (↓ key)">▼</button>
+      <span class="end-label">Feet</span>
+      <span id="slice-number" class="slice-number"></span>
+    </nav>
+    </div>
+    <div class="status">
+      <span id="help" aria-live="polite"></span>
+      <span id="scan-label"></span>
+    </div>
   </section>
 
   <!-- End of the study -->
   <section id="end" class="screen" hidden>
-    <h1>Tak!</h1>
-    <p class="lead">Alle scanninger er gemt. Udfyld nu spørgeskemaet (NASA-TLX), som forsøgslederen giver dig.</p>
-    <button id="end-home">Til forsiden</button>
+    <h1>Thank you!</h1>
+    <p class="lead">All scans are saved. Please fill in the questionnaire (NASA-TLX) that the experimenter gives you.</p>
+    <button id="end-home">Back to the start</button>
   </section>
 
+  <script src="/ui/viewer.js"></script>
   <script src="/ui/app.js"></script>
 </body>
 </html>

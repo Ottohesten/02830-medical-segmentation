@@ -22,27 +22,49 @@ selection:                            # which KiTS scans are suitable for the st
   n_scans: 6                          # scans per participant: 3 with heatmap, 3 without (see balancing)
   n_practice: 1                       # extra scan for a practice round (not part of the analysis)
   crop_margin_mm: 40                  # the CT is cut to the slices with predicted kidney plus this margin
-  min_gt_in_crop: 0.99                # a scan is skipped if the crop would cut away more ground truth than this
+  min_gt_in_crop: 0.99                # preparation stops if a crop would cut away more ground truth than this
 
 study:
-  heatmap: entropy                    # LOCKED on the development set (see PROGRESS.md: "Låst valg af heatmap til G2")
-  time_limit_min: 5                   # per scan; the scan is saved automatically when the time is up
+  heatmap: entropy                    # LOCKED on the development set (results/kits100/heatmap_eval_dev_summary.csv)
+  time_limit_min: 5                   # per scan (study and practice); the scan is locked and saved when the time is up.
+                                      # The demo queue has no time limit.
   participant_prefix: P               # participant ids look like P01, P02, ...; the number sets the balancing group
 
 queue:                                # demo mode: scans ranked by the G1 score, heatmap always available
   n_scans: 10                         # the n test scans with the highest score
   score: model_diff_mean_region       # LOCKED primary G1 measure
 
+guide:                                # example image on the instruction screen before the practice scan
+  labels: {kidney: 1, tumour: 2, cyst: 3}   # ground-truth label values of the dataset (KiTS23)
+  min_piece_cm2: 3                    # the slice must show at least two separate pieces of kidney this big
+  margin_mm: 60                       # space around the kidneys in the image
+  colours: {kidney: "#3ddc84", tumour: "#ffc233", cyst: "#ff6bd6"}
+
 viewer:
   window_presets:                     # contrast buttons (Hounsfield units); the first one is used at start
     - {name: Normal, level: 40, width: 400}
-    - {name: Skarp, level: 60, width: 200}
-  heatmap_colormap: blue2cyan          # cold colours, so the heatmap is easy to tell apart from the red mask
+    - {name: High contrast, level: 60, width: 200}
+  heatmap_colormap: blue2cyan         # cold colours, so the heatmap is easy to tell apart from the red mask
   heatmap_min: 0.1                    # entropy below this (bits) is not drawn, so only uncertain voxels show
   heatmap_opacity: 0.6
-  mask_opacity: 0.45
-  pen_sizes: [1, 3, 6, 10]            # brush diameters to choose from (voxels)
-  default_pen_size: 3
+  mask_color: [235, 40, 40]           # red; the mask is always drawn on top of the heatmap
+  mask_opacity: 0.45                  # fill of the mask
+  mask_outline_px: 2                  # solid outline along the mask's edge (screen pixels), so it stays visible
+                                      # on top of the heatmap; 0 = no outline
+  compare_colors:                     # ground-truth comparison (practice answer, demo queue)
+    correct: [235, 40, 40]            # marked and kidney (same red as the mask)
+    missed: [255, 205, 0]             # kidney that is not marked
+    extra: [60, 130, 255]             # marked, but not kidney
+  pen_sizes: [1, 3, 7, 11]            # brush diameters in voxels (odd, so the round brush is centred on a voxel)
+  default_pen_size: 7
+  zoom_min: 1                         # 1 = the whole slice fits the window
+  zoom_max: 8
+  pinch_zoom_speed: 0.01              # trackpad pinch (and Ctrl + scroll): zoom factor per scroll pixel (exp scale)
+  two_finger_scroll: pan              # what a two-finger swipe on the trackpad does: pan (move the image),
+                                      # slice (change slice) or zoom
+  scroll_px_per_slice: 40             # only for two_finger_scroll: slice
+  slice_marks_fraction: 0.5           # "with heatmap": slices whose uncertainty (sum of shown heatmap values) is at
+                                      # least this fraction of the most uncertain slice are marked on the slider
 
 server:
   host: 127.0.0.1

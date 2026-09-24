@@ -1,4 +1,4 @@
-"""Tests of the review server: files, heatmap access per condition, saving masks and logs, resuming."""
+"""Tests of the review server: files, heatmap and ground-truth access, saving masks and logs, resuming."""
 
 import gzip
 import json
@@ -65,14 +65,34 @@ def test_heatmap_only_in_with_condition(server):
     assert status_of(f"{base}/files/P01/scans/{m['study_scans'][0]}/secret.nii.gz") == 404
 
 
+def test_ground_truth_only_for_practice_and_queue(server):
+    """The answer is available after the practice and in the demo, never for a scan that is measured."""
+    base, study = server
+    m = manifest(study)
+    for cid in m["study_scans"]:
+        assert status_of(f"{base}/files/P01/scans/{cid}/truth.nii.gz") == 403
+        assert not (study_dir(study) / "scans" / cid / "truth.nii.gz").exists()
+    assert status_of(f"{base}/files/P01/scans/{m['practice_scans'][0]}/truth.nii.gz") == 200
+    assert status_of(f"{base}/files/demo/queue/{m['queue_scans'][0]}/truth.nii.gz") == 200
+
+
+def test_guide_image_is_served(server):
+    base, _ = server
+    status, body = get(base + "/files/guide/example.png")
+    assert status == 200 and body[:8] == b"\x89PNG\r\n\x1a\n"
+    assert json.loads(get(base + "/api/settings")[1])["guide_image"] is True
+    assert status_of(base + "/files/guide/other.png") == 404
+
+
 def test_saved_files_have_the_scan_grid(server):
-    """ct, mask and heatmap of every prepared scan share one voxel grid (so the drawing lines up)."""
+    """ct, mask, heatmap (and truth) of every prepared scan share one voxel grid (so the drawing lines up)."""
     _, study = server
     m = manifest(study)
     root = study_dir(study)
     for sub, ids in (("scans", m["study_scans"] + m["practice_scans"]), ("queue", m["queue_scans"])):
         for cid in ids:
-            imgs = [nib.load(root / sub / cid / f"{n}.nii.gz") for n in ("ct", "mask", "heatmap")]
+            names = ["ct", "mask", "heatmap"] + (["truth"] if cid in m["practice_scans"] or sub == "queue" else [])
+            imgs = [nib.load(root / sub / cid / f"{n}.nii.gz") for n in names]
             assert len({i.shape for i in imgs}) == 1
             assert all(np.allclose(imgs[0].affine, i.affine) for i in imgs)
 

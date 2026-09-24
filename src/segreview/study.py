@@ -24,10 +24,12 @@ import yaml
 
 from segreview.config import REPO_ROOT, load_config, results_dir
 from segreview.data import list_cases, load_canonical, load_organ_mask
+from segreview.guide import make_guide_image, pick_guide_slice
 from segreview.io import QUANT_LEVELS, load_map, voxel_spacing
 from segreview.metrics import dice
 
 WITH, WITHOUT = "with_heatmap", "without_heatmap"
+GUIDE_IMAGE = "example.png"
 
 # The 4 participant types: (block that gets the heatmap, condition shown first).
 PARTICIPANT_TYPES = [("B", WITHOUT), ("A", WITHOUT), ("B", WITH), ("A", WITH)]
@@ -123,13 +125,17 @@ def select_scans(study: dict, table: pd.DataFrame) -> tuple[list[str], list[str]
     return drawn[:sel["n_scans"]], drawn[sel["n_scans"]:needed]
 
 
-def prepare_scan(study: dict, source: dict, case, out_dir: Path) -> dict:
+def prepare_scan(study: dict, source: dict, case, out_dir: Path, with_truth: bool = False) -> dict:
     """Write the files the viewer needs for one scan: ct.nii.gz, mask.nii.gz, heatmap.nii.gz.
 
     All three are on the same canonical (RAS) grid, cut to the slices with predicted kidney plus
     selection.crop_margin_mm, so the viewer loads quickly and the participant is not lost in the scan.
     The cut uses only the prediction, so it does not reveal where the ground truth is; it is checked
     afterwards that it keeps at least selection.min_gt_in_crop of the ground truth.
+
+    with_truth=True also writes truth.nii.gz (the ground-truth organ mask). Only the practice scan (the
+    answer is shown after the practice) and the demo queue get it; study scans never do, so the server
+    cannot hand out the answer for a scan that is measured.
 
     Output: dict with scan facts (crop, Dice of the model before correction, GT share kept).
     """
@@ -155,6 +161,11 @@ def prepare_scan(study: dict, source: dict, case, out_dir: Path) -> dict:
     heat_img = nib.Nifti1Image(np.round(np.clip(heat[:, :, z0:z1], 0, 1) * QUANT_LEVELS).astype(np.uint8), affine)
     heat_img.header.set_slope_inter(1.0 / QUANT_LEVELS, 0.0)
     nib.save(heat_img, out_dir / "heatmap.nii.gz")
+    truth_file = out_dir / "truth.nii.gz"
+    if with_truth:
+        nib.save(nib.Nifti1Image(truth[:, :, z0:z1].astype(np.uint8), affine), truth_file)
+    elif truth_file.exists():
+        truth_file.unlink()
     return {"case_id": case.case_id, "crop_z": [int(z0), int(z1)], "gt_kept": round(gt_kept, 4),
             "dice_before": round(dice(mask, truth, ignore), 4)}
 
@@ -163,8 +174,8 @@ def prepare_study(study: dict, source: dict) -> dict:
     """Select the scans, prepare their files and write the manifest (manifest.json).
 
     Study and practice scans go to <study dir>/scans/, the demo queue (the highest-scoring test scans
-    by the locked G1 measure) to <study dir>/queue/. A study scan whose crop would lose ground truth is
-    replaced by the next eligible scan.
+    by the locked G1 measure) to <study dir>/queue/, the example image for the instruction screen to
+    <study dir>/guide/. The run stops with an error if a crop would cut away ground truth.
     """
     table = candidate_table(study, source)
     root = study_dir(study)
@@ -173,7 +184,8 @@ def prepare_study(study: dict, source: dict) -> dict:
     study_ids, practice_ids = select_scans(study, table)
     facts = {"scans": {}, "queue": {}}
     for cid in study_ids + practice_ids:
-        facts["scans"][cid] = prepare_scan(study, source, cases[cid], root / "scans" / cid)
+        facts["scans"][cid] = prepare_scan(study, source, cases[cid], root / "scans" / cid,
+                                           with_truth=cid in practice_ids)
     lost = [c for c, f in facts["scans"].items() if f["gt_kept"] < study["selection"]["min_gt_in_crop"]]
     if lost:
         raise ValueError(f"The crop cuts away ground truth in {lost}; increase selection.crop_margin_mm.")
@@ -181,11 +193,16 @@ def prepare_study(study: dict, source: dict) -> dict:
     queue = table[table.split != "dev"].sort_values("score", ascending=False).head(study["queue"]["n_scans"])
     queue_ids = list(queue.case_id)
     for cid in queue_ids:
-        facts["queue"][cid] = prepare_scan(study, source, cases[cid], root / "queue" / cid)
+        facts["queue"][cid] = prepare_scan(study, source, cases[cid], root / "queue" / cid, with_truth=True)
+
+    # Example image for the instruction screen, from a development scan used nowhere else in the study.
+    guide_case, guide_slice = pick_guide_slice(study, source, exclude=set(study_ids + practice_ids + queue_ids))
+    make_guide_image(study, source, guide_case, guide_slice, root / "guide" / GUIDE_IMAGE)
 
     manifest = {"study_scans": study_ids, "practice_scans": practice_ids, "queue_scans": queue_ids,
                 "queue_scores": {r.case_id: float(r.score) for r in queue.itertuples()},
-                "heatmap": study["study"]["heatmap"], "facts": facts}
+                "heatmap": study["study"]["heatmap"], "guide": {"case_id": guide_case, "slice": guide_slice},
+                "facts": facts}
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2))
     table.to_csv(root / "candidates.csv", index=False)
     return manifest

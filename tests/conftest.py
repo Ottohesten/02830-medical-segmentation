@@ -7,6 +7,7 @@ Tests that need the prepared study are skipped if scripts/prepare_study.py has n
 import copy
 import json
 import threading
+from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
@@ -31,26 +32,44 @@ def temp_study(real_study, tmp_path):
     study, _ = real_study
     real = study_dir(study)
     fake = copy.deepcopy(study)
-    fake["paths"]["study_dir"] = tmp_path
+    fake["paths"]["study_dir"] = tmp_path / "study"
     root = study_dir(fake)
     root.mkdir(parents=True)
-    for sub in ("scans", "queue"):
-        (root / sub).symlink_to(real / sub)
+    for sub in ("scans", "queue", "guide"):
+        if (real / sub).exists():
+            (root / sub).symlink_to(real / sub)
     (root / "manifest.json").write_text((real / "manifest.json").read_text())
     return fake
 
 
-@pytest.fixture()
-def server(temp_study):
-    """The review server on a free port in a background thread. Yields (base url, study config)."""
+@contextmanager
+def running_server(study):
+    """The review server for a study config, on a free port in a background thread. Yields the base url."""
     from segreview.ui_server import make_server
 
-    srv = make_server(temp_study, host="127.0.0.1", port=0)
+    srv = make_server(study, host="127.0.0.1", port=0)
     thread = threading.Thread(target=srv.serve_forever, daemon=True)
     thread.start()
-    yield f"http://127.0.0.1:{srv.server_address[1]}", temp_study
-    srv.shutdown()
-    srv.server_close()
+    try:
+        yield f"http://127.0.0.1:{srv.server_address[1]}"
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+@pytest.fixture()
+def server(temp_study):
+    """The review server with the study config as it is. Yields (base url, study config)."""
+    with running_server(temp_study) as base:
+        yield base, temp_study
+
+
+@pytest.fixture()
+def quick_server(temp_study):
+    """Like server, but with a 4-second time limit, so a test can let the time run out."""
+    temp_study["study"]["time_limit_min"] = 4 / 60
+    with running_server(temp_study) as base:
+        yield base, temp_study
 
 
 def manifest(study) -> dict:

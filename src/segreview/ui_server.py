@@ -9,13 +9,15 @@ Endpoints:
   GET  /api/settings                            viewer settings and time limit from the study config
   GET  /api/study/<participant>                 the participant's practice + study scans, in order, with 'done' flags
   GET  /api/queue                               demo queue: scans ranked by the G1 score
-  GET  /files/<participant>/<set>/<case>/<name>.nii.gz   ct, mask or heatmap (set = scans or queue)
+  GET  /files/<participant>/<set>/<case>/<name>.nii.gz   ct, mask, heatmap or truth (set = scans or queue)
+  GET  /files/guide/example.png                 example image for the instruction screen
   POST /api/save/<mode>/<participant>/<case>    body = the corrected mask as NIfTI bytes (from NiiVue)
   POST /api/log/<mode>/<participant>/<case>     body = JSON log of the scan (times, events)
 
 The heatmap of a study scan is only handed out if that participant has the scan in the WITH-heatmap
-condition, so the "without" condition cannot show it by mistake. Only known scan ids and file names are
-accepted, and the server only listens on this computer (127.0.0.1).
+condition, so the "without" condition cannot show it by mistake. The ground truth (truth) is only handed
+out for the practice scan (shown as the answer after the practice) and the demo queue, never for a study
+scan. Only known scan ids and file names are accepted, and the server only listens on this computer (127.0.0.1).
 
 Saved files (data/study/<study name>/):
   sessions/<participant>/<case>_mask.nii.gz and <case>_log.json   study scans
@@ -35,10 +37,10 @@ from pathlib import Path
 import nibabel as nib
 
 from segreview.config import REPO_ROOT
-from segreview.study import WITH, assignment, load_manifest, participant_type, study_dir
+from segreview.study import GUIDE_IMAGE, WITH, assignment, load_manifest, participant_type, study_dir
 
 UI_DIR = REPO_ROOT / "ui"
-FILE_NAMES = {"ct", "mask", "heatmap"}
+FILE_NAMES = {"ct", "mask", "heatmap", "truth"}
 MODES = {"study", "practice", "queue"}
 
 
@@ -75,6 +77,10 @@ class StudyServer:
             return True
         return any(s["case_id"] == case_id and s["condition"] == WITH
                    for s in assignment(participant, self.manifest["study_scans"], self.prefix))
+
+    def truth_allowed(self, file_set: str, case_id: str) -> bool:
+        """The ground truth is shown for the demo queue and the practice scan only, never for a study scan."""
+        return file_set == "queue" or case_id in self.manifest["practice_scans"]
 
     def known_case(self, file_set: str, case_id: str) -> bool:
         if file_set == "queue":
@@ -124,13 +130,16 @@ class Handler(BaseHTTPRequestHandler):
             if parts[:2] == ["api", "settings"]:
                 s = self.app.study
                 return self._json({"viewer": s["viewer"], "time_limit_min": s["study"]["time_limit_min"],
-                                   "participant_prefix": self.app.prefix})
+                                   "participant_prefix": self.app.prefix,
+                                   "guide_image": (self.app.root / "guide" / GUIDE_IMAGE).exists()})
             if parts[:2] == ["api", "study"] and len(parts) == 3:
                 return self._json(self.app.plan(parts[2]))
             if parts[:2] == ["api", "queue"]:
                 m = self.app.manifest
                 return self._json([{"case_id": c, "score": m["queue_scores"][c], "rank": i + 1}
                                    for i, c in enumerate(m["queue_scans"])])
+            if parts == ["files", "guide", GUIDE_IMAGE]:
+                return self._static(self.app.root / "guide" / GUIDE_IMAGE)
             if parts[0] == "files" and len(parts) == 5:
                 return self._file(*parts[1:])
             return self._error(HTTPStatus.NOT_FOUND, "unknown path")
@@ -149,6 +158,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._error(HTTPStatus.NOT_FOUND, "unknown scan or file")
         if name == "heatmap" and not self.app.heatmap_allowed(participant, file_set, case_id):
             return self._error(HTTPStatus.FORBIDDEN, "no heatmap in this condition")
+        if name == "truth" and not self.app.truth_allowed(file_set, case_id):
+            return self._error(HTTPStatus.FORBIDDEN, "no ground truth for study scans")
         self._send(HTTPStatus.OK, (self.app.root / file_set / case_id / filename).read_bytes(), "application/gzip")
 
     # --- POST ----------------------------------------------------------------------------------

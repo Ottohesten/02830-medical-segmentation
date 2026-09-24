@@ -1,4 +1,4 @@
-/* Review interface styles: a quiet, dark viewer with a single toolbar, and simple light start screens. */
+/* Review interface styles: simple light screens around a quiet, dark viewer with one toolbar and a slice slider. */
 :root {
   --bg: #f6f6f4;
   --panel: #ffffff;
@@ -10,8 +10,16 @@
   --viewer-bg: #111111;
   --toolbar-bg: #1d1d1c;
   --toolbar-text: #eeeeea;
+  --toolbar-muted: #b9b8b1;
   --danger: #c0392b;
+  --mark: #3ee0ff;                /* high-uncertainty slices on the slider (the top colour of the heatmap) */
+  --correct: rgb(235, 40, 40);    /* legend of the ground-truth comparison; app.js sets these from the config */
+  --missed: rgb(255, 205, 0);
+  --extra: rgb(60, 130, 255);
 }
+
+/* The hidden attribute must always win, also over rules like "#viewer { display: flex }". */
+[hidden] { display: none !important; }
 
 * { box-sizing: border-box; }
 body { margin: 0; font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text); background: var(--bg); }
@@ -21,6 +29,7 @@ h2 { font-size: 1.1rem; margin: 0 0 .5rem; }
 .error { color: var(--danger); }
 
 .screen { max-width: 760px; margin: 0 auto; padding: 2.5rem 1rem; }
+.screen.wide { max-width: 1120px; }
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; margin-bottom: 1rem; }
 label { display: block; font-weight: 600; margin-bottom: .3rem; }
 input { font: inherit; padding: .5rem .6rem; border: 1px solid var(--border); border-radius: 6px; width: 10rem; margin-right: .5rem; }
@@ -32,19 +41,80 @@ button:disabled { opacity: .5; cursor: default; }
 
 #queue-list li { margin: .4rem 0; }
 #queue-list button { min-width: 20rem; text-align: left; }
-.howto li { margin: .3rem 0; }
+.howto li, .guide-grid li { margin: .35rem 0; }
 
-/* Viewer: full window, toolbar on top */
+/* Guide */
+#guide-figure { margin: 0 0 1rem; text-align: center; }
+#guide-image { max-width: 100%; max-height: 55vh; height: auto; border-radius: 8px; border: 1px solid var(--border); }
+.guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.guide-grid ul { padding-left: 1.2rem; margin: 0; }
+@media (max-width: 800px) { .guide-grid { grid-template-columns: 1fr; } }
+
+/* ---------- Viewer: full window. Toolbar on top, image + slice slider, help line at the bottom ---------- */
 #viewer { max-width: none; padding: 0; height: 100vh; display: flex; flex-direction: column; background: var(--viewer-bg); }
-.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; padding: .5rem .8rem; background: var(--toolbar-bg); color: var(--toolbar-text); }
-.toolbar button { background: #2c2c2a; color: var(--toolbar-text); border-color: #444440; }
-.toolbar button.active, .toolbar button[aria-pressed="true"].tool { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; padding: .45rem .7rem; background: var(--toolbar-bg);
+           color: var(--toolbar-text); font-size: .92rem; }
+.toolbar button, .slice-nav button { background: #2c2c2a; color: var(--toolbar-text); border-color: #444440; }
+.toolbar button { padding: .35rem .7rem; }
+.toolbar button.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 .toolbar button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 .toolbar .group { display: flex; align-items: center; gap: .3rem; }
-.toolbar .label { color: #b9b8b1; font-size: .9rem; }
+.toolbar .label { color: var(--toolbar-muted); font-size: .9rem; }
 .toolbar .spacer { flex: 1; }
-.timer { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 4.2rem; text-align: right; }
+.timer { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 7rem; text-align: right; }
 .timer.low { color: #ff8a70; }
-.canvas-wrap { flex: 1; position: relative; }
-#gl { position: absolute; inset: 0; width: 100%; height: 100%; }
-.status { margin: 0; padding: .3rem .8rem; color: #b9b8b1; font-size: .85rem; background: var(--toolbar-bg); min-height: 1.6rem; }
+
+/* Brush-size buttons show a dot of the relative size */
+#pen-sizes button { width: 2.3rem; height: 2.1rem; padding: 0; display: grid; place-items: center; }
+#pen-sizes .dot { display: block; border-radius: 50%; background: currentColor; }
+
+.main { flex: 1; display: flex; min-height: 0; }
+.stage { flex: 1; position: relative; min-width: 0; }
+.canvas-wrap { position: absolute; inset: 0; overflow: hidden; }
+#gl { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+#gl[data-tool="add"], #gl[data-tool="erase"] { cursor: crosshair; }
+#gl[data-tool="move"] { cursor: grab; }
+#gl.dragging { cursor: grabbing; }
+
+/* The brush circle follows the pointer and has the brush's real size on screen */
+.brush { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none;
+         border: 2px solid #ffffff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(0, 0, 0, .8); }
+.brush.erase { border-style: dashed; }
+
+.orient { position: absolute; top: 50%; transform: translateY(-50%); color: #d8d8d2; font-weight: 700; font-size: 1.1rem; pointer-events: none; }
+.orient.r { left: .7rem; }
+.orient.l { right: .7rem; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; color: #d8d8d2; font-size: 1.1rem; background: var(--viewer-bg); }
+.legend { position: absolute; left: .8rem; bottom: .8rem; display: flex; flex-direction: column; gap: .2rem; padding: .5rem .8rem;
+          background: rgba(20, 20, 20, .88); color: #eeeeea; border-radius: 8px; font-size: .9rem; pointer-events: none; }
+.legend i { display: inline-block; width: .8rem; height: .8rem; margin-right: .45rem; vertical-align: -1px; border-radius: 2px; }
+
+/* Message over the image (time is up / saving failed) */
+.modal { position: absolute; inset: 0; background: rgba(0, 0, 0, .6); display: grid; place-items: center; z-index: 10; }
+.modal-box { background: var(--panel); color: var(--text); padding: 1.6rem 2rem; border-radius: 12px; max-width: 26rem; text-align: center; }
+.modal-box h2 { font-size: 1.4rem; }
+.toolbar[inert], .slice-nav[inert] { opacity: .45; }
+
+/* Slice slider: slice 1 (towards the feet) at the bottom, the last slice (towards the head) at the top */
+.slice-nav { width: 5.4rem; display: flex; flex-direction: column; align-items: center; gap: .35rem; padding: .6rem 0;
+             background: var(--toolbar-bg); color: var(--toolbar-muted); font-size: .8rem; }
+.slice-nav button { width: 2.6rem; padding: .25rem 0; }
+.slice-track { flex: 1; width: 2.2rem; position: relative; background: #2c2c2a; border-radius: 6px; cursor: pointer; touch-action: none; }
+#slice-marks { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 6px; }
+.slice-thumb { position: absolute; left: -4px; right: -4px; border: 2px solid #ffffff; border-radius: 4px;
+               background: rgba(255, 255, 255, .2); box-shadow: 0 0 0 1px rgba(0, 0, 0, .8); pointer-events: none; }
+.slice-number { color: var(--toolbar-text); font-variant-numeric: tabular-nums; text-align: center; line-height: 1.2; }
+
+.status { display: flex; gap: 1rem; justify-content: space-between; padding: .35rem .8rem; color: var(--toolbar-muted);
+          font-size: .88rem; background: var(--toolbar-bg); min-height: 1.8rem; }
+#scan-label { color: var(--toolbar-text); white-space: nowrap; }
+
+/* What shows when (data attributes on #viewer, set by app.js) */
+#viewer[data-mode="loading"] .toolbar > *, #viewer[data-mode="loading"] .slice-nav > *,
+#viewer[data-mode="loading"] .orient, #viewer[data-mode="loading"] .status > * { visibility: hidden; }
+#viewer:not([data-mode="loading"]) .loading { display: none; }
+#viewer:not([data-mode="edit"]) .edit-only { display: none !important; }
+#viewer:not([data-mode="answer"]) .answer-only { display: none !important; }
+#viewer:not([data-kind="queue"]) .queue-only { display: none !important; }
+#viewer:not([data-heatmap="yes"]) .heatmap-only { display: none !important; }
+#viewer[data-compare="yes"] .paint-only { opacity: .35; pointer-events: none; }

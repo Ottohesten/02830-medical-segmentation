@@ -21,7 +21,8 @@ case_id: stem
 
 # Ground-truth labels: 1 = kidney, 2 = tumour, 3 = cyst. Which of them count as "the kidney"?
 # TotalSegmentator has classes for kidney and kidney cyst, but not for kidney tumour, so it is not
-# obvious which definition matches what the model was trained to do. See PROGRESS / the label check.
+# obvious which definition matches what the model was trained to do. See the label check
+# (scripts/check_labels.py, results/kits100/label_check_summary.csv).
 organ_definitions:
   kidney_tumor_cyst: {organ_labels: [1, 2, 3]}                  # the whole kidney incl. all masses (KiTS "kidney + masses")
   kidney_cyst:       {organ_labels: [1, 3]}                     # tumour counts as background

@@ -40,6 +40,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "websocket-client>=1.9.2",
 ]
 
 [tool.uv.build-backend]
