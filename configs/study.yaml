@@ -1,0 +1,49 @@
+# User study (G2): which scans, how they are shown, time limit, balancing.
+# The scans come from the model output of another config (source_config), so the study uses exactly
+# the masks and heatmaps that G1 evaluated.
+#
+# Prepare once:  uv run python scripts/prepare_study.py --config configs/study.yaml
+# Start:         uv run python scripts/run_ui.py --config configs/study.yaml
+
+name: study_kits
+source_config: configs/kits100.yaml   # model output, ground truth and scores are taken from here
+seed: 42
+
+paths:
+  study_dir: data/study               # prepared scans, saved masks and logs (not in git)
+
+selection:                            # which KiTS scans are suitable for the study (ground truth is used here,
+  dice_min: 0.70                      # only to pick scans; the participants never see it)
+  dice_max: 0.90                      # visible errors, but not an empty or nearly empty mask
+  error_ml_min: 50                    # total wrong volume (missed + extra) in ml: big enough to see ...
+  error_ml_max: 400                   # ... small enough to fix within the time limit
+  max_axial_slices: 150               # many thin slices make a fix too slow with a 2D brush
+  require_both_sides: true            # skip scans where a whole kidney is missing (plausibility check)
+  n_scans: 6                          # scans per participant: 3 with heatmap, 3 without (see balancing)
+  n_practice: 1                       # extra scan for a practice round (not part of the analysis)
+  crop_margin_mm: 40                  # the CT is cut to the slices with predicted kidney plus this margin
+  min_gt_in_crop: 0.99                # a scan is skipped if the crop would cut away more ground truth than this
+
+study:
+  heatmap: entropy                    # LOCKED on the development set (see PROGRESS.md: "Låst valg af heatmap til G2")
+  time_limit_min: 5                   # per scan; the scan is saved automatically when the time is up
+  participant_prefix: P               # participant ids look like P01, P02, ...; the number sets the balancing group
+
+queue:                                # demo mode: scans ranked by the G1 score, heatmap always available
+  n_scans: 10                         # the n test scans with the highest score
+  score: model_diff_mean_region       # LOCKED primary G1 measure
+
+viewer:
+  window_presets:                     # contrast buttons (Hounsfield units); the first one is used at start
+    - {name: Normal, level: 40, width: 400}
+    - {name: Skarp, level: 60, width: 200}
+  heatmap_colormap: blue2cyan          # cold colours, so the heatmap is easy to tell apart from the red mask
+  heatmap_min: 0.1                    # entropy below this (bits) is not drawn, so only uncertain voxels show
+  heatmap_opacity: 0.6
+  mask_opacity: 0.45
+  pen_sizes: [1, 3, 6, 10]            # brush diameters to choose from (voxels)
+  default_pen_size: 3
+
+server:
+  host: 127.0.0.1
+  port: 8765

@@ -113,13 +113,39 @@ Main outputs in `results/<name>/`: `dice.csv`, `scores.csv`, `g1_metrics_<set>.c
 "bad" rule), `g1_scores_<set>.csv`, `figures/g1_curves_<set>_<rule>.png`, `figures/g1_scatter_<set>_<rule>.png`.
 `<set>` is `clean` (or `clean_dev` / `clean_test` with a split) and `perturbed` if perturbations are configured.
 
+## Review interface (G2)
+
+A browser-based viewer built on [NiiVue](https://github.com/niivue/niivue) (stored in `ui/vendor/niivue`, so no internet
+is needed) with a small local Python server. Settings are in `configs/study.yaml` (scan selection, time limit,
+heatmap, colours, brush sizes).
+
+```bash
+uv run python scripts/prepare_study.py --config configs/study.yaml   # once: pick scans, write viewer files
+uv run python scripts/run_ui.py        --config configs/study.yaml   # start the server and open the browser
+```
+
+- **Study mode:** enter a participant id (P01, P02, ...). The participant gets a practice scan and then 6 scans,
+  3 with and 3 without the uncertainty heatmap, in a balanced order (the number in the id sets the order; use a
+  multiple of 4 participants). Each scan has a time limit; the clock starts when the scan is ready and stops at
+  "Færdig" or when the time is up. The corrected mask and a log (times, tools, heatmap use) are saved to
+  `data/study/<study name>/sessions/<participant>/`. A session can be resumed: finished scans are skipped.
+- **Demo queue:** the test scans ranked by the G1 score, most uncertain first, heatmap always available.
+- **Tools:** brush add/erase, brush size, undo (also Ctrl/Cmd+Z), slice up/down (mouse wheel, arrow keys),
+  two contrast presets, heatmap on/off (only in the "with" condition), "Færdig".
+- **Heatmap:** voxel entropy, chosen on the KiTS development set because it points best at wrong voxels
+  (`scripts/evaluate_heatmaps.py`).
+- **Tests:** `uv run pytest` checks the balancing, the scan selection, the server (files, heatmap access per
+  condition, saving, resuming) and, if Google Chrome is installed, loads the page in a headless browser, paints
+  a square and checks that the saved mask is exactly the original plus that square.
+
 ## Layout
 
 ```
 configs/        one YAML config per environment; configs/datasets/ describes each dataset
 src/segreview/  shared code (config, data, weights, inference, augment, uncertainty, evaluation, figures, pipeline)
 scripts/        runnable pipeline steps
-ui/             review interface (G2)
+ui/             review interface (G2): index.html, app.js, style.css, vendor/niivue
+tests/          automatic tests (uv run pytest)
 results/        results/<config name>/: small result files (csv, figures)
 data/           scans, ground truth, model output (not in git)
 models/         pretrained weights (not in git)

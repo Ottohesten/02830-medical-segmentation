@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nyre-review</title>
+  <link rel="stylesheet" href="/ui/style.css">
+  <!-- Review interface for the user study (G2). NiiVue is served locally from ui/vendor, so no internet is needed. -->
+  <script src="/ui/vendor/niivue/niivue.umd.js"></script>
+</head>
+<body>
+  <!-- Start screen: choose the user study (participant id) or the demo queue -->
+  <section id="start" class="screen">
+    <h1>Nyre-review</h1>
+    <p class="lead">Ret AI'ens markering af nyrerne i CT-scanninger.</p>
+    <div class="card">
+      <h2>Brugerstudie</h2>
+      <label for="participant">Deltager-ID</label>
+      <input id="participant" placeholder="P01" autocomplete="off">
+      <button id="start-study" class="primary">Start</button>
+      <p id="start-error" class="error" hidden></p>
+    </div>
+    <div class="card">
+      <h2>Demo: rangeret kø</h2>
+      <p>Scanninger sorteret efter modellens usikkerhed. Mest usikre øverst.</p>
+      <button id="start-queue">Åbn køen</button>
+    </div>
+  </section>
+
+  <!-- Queue list (demo mode) -->
+  <section id="queue" class="screen" hidden>
+    <h1>Rangeret kø</h1>
+    <p class="lead">Mest usikre scanninger øverst. Klik for at åbne.</p>
+    <ol id="queue-list"></ol>
+    <button id="queue-back">Tilbage</button>
+  </section>
+
+  <!-- Intro before each scan: tells the participant the condition and waits for "Start" -->
+  <section id="intro" class="screen" hidden>
+    <h1 id="intro-title"></h1>
+    <p id="intro-text" class="lead"></p>
+    <ul class="howto">
+      <li><b>Tilføj</b>: mal nyrevæv, som mangler i den røde markering.</li>
+      <li><b>Fjern</b>: visk markering ud, som ikke er nyre.</li>
+      <li>Rul med musehjulet eller brug ▲ ▼ for at bladre mellem snit. Højreklik og træk for at flytte billedet.</li>
+      <li>Du har <span id="intro-limit"></span> minutter. Tryk <b>Færdig</b>, når du er tilfreds.</li>
+    </ul>
+    <button id="intro-go" class="primary">Start scanning</button>
+  </section>
+
+  <!-- The viewer -->
+  <section id="viewer" class="screen" hidden>
+    <div class="toolbar" role="toolbar" aria-label="Værktøjer">
+      <div class="group" role="group" aria-label="Pensel">
+        <button id="tool-add" class="tool active" aria-pressed="true">Tilføj</button>
+        <button id="tool-erase" class="tool" aria-pressed="false">Fjern</button>
+      </div>
+      <div class="group" role="group" aria-label="Penselstørrelse">
+        <span class="label">Størrelse</span>
+        <span id="pen-sizes"></span>
+      </div>
+      <button id="undo">Fortryd</button>
+      <div class="group" role="group" aria-label="Snit">
+        <button id="slice-up" title="Næste snit (Page Up)">▲</button>
+        <button id="slice-down" title="Forrige snit (Page Down)">▼</button>
+      </div>
+      <div class="group" role="group" aria-label="Kontrast">
+        <span class="label">Kontrast</span>
+        <span id="window-presets"></span>
+      </div>
+      <button id="heatmap-toggle" aria-pressed="true" hidden>Usikkerhed: til</button>
+      <span class="spacer"></span>
+      <span id="scan-label" class="label"></span>
+      <span id="timer" class="timer" aria-live="polite"></span>
+      <button id="done" class="primary">Færdig</button>
+    </div>
+    <div class="canvas-wrap"><canvas id="gl"></canvas></div>
+    <p id="status" class="status" aria-live="polite"></p>
+  </section>
+
+  <!-- End of the study -->
+  <section id="end" class="screen" hidden>
+    <h1>Tak!</h1>
+    <p class="lead">Alle scanninger er gemt. Udfyld nu spørgeskemaet (NASA-TLX), som forsøgslederen giver dig.</p>
+    <button id="end-home">Til forsiden</button>
+  </section>
+
+  <script src="/ui/app.js"></script>
+</body>
+</html>

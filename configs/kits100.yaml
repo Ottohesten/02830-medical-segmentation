@@ -45,6 +45,10 @@ uncertainty:
     intensity_shift_hu: 20    # random intensity offset by up to +-20 Hounsfield units
     noise_std_hu: 10          # Gaussian noise with this standard deviation (HU)
 
+heatmap_eval:         # G2: which heatmap points best at the wrong voxels (scripts/evaluate_heatmaps.py)
+  candidates: [entropy, m2_diff]   # entropy = binary entropy of the organ probability; m2_diff = |p_3mm - p_6mm|
+  top_fraction: 0.1   # share of the region's voxels with the highest heatmap values ("top 10 %")
+
 plausibility:        # anatomical check for paired organs (only if the dataset file sets paired_organ: true)
   body_threshold_hu: -500   # voxels above this CT value count as body when finding the left-right midline
   min_component_ml: 20      # a side counts as "organ found" if its largest connected piece is at least this big
