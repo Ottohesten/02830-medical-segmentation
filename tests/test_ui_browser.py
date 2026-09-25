@@ -9,7 +9,7 @@ of the interface (24 September):
 - the mask is drawn on top of the heatmap;
 - the toolbar only shows when a scan is open;
 - the study flow: guide -> practice -> "time is up" lock -> correct answer -> study scans (without heatmap
-  where the balancing says so).
+  where the balancing says so) -> NASA-TLX -> end.
 Skipped if Chrome is not installed.
 """
 
@@ -228,8 +228,12 @@ def test_move_zoom_and_slices_do_not_paint(server, browser):
     b.click("#slice-track")     # the middle of the slider
     assert abs(b.js("state.viewer.slice") - b.js("state.viewer.nSlices") / 2) <= 1
     assert b.js("t.maskSum()") == total                               # none of this painted anything
-    # With the heatmap on, the high-uncertainty slices are marked on the slider.
+    # With the heatmap on, the high-uncertainty slices are marked on the slider, and blue is explained.
     assert b.js("state.marks.length") > 0 and b.js("state.heatmapOn")
+    visible = "(id) => document.getElementById(id).getClientRects().length > 0"
+    assert b.js(f"({visible})('key') && ({visible})('key-blue')")
+    b.click("#heatmap-toggle")
+    assert b.js(f"({visible})('key') && !({visible})('key-blue')")     # heatmap off: no blue in the key
     # The toolbar is hidden while a scan loads (checked through the CSS rule).
     b.js("document.getElementById('viewer').dataset.mode = 'loading'")
     assert b.js("getComputedStyle(document.getElementById('done')).visibility") == "hidden"
@@ -293,6 +297,8 @@ def test_study_flow_guide_practice_timeout_answer(quick_server, browser):
     b.click("#intro-go")
     b.wait_for("document.getElementById('viewer').dataset.mode === 'edit'")
     assert b.js("getComputedStyle(document.getElementById('heatmap-toggle')).display") == "none"
+    assert b.js("document.getElementById('key').getClientRects().length > 0")          # task + red explained
+    assert b.js("document.getElementById('key-blue').getClientRects().length") == 0    # no blue to explain
     assert b.js("state.viewer.nv.volumes.length") == 1 and b.js("state.marks.length") == 0
     assert b.js("state.viewer.truthUrl") is None                        # no ground truth for study scans
     b.click("#done")
@@ -300,3 +306,23 @@ def test_study_flow_guide_practice_timeout_answer(quick_server, browser):
     log = json.loads((root / "sessions" / "P01" / f"{first['case_id']}_log.json").read_text())
     assert log["reason"] == "done" and not log["heatmap_available"] and log["time_limit_s"] == pytest.approx(4)
     assert (root / "sessions" / "P01" / f"{first['case_id']}_mask.nii.gz").exists()
+
+    # Scans 2-6 (pressing Done right away), then the NASA-TLX questionnaire as the last step.
+    for k in range(2, 7):
+        b.click("#intro-go")
+        b.wait_for("document.getElementById('viewer').dataset.mode === 'edit'")
+        b.click("#done")
+        b.wait_for(f"document.getElementById('intro-title').textContent === 'Scan {k + 1} of 6'"
+                   if k < 6 else "!document.getElementById('tlx').hidden")
+    assert b.js("document.getElementById('tlx-submit').disabled")          # nothing answered yet
+    for i in range(6):                                                       # click each scale somewhere
+        x0, y0 = b.center(f".tlx-scale:nth-child({i + 1}) input")
+        width = b.js(f"document.querySelectorAll('.tlx-range')[{i}].getBoundingClientRect().width")
+        b.mouse("mousePressed", x0 - width / 2 + width * (0.1 + 0.15 * i), y0, buttons=1)
+        b.mouse("mouseReleased", x0 - width / 2 + width * (0.1 + 0.15 * i), y0)
+    answers = b.js("Object.fromEntries([...document.querySelectorAll('.tlx-range')].map((r) => [r.dataset.key, r.valueAsNumber]))")
+    assert len(set(answers.values())) == 6                                   # each click set its own value
+    b.click("#tlx-submit")
+    b.wait_for("!document.getElementById('end').hidden")
+    tlx = json.loads((root / "sessions" / "P01" / "tlx_session.json").read_text())
+    assert tlx["scales"] == answers and tlx["raw_tlx"] == pytest.approx(sum(answers.values()) / 6)

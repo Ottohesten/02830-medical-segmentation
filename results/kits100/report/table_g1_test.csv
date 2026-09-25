@@ -1,0 +1,13 @@
+method,label,primary,spearman_rho,partial_rho_given_volume,review_auc_worst10,beats_volume_review_worst10,review_auc_dice_below_083,beats_volume_review_dice_below_083,quality_auc,beats_volume_quality
+random,Random order (baseline),False,–,–,"0.506 [0.314, 0.692]",False,"0.504 [0.349, 0.670]",False,"0.935 [0.927, 0.944]",False
+neg_volume_ml,Predicted volume (baseline),False,"-0.05 [-0.28, 0.17]",–,"0.487 [0.254, 0.726]",False,"0.390 [0.206, 0.584]",False,"0.939 [0.925, 0.951]",False
+entropy_sum_ml,"Entropy, total",False,"-0.23 [-0.43, 0.01]","-0.63 [-0.74, -0.47]","0.681 [0.425, 0.906]",False,"0.748 [0.555, 0.916]",False,"0.940 [0.915, 0.955]",False
+entropy_mean_region,"Entropy, mean in region",False,"-0.80 [-0.87, -0.69]","-0.80 [-0.87, -0.69]","0.894 [0.821, 0.956]",True,"0.895 [0.836, 0.949]",True,"0.957 [0.951, 0.960]",True
+entropy_per_volume,Entropy per volume,False,"-0.75 [-0.82, -0.65]","-0.80 [-0.85, -0.71]","0.897 [0.821, 0.966]",True,"0.869 [0.791, 0.942]",True,"0.956 [0.952, 0.960]",True
+soft_dice_gap,Soft-Dice gap,False,"-0.71 [-0.80, -0.59]","-0.78 [-0.84, -0.68]","0.883 [0.800, 0.964]",True,"0.847 [0.755, 0.931]",True,"0.956 [0.951, 0.959]",True
+model_disagreement,"Model disagreement, 1 − Dice",False,"-0.64 [-0.77, -0.47]","-0.64 [-0.77, -0.46]","0.869 [0.749, 0.954]",True,"0.860 [0.773, 0.937]",True,"0.955 [0.950, 0.959]",True
+model_diff_mean_region,"Model disagreement, mean |Δp| (primary)",True,"-0.63 [-0.76, -0.47]","-0.63 [-0.76, -0.46]","0.855 [0.763, 0.934]",True,"0.831 [0.724, 0.925]",True,"0.954 [0.948, 0.959]",True
+plaus_asymmetry,Plausibility: asymmetry,False,"-0.22 [-0.43, 0.01]","-0.25 [-0.46, -0.01]","0.603 [0.409, 0.774]",False,"0.653 [0.494, 0.787]",True,"0.944 [0.933, 0.953]",False
+plaus_missing_side,Plausibility: missing side,False,"-0.01 [-0.33, 0.31]","-0.00 [-0.30, 0.31]","0.551 [0.481, 0.684]",False,"0.533 [0.481, 0.619]",False,"0.940 [0.928, 0.950]",False
+combo_mean_missing,Combination with plausibility (primary),True,"-0.61 [-0.75, -0.42]","-0.61 [-0.75, -0.42]","0.847 [0.756, 0.929]",True,"0.823 [0.719, 0.915]",True,"0.954 [0.947, 0.958]",True
+oracle,Oracle (true Dice),False,"-1.00 [-1.00, -1.00]","-1.00 [-1.00, -1.00]","0.950 [0.919, 0.981]",True,"0.931 [0.894, 0.969]",True,"0.959 [0.955, 0.962]",True

@@ -4,7 +4,8 @@
 //
 // Study mode: participant id -> guide (what kidneys and tumours look like, how to use the trackpad) ->
 // practice scan -> the correct answer for the practice scan -> the 6 study scans in the balanced order the
-// server returns -> thank-you screen. Each scan: intro screen (condition) -> viewer with timer -> "Done" or
+// server returns -> NASA-TLX questionnaire (at the end, or after each condition block; study.tlx in the
+// config) -> thank-you screen. Each scan: intro screen (condition) -> viewer with timer -> "Done" or
 // the time limit -> the corrected mask and a log are sent to the server. When the time is up the scan is
 // locked and a message says so. Scans that already have a saved log are skipped, so a session can be resumed.
 //
@@ -14,10 +15,20 @@
 // limit is reached (then the mask is saved as it is). The log records both the reason and the time.
 
 const $ = (id) => document.getElementById(id);
+
+// NASA-TLX scales (official wording). The keys must match TLX_SCALES in src/segreview/study.py.
+const TLX = [
+  ["mental", "Mental demand", "How mentally demanding was the task?", "Very low", "Very high"],
+  ["physical", "Physical demand", "How physically demanding was the task?", "Very low", "Very high"],
+  ["temporal", "Temporal demand", "How hurried or rushed was the pace of the task?", "Very low", "Very high"],
+  ["performance", "Performance", "How successful were you in accomplishing what you were asked to do?", "Perfect", "Failure"],
+  ["effort", "Effort", "How hard did you have to work to accomplish your level of performance?", "Very low", "Very high"],
+  ["frustration", "Frustration", "How insecure, discouraged, irritated, stressed, and annoyed were you?", "Very low", "Very high"],
+];
 const state = {
   settings: null,
   participant: null,
-  items: [],          // scans still to do: {case_id, condition, position, mode}
+  items: [],          // steps still to do: scans {case_id, condition, position, mode} and questionnaires {mode: "tlx", which}
   current: null,
   viewer: null,       // ReviewViewer (viewer.js)
   t0: 0,              // performance.now() when the scan became editable
@@ -102,7 +113,9 @@ async function init() {
   $("intro-go").onclick = () => openScan(state.current);
   $("done").onclick = () => finish("done");
   $("answer-continue").onclick = nextItem;
+  $("tlx-submit").onclick = submitTlx;
   buildToolbar();
+  buildTlx();
   buildSliceSlider();
 }
 
@@ -112,9 +125,13 @@ async function startStudy() {
   try {
     const plan = await api(`/api/study/${encodeURIComponent(pid)}`);
     state.participant = pid;
+    // Each study scan (if not done yet), followed by the questionnaire(s) due after its position.
+    const tlxAfter = {};
+    for (const t of plan.tlx.filter((t) => !t.done)) (tlxAfter[t.after_position] ||= []).push({ mode: "tlx", which: t.which });
     state.items = [
       ...plan.practice.filter((s) => !s.done).map((s) => ({ ...s, mode: "practice" })),
-      ...plan.scans.filter((s) => !s.done).map((s) => ({ ...s, mode: "study", total: plan.scans.length })),
+      ...plan.scans.flatMap((s) => [...(s.done ? [] : [{ ...s, mode: "study", total: plan.scans.length }]),
+                                    ...(tlxAfter[s.position] || [])]),
     ];
     // The guide comes before the practice scan (and is skipped when a session is resumed after it).
     if (state.items[0]?.mode === "practice") show("guide");
@@ -129,6 +146,7 @@ function nextItem() {
   state.current = state.items.shift() || null;
   if (!state.current) return show("end");
   const it = state.current;
+  if (it.mode === "tlx") return showTlx(it.which);
   $("intro-title").textContent = it.mode === "practice" ? "Practice scan" : `Scan ${it.position} of ${it.total}`;
   $("intro-text").textContent = it.mode === "practice"
     ? "Try the tools. This scan does not count. The blue colours show where the AI is uncertain. " +
@@ -138,6 +156,66 @@ function nextItem() {
         "slice slider. Use them to find mistakes."
       : "This time there is no uncertainty information. Find the mistakes yourself.";
   show("intro");
+}
+
+// ---------- NASA-TLX questionnaire ----------
+function buildTlx() {
+  for (const [key, title, question, low, high] of TLX) {
+    const card = document.createElement("div");
+    card.className = "tlx-scale";
+    card.innerHTML = `<h2>${title}</h2><p>${question}</p>
+      <input type="range" class="tlx-range unset" min="0" max="100" step="5" value="50" data-key="${key}"
+             aria-label="${title}: ${question}">
+      <div class="tlx-anchors"><span>${low}</span><span>${high}</span></div>`;
+    const input = card.querySelector("input");
+    // A scale counts as answered once the participant has clicked or moved it; until then it shows no position.
+    const answered = () => { input.classList.remove("unset"); updateTlxButton(); };
+    input.addEventListener("pointerdown", answered);
+    input.addEventListener("input", answered);
+    input.addEventListener("keydown", answered);
+    $("tlx-scales").appendChild(card);
+  }
+}
+
+function updateTlxButton() {
+  const open = [...document.querySelectorAll(".tlx-range.unset")].length;
+  $("tlx-submit").disabled = open > 0;
+  $("tlx-missing").textContent = open ? ` ${open} of ${TLX.length} scales still to answer` : "";
+}
+
+function showTlx(which) {
+  const about = {
+    session: "the scans you just corrected (not the practice scan)",
+    with_heatmap: "the last scans, where you could see where the AI was unsure (blue)",
+    without_heatmap: "the last scans, where there was no uncertainty information",
+  }[which];
+  $("tlx-lead").textContent = `Think about ${about}. For each scale, click where it fits best. There are no right answers.`;
+  for (const input of document.querySelectorAll(".tlx-range")) {
+    input.value = 50;
+    input.classList.add("unset");
+  }
+  $("tlx-error").hidden = true;
+  state.tlxStarted = new Date().toISOString();
+  updateTlxButton();
+  show("tlx");
+  window.scrollTo(0, 0);
+}
+
+async function submitTlx() {
+  const scales = {};
+  for (const input of document.querySelectorAll(".tlx-range")) scales[input.dataset.key] = input.valueAsNumber;
+  $("tlx-submit").disabled = true;
+  try {
+    await api(`/api/tlx/${state.participant}/${state.current.which}`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scales, started_iso: state.tlxStarted, submitted_iso: new Date().toISOString() }) });
+  } catch (err) {
+    $("tlx-error").textContent = `Could not save: ${err.message}. Please call the experimenter.`;
+    $("tlx-error").hidden = false;
+    $("tlx-submit").disabled = false;
+    return;
+  }
+  nextItem();
 }
 
 // ---------- queue (demo) ----------
@@ -247,6 +325,7 @@ function setHeatmap(on) {
   state.heatmapOn = on;
   state.viewer.setHeatmapVisible(on);
   drawSliceMarks();
+  $("key-blue").hidden = !on;          // blue is only explained while it is shown
   $("heatmap-toggle").textContent = on ? "Uncertainty: on" : "Uncertainty: off";
   $("heatmap-toggle").setAttribute("aria-pressed", String(on));
   logEvent("heatmap", { on });
@@ -391,6 +470,7 @@ async function openScan(item) {
   $("truth-toggle").textContent = "Show ground truth";
   $("scan-label").textContent = item.mode === "queue" ? `${item.case_id} (no. ${item.position} in the queue)`
     : item.mode === "practice" ? "Practice scan" : `Scan ${item.position} of ${item.total}`;
+  $("key-blue").hidden = true;          // shown by setHeatmap(true) below, if this scan has the heatmap
   viewerData("mode", "edit");
   updateSlice(viewer.slice);
   if (withHeatmap) setHeatmap(true);

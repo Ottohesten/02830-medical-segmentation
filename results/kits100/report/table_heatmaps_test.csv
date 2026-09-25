@@ -1,0 +1,4 @@
+heatmap,label,voxel_auc,top10_share
+entropy,Voxel entropy (chosen),0.864 (0.47--0.91),0.435 (0.08--0.59)
+m2_diff,"3 mm vs 6 mm model, $|p_3 - p_6|$",0.718 (0.37--0.83),0.212 (0.00--0.37)
+boundary,Distance to predicted edge (reference),0.841 (0.39--0.91),0.412 (0.07--0.58)

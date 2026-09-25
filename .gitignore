@@ -226,3 +226,6 @@ models/
 *.nii
 *.nii.gz
 *.npz
+
+# Output of HPC jobs (jobs/*.sh)
+logs/

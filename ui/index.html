@@ -19,6 +19,7 @@
       <input id="participant" placeholder="P01" autocomplete="off">
       <button id="start-study" class="primary">Start</button>
       <p id="start-error" class="error" hidden></p>
+      <p class="note">Test runs: use T01, T02, … (never analysed; delete them with scripts/clean_test_data.py).</p>
     </div>
     <div class="card">
       <h2>Demo: ranked queue</h2>
@@ -78,6 +79,7 @@
   <!-- Intro before each scan: tells the participant the condition and waits for "Start" -->
   <section id="intro" class="screen" hidden>
     <h1 id="intro-title"></h1>
+    <p class="task">Fix the red outline so it covers the whole kidney, including any tumour. Press Done when finished.</p>
     <p id="intro-text" class="lead"></p>
     <ul class="howto">
       <li><b>Add</b>: paint kidney that is missing from the red marking. <b>Erase</b>: remove red that is not kidney.
@@ -126,6 +128,12 @@
       <span class="orient r" title="The patient's right side">R</span>
       <span class="orient l" title="The patient's left side">L</span>
       <div id="loading" class="loading">Loading scan …</div>
+      <!-- Task and colour key, always in view while editing -->
+      <div id="key" class="key">
+        <p class="task">Fix the red outline so it covers the whole kidney, including any tumour. Press Done when finished.</p>
+        <span><i class="swatch red"></i>Red: the AI's kidney outline, which you fix</span>
+        <span id="key-blue"><i class="swatch blue"></i>Blue: where the AI is unsure</span>
+      </div>
       <div id="legend" class="legend" hidden>
         <span><i style="background: var(--correct)"></i>Marked and kidney</span>
         <span><i style="background: var(--missed)"></i>Kidney, not marked</span>
@@ -159,10 +167,20 @@
     </div>
   </section>
 
+  <!-- NASA-TLX questionnaire (Raw TLX): six scales, built by app.js -->
+  <section id="tlx" class="screen wide" hidden>
+    <h1>How was it?</h1>
+    <p id="tlx-lead" class="lead"></p>
+    <div id="tlx-scales" class="tlx-grid"></div>
+    <p id="tlx-error" class="error" hidden></p>
+    <button id="tlx-submit" class="primary" disabled>Submit</button>
+    <span id="tlx-missing" class="note"></span>
+  </section>
+
   <!-- End of the study -->
   <section id="end" class="screen" hidden>
     <h1>Thank you!</h1>
-    <p class="lead">All scans are saved. Please fill in the questionnaire (NASA-TLX) that the experimenter gives you.</p>
+    <p class="lead">All scans and answers are saved. You are done.</p>
     <button id="end-home">Back to the start</button>
   </section>
 

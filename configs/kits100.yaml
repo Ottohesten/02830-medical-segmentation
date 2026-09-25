@@ -78,3 +78,9 @@ visualisation:
   share_bin_width: 0.05 # histogram bin width for shares (0-1) in the label check plot
   label_worst_n: 3      # how many of the worst scans get their name written in plots
   dpi: 120
+
+report:                         # figures and tables for the paper (scripts/make_report_figures.py); no new analysis
+  set: clean_test               # the final G1 result is the test set
+  primary: model_diff_mean_region   # LOCKED primary measure (used to pick the heatmap example scans)
+  heatmap: entropy              # LOCKED G2 heatmap
+  example_bad_rule: worst10     # "bad" rule used to pick the failure examples

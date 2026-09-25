@@ -50,6 +50,8 @@ def test_plan_follows_balancing(server):
     assert [s["case_id"] for s in plan["scans"]] == [a["case_id"] for a in assignment("P01", m["study_scans"], "P")]
     assert not any(s["done"] for s in plan["scans"] + plan["practice"])
     assert status_of(base + "/api/study/nonsense") == 400
+    test_plan = json.loads(get(base + "/api/study/T01")[1])         # test ids work and get the same order
+    assert [s["case_id"] for s in test_plan["scans"]] == [s["case_id"] for s in plan["scans"]]
 
 
 def test_heatmap_only_in_with_condition(server):
@@ -132,3 +134,58 @@ def test_bad_uploads_are_rejected(server):
     assert post(f"{base}/api/save/study/P01/case_99999", gzip.compress(b"x"))[0] == 404
     assert post(f"{base}/api/save/study/Z01/{cid}", b"x")[0] == 400
     assert not (study_dir(study) / "sessions" / "P01" / f"{cid}_mask.nii.gz").exists()
+
+
+GOOD_TLX = {"mental": 55, "physical": 10, "temporal": 70, "performance": 25, "effort": 60, "frustration": 30}
+
+
+def test_tlx_is_saved_with_the_raw_score(server):
+    base, study = server
+    plan = json.loads(get(base + "/api/study/P05")[1])
+    assert [t["which"] for t in plan["tlx"]] == ["session"] and not plan["tlx"][0]["done"]
+    assert plan["tlx"][0]["after_position"] == len(plan["scans"])
+    code, reply = post(f"{base}/api/tlx/P05/session", json.dumps({"scales": GOOD_TLX}).encode(), "application/json")
+    assert code == 200 and reply["raw_tlx"] == pytest.approx(sum(GOOD_TLX.values()) / 6)
+    saved = json.loads((study_dir(study) / "sessions" / "P05" / "tlx_session.json").read_text())
+    assert saved["scales"] == GOOD_TLX and saved["raw_tlx"] == pytest.approx(41.6667, abs=1e-3)
+    assert json.loads(get(base + "/api/study/P05")[1])["tlx"][0]["done"]
+
+
+@pytest.mark.parametrize("scales, which, pid", [
+    ({**GOOD_TLX, "mental": 7}, "session", "P05"),        # not a step of 5
+    ({**GOOD_TLX, "effort": 105}, "session", "P05"),      # out of range
+    ({k: v for k, v in GOOD_TLX.items() if k != "effort"}, "session", "P05"),   # a scale missing
+    (GOOD_TLX, "with_heatmap", "P05"),                    # not a questionnaire of this study (after_session)
+    (GOOD_TLX, "session", "X05"),                         # not a valid id
+])
+def test_bad_tlx_is_rejected(server, scales, which, pid):
+    base, study = server
+    code, _ = post(f"{base}/api/tlx/{pid}/{which}", json.dumps({"scales": scales}).encode(), "application/json")
+    assert code == 400
+    assert not (study_dir(study) / "sessions" / pid).exists()
+
+
+def test_tlx_after_each_block(temp_study):
+    from segreview.study import tlx_schedule
+    from tests.conftest import running_server
+    temp_study["study"]["tlx"] = "after_each_block"
+    m = manifest(temp_study)
+    with running_server(temp_study) as base:
+        plan = json.loads(get(base + "/api/study/P02")[1])
+        # One questionnaire after each block, named after its condition.
+        conditions = [s["condition"] for s in plan["scans"]]
+        assert [(t["which"], t["after_position"]) for t in plan["tlx"]] == [(conditions[0], 3), (conditions[3], 6)]
+        code, _ = post(f"{base}/api/tlx/P02/{WITH}", json.dumps({"scales": GOOD_TLX}).encode(), "application/json")
+        assert code == 200
+    assert tlx_schedule(temp_study, assignment("P02", m["study_scans"], "P")) == [
+        {"which": t["which"], "after_position": t["after_position"]} for t in plan["tlx"]]
+
+
+def test_tlx_scale_names_match_the_page():
+    """The page (ui/app.js) and the server must use the same six scale keys."""
+    import re
+    from segreview.config import REPO_ROOT
+    from segreview.study import TLX_SCALES
+    js = (REPO_ROOT / "ui" / "app.js").read_text()
+    block = js[js.index("const TLX = ["):js.index("];", js.index("const TLX = ["))]
+    assert re.findall(r'^\s*\["(\w+)"', block, flags=re.M) == TLX_SCALES

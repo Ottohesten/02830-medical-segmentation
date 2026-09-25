@@ -29,6 +29,11 @@ study:
   time_limit_min: 5                   # per scan (study and practice); the scan is locked and saved when the time is up.
                                       # The demo queue has no time limit.
   participant_prefix: P               # participant ids look like P01, P02, ...; the number sets the balancing group
+  test_prefix: T                      # test runs use T01, T02, ... (same balancing, never analysed, and
+                                      # scripts/clean_test_data.py deletes them; it never touches P ids)
+  tlx: after_session                  # NASA-TLX (Raw TLX, 6 scales) in the interface: after_session (once, at the end)
+                                      # or after_each_block (after each condition, so workload WITH vs WITHOUT the
+                                      # heatmap can be compared per participant)
 
 queue:                                # demo mode: scans ranked by the G1 score, heatmap always available
   n_scans: 10                         # the n test scans with the highest score
@@ -66,6 +71,16 @@ viewer:
   slice_marks_fraction: 0.5           # "with heatmap": slices whose uncertainty (sum of shown heatmap values) is at
                                       # least this fraction of the most uncertain slice are marked on the slider
 
+power:                                # planning: participants needed for an assumed effect (scripts/power_study.py)
+  effect_sizes_dz: [0, 0.5, 0.8, 1.0, 1.2]   # d_z = mean / SD of the per-participant differences (with - without);
+                                      # 0 checks the false-positive rate
+  n_participants: [4, 8, 12, 16, 20, 24, 28, 32, 36, 40]   # multiples of 4 (balancing)
+  n_simulations: 10000
+  alpha: 0.05                         # two-sided Wilcoxon signed-rank test, as in the analysis
+  target_power: 0.8
+
 server:
   host: 127.0.0.1
   port: 8765
+  browser: chrome                     # what scripts/run_ui.py opens: chrome (the study only runs in Chrome),
+                                      # default (the computer's default browser) or none

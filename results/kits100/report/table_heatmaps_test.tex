@@ -1,0 +1,14 @@
+\begin{table}
+\centering\small
+\caption{Where are the wrong voxels? Heatmaps on the KiTS test set ($n = 80$), inside the organ plus a 5\,mm border: median (range) of the voxel-level AUC for wrong voxels, and the share of wrong voxels in the heatmap's top 10\%. The heatmap was chosen on the development set before this evaluation.}
+\label{tab:heatmaps}
+\begin{tabular}{lcc}
+\toprule
+Heatmap & Voxel AUC & Top-10\% share \\
+\midrule
+Voxel entropy (chosen) & 0.864 (0.47--0.91) & 0.435 (0.08--0.59) \\
+3 mm vs 6 mm model, $|p_3 - p_6|$ & 0.718 (0.37--0.83) & 0.212 (0.00--0.37) \\
+Distance to predicted edge (reference) & 0.841 (0.39--0.91) & 0.412 (0.07--0.58) \\
+\bottomrule
+\end{tabular}
+\end{table}

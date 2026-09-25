@@ -12,9 +12,15 @@ a scan twice. Two things are swapped between participants:
 - which condition comes first, so learning and tiredness affect both conditions equally.
 That gives 4 participant types, cycled by participant number (P01 -> type 0, P02 -> type 1, ...).
 With a multiple of 4 participants every combination occurs equally often.
+
+Test runs (trying the interface, demos) use ids with the test prefix instead, e.g. T01. They get the same
+balancing, but they are never analysed, and scripts/clean_test_data.py can delete them. Real participant ids
+(P01, ...) can never be deleted by that script.
 """
 
 import json
+import re
+import shutil
 from pathlib import Path
 
 import nibabel as nib
@@ -30,6 +36,40 @@ from segreview.metrics import dice
 
 WITH, WITHOUT = "with_heatmap", "without_heatmap"
 GUIDE_IMAGE = "example.png"
+
+# NASA-TLX, raw version (Raw TLX): six scales from 0 to 100 in steps of 5, no pairwise weighting.
+# The score is the mean of the six. For "performance" 0 = perfect and 100 = failure, so for every scale a
+# higher value means a higher workload.
+TLX_SCALES = ["mental", "physical", "temporal", "performance", "effort", "frustration"]
+TLX_MODES = ("after_session", "after_each_block")
+
+
+def tlx_schedule(study: dict, scans: list[dict]) -> list[dict]:
+    """When a participant fills in the NASA-TLX (study.tlx in the config).
+
+    after_session:    once, after the last study scan ("which" = "session").
+    after_each_block: after the last scan of each block, i.e. once per condition ("which" = the condition),
+                      so the workload WITH and WITHOUT the heatmap can be compared per participant.
+    Input: study config, the participant's scans in order (from assignment()).
+    Output: list of {"which", "after_position"}.
+    """
+    mode = study["study"]["tlx"]
+    if mode not in TLX_MODES:
+        raise ValueError(f"study.tlx must be one of {TLX_MODES}, not '{mode}'")
+    if mode == "after_session":
+        return [{"which": "session", "after_position": scans[-1]["position"]}]
+    ends = [s for i, s in enumerate(scans) if i + 1 == len(scans) or scans[i + 1]["condition"] != s["condition"]]
+    return [{"which": s["condition"], "after_position": s["position"]} for s in ends]
+
+
+def raw_tlx(scales: dict) -> float:
+    """Raw TLX score: the mean of the six scales (0-100). Checks that every scale is 0..100 in steps of 5."""
+    if sorted(scales) != sorted(TLX_SCALES):
+        raise ValueError(f"TLX needs exactly the scales {TLX_SCALES}")
+    for name, v in scales.items():
+        if not isinstance(v, int) or not 0 <= v <= 100 or v % 5:
+            raise ValueError(f"TLX scale '{name}' must be 0-100 in steps of 5 (got {v!r})")
+    return sum(scales.values()) / len(scales)
 
 # The 4 participant types: (block that gets the heatmap, condition shown first).
 PARTICIPANT_TYPES = [("B", WITHOUT), ("A", WITHOUT), ("B", WITH), ("A", WITH)]
@@ -52,20 +92,39 @@ def study_dir(study: dict) -> Path:
     return study["paths"]["study_dir"] / study["name"]
 
 
-def participant_type(participant_id: str, prefix: str) -> int:
-    """Balancing type (0-3) from a participant id like 'P07' (number 7 -> type (7 - 1) % 4 = 2)."""
-    if not participant_id.startswith(prefix) or not participant_id[len(prefix):].isdigit():
-        raise ValueError(f"Participant id must look like {prefix}01, {prefix}02, ... (got '{participant_id}')")
-    number = int(participant_id[len(prefix):])
+def id_pattern(prefix: str) -> re.Pattern:
+    """The ids of one kind: the prefix followed by digits only, e.g. P01 or T12."""
+    return re.compile(re.escape(prefix) + r"\d+")
+
+
+def id_prefixes(study: dict) -> tuple[str, str]:
+    """(participant prefix, test prefix) from the study config. They must differ, and no id may fit both."""
+    participant, test = study["study"]["participant_prefix"], study["study"]["test_prefix"]
+    if not participant or not test or participant.startswith(test) or test.startswith(participant):
+        raise ValueError(f"participant_prefix '{participant}' and test_prefix '{test}' must be different and "
+                         "neither may start with the other")
+    return participant, test
+
+
+def participant_type(participant_id: str, prefix: str | tuple[str, ...]) -> int:
+    """Balancing type (0-3) from an id like 'P07' (number 7 -> type (7 - 1) % 4 = 2).
+
+    prefix: the allowed id prefix, or several (e.g. ("P", "T") for participant and test ids).
+    """
+    prefixes = (prefix,) if isinstance(prefix, str) else tuple(prefix)
+    match = next((p for p in prefixes if id_pattern(p).fullmatch(participant_id)), None)
+    if match is None:
+        raise ValueError(f"Participant id must look like {prefixes[0]}01, {prefixes[0]}02, ... (got '{participant_id}')")
+    number = int(participant_id[len(match):])
     if number < 1:
         raise ValueError("Participant numbers start at 1")
     return (number - 1) % len(PARTICIPANT_TYPES)
 
 
-def assignment(participant_id: str, study_scans: list[str], prefix: str) -> list[dict]:
+def assignment(participant_id: str, study_scans: list[str], prefix: str | tuple[str, ...]) -> list[dict]:
     """The ordered list of scans and conditions for one participant (see the module docstring).
 
-    Input: participant id, the study scans in their fixed order (first half = block A), id prefix.
+    Input: participant id, the study scans in their fixed order (first half = block A), id prefix(es).
     Output: list of {"case_id", "condition", "position"} in the order the participant sees them.
     """
     half = len(study_scans) // 2
@@ -214,3 +273,32 @@ def load_manifest(study: dict) -> dict:
     if not path.exists():
         raise FileNotFoundError(f"{path} missing. Run scripts/prepare_study.py first.")
     return json.loads(path.read_text())
+
+
+def clean_test_data(study: dict, dry_run: bool = False) -> list[Path]:
+    """Delete what test runs saved: sessions/<test id>/ and queue_edits/ (the demo queue, never study data).
+
+    Safety: a session folder is only deleted if its name is a test id (test prefix + digits, e.g. T03) AND not
+    a participant id. Everything else in sessions/ (P01, ...) is left alone. Symbolic links are removed as
+    links; what they point to is never touched.
+
+    Input: study config; dry_run=True only lists what would be deleted.
+    Output: the deleted (or, with dry_run, the would-be deleted) paths.
+    """
+    participant, test = id_prefixes(study)
+    root = study_dir(study)
+    targets = []
+    sessions = root / "sessions"
+    if sessions.is_dir():
+        for folder in sorted(sessions.iterdir()):
+            if id_pattern(test).fullmatch(folder.name) and not id_pattern(participant).fullmatch(folder.name):
+                targets.append(folder)
+    if (root / "queue_edits").exists():
+        targets.append(root / "queue_edits")
+    if not dry_run:
+        for t in targets:
+            if t.is_symlink() or t.is_file():
+                t.unlink()
+            else:
+                shutil.rmtree(t)
+    return targets

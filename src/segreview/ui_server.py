@@ -13,6 +13,7 @@ Endpoints:
   GET  /files/guide/example.png                 example image for the instruction screen
   POST /api/save/<mode>/<participant>/<case>    body = the corrected mask as NIfTI bytes (from NiiVue)
   POST /api/log/<mode>/<participant>/<case>     body = JSON log of the scan (times, events)
+  POST /api/tlx/<participant>/<which>           body = JSON NASA-TLX answers (which = session or a condition)
 
 The heatmap of a study scan is only handed out if that participant has the scan in the WITH-heatmap
 condition, so the "without" condition cannot show it by mistake. The ground truth (truth) is only handed
@@ -22,6 +23,7 @@ scan. Only known scan ids and file names are accepted, and the server only liste
 Saved files (data/study/<study name>/):
   sessions/<participant>/<case>_mask.nii.gz and <case>_log.json   study scans
   sessions/<participant>/practice/...                             practice scans
+  sessions/<participant>/tlx_<which>.json                         NASA-TLX answers
   queue_edits/<case>_mask.nii.gz and <case>_log.json              demo queue
 """
 
@@ -37,7 +39,8 @@ from pathlib import Path
 import nibabel as nib
 
 from segreview.config import REPO_ROOT
-from segreview.study import GUIDE_IMAGE, WITH, assignment, load_manifest, participant_type, study_dir
+from segreview.study import (GUIDE_IMAGE, TLX_SCALES, WITH, assignment, id_prefixes, load_manifest, participant_type,
+                             raw_tlx, study_dir, tlx_schedule)
 
 UI_DIR = REPO_ROOT / "ui"
 FILE_NAMES = {"ct", "mask", "heatmap", "truth"}
@@ -51,7 +54,7 @@ class StudyServer:
         self.study = study
         self.root = study_dir(study)
         self.manifest = load_manifest(study)
-        self.prefix = study["study"]["participant_prefix"]
+        self.prefixes = id_prefixes(study)     # participant ids (P01, ...) and test ids (T01, ...)
 
     def output_dir(self, mode: str, participant: str) -> Path:
         """Where a scan's corrected mask and log are written."""
@@ -62,21 +65,24 @@ class StudyServer:
 
     def plan(self, participant: str) -> dict:
         """Practice + study scans for one participant, with the condition and whether each is done."""
-        scans = assignment(participant, self.manifest["study_scans"], self.prefix)
+        scans = assignment(participant, self.manifest["study_scans"], self.prefixes)
         for s in scans:
             s["done"] = (self.output_dir("study", participant) / f"{s['case_id']}_log.json").exists()
         practice = [{"case_id": c, "condition": WITH, "position": i + 1,
                      "done": (self.output_dir("practice", participant) / f"{c}_log.json").exists()}
                     for i, c in enumerate(self.manifest["practice_scans"])]
-        return {"participant": participant, "type": participant_type(participant, self.prefix),
-                "practice": practice, "scans": scans}
+        tlx = tlx_schedule(self.study, scans)
+        for t in tlx:
+            t["done"] = (self.output_dir("study", participant) / f"tlx_{t['which']}.json").exists()
+        return {"participant": participant, "type": participant_type(participant, self.prefixes),
+                "practice": practice, "scans": scans, "tlx": tlx}
 
     def heatmap_allowed(self, participant: str, file_set: str, case_id: str) -> bool:
         """The heatmap is shown in the demo queue, in practice, and for study scans in the WITH condition."""
         if file_set == "queue" or case_id in self.manifest["practice_scans"]:
             return True
         return any(s["case_id"] == case_id and s["condition"] == WITH
-                   for s in assignment(participant, self.manifest["study_scans"], self.prefix))
+                   for s in assignment(participant, self.manifest["study_scans"], self.prefixes))
 
     def truth_allowed(self, file_set: str, case_id: str) -> bool:
         """The ground truth is shown for the demo queue and the practice scan only, never for a study scan."""
@@ -130,7 +136,8 @@ class Handler(BaseHTTPRequestHandler):
             if parts[:2] == ["api", "settings"]:
                 s = self.app.study
                 return self._json({"viewer": s["viewer"], "time_limit_min": s["study"]["time_limit_min"],
-                                   "participant_prefix": self.app.prefix,
+                                   "participant_prefix": self.app.prefixes[0], "test_prefix": self.app.prefixes[1],
+                                   "tlx": s["study"]["tlx"],
                                    "guide_image": (self.app.root / "guide" / GUIDE_IMAGE).exists()})
             if parts[:2] == ["api", "study"] and len(parts) == 3:
                 return self._json(self.app.plan(parts[2]))
@@ -165,12 +172,14 @@ class Handler(BaseHTTPRequestHandler):
     # --- POST ----------------------------------------------------------------------------------
     def do_POST(self):
         parts = [p for p in self.path.split("?")[0].split("/") if p]
+        if parts[:2] == ["api", "tlx"] and len(parts) == 4:
+            return self._save_tlx(parts[2], parts[3])
         if len(parts) != 5 or parts[0] != "api" or parts[1] not in {"save", "log"} or parts[2] not in MODES:
             return self._error(HTTPStatus.NOT_FOUND, "unknown path")
         _, kind, mode, participant, case_id = parts
         try:
             if mode != "queue":
-                participant_type(participant, self.app.prefix)  # validates the id
+                participant_type(participant, self.app.prefixes)  # validates the id
         except ValueError as e:
             return self._error(HTTPStatus.BAD_REQUEST, str(e))
         file_set = "queue" if mode == "queue" else "scans"
@@ -186,6 +195,25 @@ class Handler(BaseHTTPRequestHandler):
                     "server_received_unix": time.time()})
         (out / f"{case_id}_log.json").write_text(json.dumps(log, indent=2))
         return self._json({"ok": True})
+
+    def _save_tlx(self, participant: str, which: str) -> None:
+        """Store one NASA-TLX questionnaire. The raw TLX score is computed here, not trusted from the page."""
+        try:
+            plan = self.app.plan(participant)                   # also validates the participant id
+            if which not in {t["which"] for t in plan["tlx"]}:
+                raise ValueError(f"no TLX '{which}' in this study")
+            answer = json.loads(self._body())
+            scales = {k: answer["scales"][k] for k in TLX_SCALES}
+            score = raw_tlx(scales)
+        except (ValueError, KeyError, TypeError) as e:
+            return self._error(HTTPStatus.BAD_REQUEST, f"bad TLX: {e}")
+        out = self.app.output_dir("study", participant)
+        out.mkdir(parents=True, exist_ok=True)
+        record = {"participant": participant, "which": which, "scales": scales, "raw_tlx": score,
+                  "started_iso": answer.get("started_iso"), "submitted_iso": answer.get("submitted_iso"),
+                  "server_received_unix": time.time()}
+        (out / f"tlx_{which}.json").write_text(json.dumps(record, indent=2))
+        return self._json({"ok": True, "raw_tlx": score})
 
     def _save_mask(self, body: bytes, out: Path, file_set: str, case_id: str) -> None:
         """Check that the uploaded NIfTI has the scan's shape, then store it gzipped."""

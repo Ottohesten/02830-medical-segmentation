@@ -61,3 +61,38 @@ def test_selected_scans_meet_the_criteria(real_study):
         assert sel["error_ml_min"] <= r.error_ml <= sel["error_ml_max"]
         assert r.axial_slices <= sel["max_axial_slices"] and r.n_sides_found == 2
         assert m["facts"]["scans"][cid]["gt_kept"] >= sel["min_gt_in_crop"]
+
+
+def test_test_ids_get_the_same_balancing_as_participant_ids():
+    for n in (1, 2, 3, 4, 7):
+        assert assignment(f"T{n:02d}", SCANS, ("P", "T")) == assignment(f"P{n:02d}", SCANS, "P")
+    with pytest.raises(ValueError):
+        participant_type("T01", "P")              # a test id is only accepted where test ids are allowed
+
+
+def test_clean_test_data_deletes_only_test_ids(temp_study):
+    from segreview.study import clean_test_data, study_dir
+    root = study_dir(temp_study)
+    folders = ["P01", "P12", "T01", "T15", "TX", "T01a", "t02", "PT01", "demo"]
+    for name in folders:
+        (root / "sessions" / name).mkdir(parents=True)
+        (root / "sessions" / name / "case_00001_log.json").write_text("{}")
+    (root / "queue_edits").mkdir()
+    (root / "queue_edits" / "case_00001_mask.nii.gz").write_bytes(b"x")
+
+    listed = clean_test_data(temp_study, dry_run=True)
+    assert all(p.exists() for p in listed)                                  # a dry run deletes nothing
+    deleted = clean_test_data(temp_study)
+    assert sorted(p.name for p in deleted) == ["T01", "T15", "queue_edits"]
+    left = sorted(p.name for p in (root / "sessions").iterdir())
+    assert left == sorted(set(folders) - {"T01", "T15"})
+    assert (root / "sessions" / "P01" / "case_00001_log.json").exists()     # participant data untouched
+    assert (root / "scans").exists() and (root / "manifest.json").exists()
+
+
+def test_prefixes_that_could_overlap_are_refused(temp_study):
+    from segreview.study import clean_test_data
+    for participant, test in (("P", "P"), ("P", "PT"), ("TP", "T"), ("P", "")):
+        temp_study["study"]["participant_prefix"], temp_study["study"]["test_prefix"] = participant, test
+        with pytest.raises(ValueError):
+            clean_test_data(temp_study, dry_run=True)

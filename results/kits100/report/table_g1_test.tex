@@ -1,0 +1,35 @@
+\begin{table*}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{G1 on the KiTS test set ($n = 80$ scans). Spearman $\rho$ between score and true Dice (negative = good), partial $\rho$ given predicted volume, and areas under the review and quality curves (AUC), with 95\% bootstrap CIs. $^\dagger$: the lower CI bound of the AUC difference to the volume baseline is above 0. Bold: primary measures (locked on the development set).}
+\label{tab:g1}
+\begin{tabular}{lccccc}
+\toprule
+ & & & \multicolumn{2}{c}{Review AUC, bad =} & \\
+\cmidrule(lr){4-5}
+Method & Spearman $\rho$ & Partial $\rho$ & worst 10 \% (8 bad) & Dice $<$ 0.83 (11 bad) & Quality AUC \\
+\midrule
+\multicolumn{6}{l}{\emph{Baselines}} \\
+\quad Random order & -- & -- & 0.51 [0.31, 0.69] & 0.50 [0.35, 0.67] & 0.935 [0.927, 0.944] \\
+\quad Predicted volume & $-$0.05 [$-$0.28, 0.17] & -- & 0.49 [0.25, 0.73] & 0.39 [0.21, 0.58] & 0.939 [0.925, 0.951] \\
+\addlinespace
+\multicolumn{6}{l}{\emph{GT-free uncertainty measures}} \\
+\quad Entropy, total & $-$0.23 [$-$0.43, 0.01] & $-$0.63 & 0.68 [0.43, 0.91] & 0.75 [0.55, 0.92] & 0.940 [0.915, 0.955] \\
+\quad Entropy, mean in region & $-$0.80 [$-$0.87, $-$0.69] & $-$0.80 & 0.89 [0.82, 0.96]$^\dagger$ & 0.89 [0.84, 0.95]$^\dagger$ & 0.957 [0.951, 0.960]$^\dagger$ \\
+\quad Entropy per volume & $-$0.75 [$-$0.82, $-$0.65] & $-$0.80 & 0.90 [0.82, 0.97]$^\dagger$ & 0.87 [0.79, 0.94]$^\dagger$ & 0.956 [0.952, 0.960]$^\dagger$ \\
+\quad Soft-Dice gap & $-$0.71 [$-$0.80, $-$0.59] & $-$0.78 & 0.88 [0.80, 0.96]$^\dagger$ & 0.85 [0.76, 0.93]$^\dagger$ & 0.956 [0.951, 0.959]$^\dagger$ \\
+\quad Model disagreement, 1 $-$ Dice & $-$0.64 [$-$0.77, $-$0.47] & $-$0.64 & 0.87 [0.75, 0.95]$^\dagger$ & 0.86 [0.77, 0.94]$^\dagger$ & 0.955 [0.950, 0.959]$^\dagger$ \\
+\quad \textbf{Model disagreement, mean $|\Delta p|$} & $-$0.63 [$-$0.76, $-$0.47] & $-$0.63 & 0.85 [0.76, 0.93]$^\dagger$ & 0.83 [0.72, 0.93]$^\dagger$ & 0.954 [0.948, 0.959]$^\dagger$ \\
+\addlinespace
+\multicolumn{6}{l}{\emph{Plausibility}} \\
+\quad Asymmetry & $-$0.22 [$-$0.43, 0.01] & $-$0.25 & 0.60 [0.41, 0.77] & 0.65 [0.49, 0.79]$^\dagger$ & 0.944 [0.933, 0.953] \\
+\quad Missing side & $-$0.01 [$-$0.33, 0.31] & $-$0.00 & 0.55 [0.48, 0.68] & 0.53 [0.48, 0.62] & 0.940 [0.928, 0.950] \\
+\addlinespace
+\multicolumn{6}{l}{\emph{Combination}} \\
+\quad \textbf{Combination with plausibility} & $-$0.61 [$-$0.75, $-$0.42] & $-$0.61 & 0.85 [0.76, 0.93]$^\dagger$ & 0.82 [0.72, 0.92]$^\dagger$ & 0.954 [0.947, 0.958]$^\dagger$ \\
+\addlinespace
+\multicolumn{6}{l}{\emph{Upper bound}} \\
+\quad Oracle (true Dice) & $-$1.00 [$-$1.00, $-$1.00] & $-$1.00 & 0.95 [0.92, 0.98]$^\dagger$ & 0.93 [0.89, 0.97]$^\dagger$ & 0.959 [0.955, 0.962]$^\dagger$ \\
+\bottomrule
+\end{tabular}
+\end{table*}

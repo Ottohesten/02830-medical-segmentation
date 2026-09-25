@@ -1,6 +1,6 @@
 # HPC configuration: DTU HPC (Linux with an NVIDIA GPU).
 # Same structure as local.yaml, but full resolution, all scans, TTA and more perturbation strengths.
-# Not tested yet (no GPU access so far).
+# Not tested yet (no GPU access so far). Job scripts for the DTU HPC (LSF): jobs/hpc_inference.sh, jobs/hpc_g1.sh.
 # Every setting that changes runtime or data lives here, so scripts never hardcode paths or numbers.
 # Use it with:  uv run python scripts/<script>.py --config configs/hpc.yaml
 
@@ -9,7 +9,7 @@ seed: 42
 
 compute:
   device: auto        # auto = CUDA if available, else MPS (Apple Silicon), else CPU. Or force: cuda / mps / cpu
-  num_threads: 0      # CPU threads for torch. 0 = use all cores
+  num_threads: 4      # CPU threads for torch; match the cores the LSF job asks for (#BSUB -n in jobs/*.sh)
   reduce_chunk_slices: 16  # slices processed at a time when reducing the 117-class output (lower = less memory)
 
 paths:                # relative paths are relative to the repository root

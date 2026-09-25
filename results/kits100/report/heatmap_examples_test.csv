@@ -1,0 +1,4 @@
+panel,category,case_id,slice,dice,model_diff_mean_region,queue_position
+a,Certain and correct,case_00457,45,0.9398,0.0936857759952545,80
+b,Uncertain and wrong,case_00192,49,0.6613,0.2942152619361877,2
+c,Certain but wrong,case_00406,53,0.8004,0.1117602065205574,34
