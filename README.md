@@ -1,6 +1,6 @@
 # Where to Look First
 
-Prioritising human review of AI medical image segmentation.
+Prioritizing human review of AI medical image segmentation.
 DTU 02830 Advanced Project in Digital Media Engineering, group 2.
 
 A pretrained segmentation model (TotalSegmentator / nnU-Net) segments an organ in many CT scans.
@@ -18,7 +18,7 @@ The interface opens in Google Chrome at **http://127.0.0.1:8765** (the study onl
 `server.browser` in `configs/study.yaml` to `default` or `none` to change that). Stop it with Ctrl+C.
 
 - **Participant ids:** real participants are `P01`, `P02`, ... (the number sets the balanced order).
-  **Test runs always use `T01`, `T02`, ...**: same order as the P id with the same number, never analysed.
+  **Test runs always use `T01`, `T02`, ...**: same order as the P id with the same number, never analyzed.
 - **Delete test data** (sessions of T ids and all demo-queue edits; P ids are never touched):
 
   ```bash
@@ -53,7 +53,7 @@ Every setting that affects runtime, data or file locations lives in one YAML fil
 All files have the same structure: `compute` (device, threads), `paths` (data, weights, predictions,
 results), `dataset` (which dataset file, how many scans, first or random selection), `model` (resolution, folds),
 `uncertainty` (border, TTA, second model), `plausibility`, `perturbations`, `evaluation` (which splits may be
-evaluated, one or more rules for a bad segmentation, rank combinations, bootstrap) and `visualisation`. All configs also run the 6 mm model as a second model (see below).
+evaluated, one or more rules for a bad segmentation, rank combinations, bootstrap) and `visualization`. All configs also run the 6 mm model as a second model (see below).
 
 Every script takes the config as its only required argument. To switch environment, switch the file:
 
@@ -83,8 +83,8 @@ dataset file, not changes to inference, uncertainty or evaluation.
 
 - **MSD Task09 Spleen** (`configs/datasets/msd_spleen.yaml`): 41 contrast-enhanced CT scans with manual
   spleen masks (Memorial Sloan Kettering), [Medical Segmentation Decathlon](http://medicaldecathlon.com/), CC-BY-SA 4.0.
-- **KiTS23** (`configs/datasets/kits23.yaml`): 489 CT scans of patients with kidney tumours, with kidney (1),
-  tumour (2) and cyst (3) masks; scans from many referring hospitals. [kits-challenge.org](https://kits-challenge.org/kits23/),
+- **KiTS23** (`configs/datasets/kits23.yaml`): 489 CT scans of patients with kidney tumors, with kidney (1),
+  tumor (2) and cyst (3) masks; scans from many referring hospitals. [kits-challenge.org](https://kits-challenge.org/kits23/),
   CC BY-NC-SA 4.0. Only the selected scans are downloaded (median ~50 MB each). Organ definitions:
   `kidney_tumor_cyst` (used), `kidney_cyst`, `kidney_cyst_ignore_tumor`. Matching TotalSegmentator classes:
   kidney_left + kidney_right + kidney_cyst_left + kidney_cyst_right.
@@ -119,7 +119,7 @@ What G1 computes:
 - **Baselines:** random order and small predicted organ volume. **Oracle:** true Dice (upper bound).
 - **Evaluation** (uses ground truth): Spearman rho with bootstrap CI, partial rho given volume, the review curve
   (share of bad segmentations found vs. share reviewed) and the quality curve (mean Dice after correcting the
-  reviewed scans), each summarised by the area under the curve, all methods in one figure.
+  reviewed scans), each summarized by the area under the curve, all methods in one figure.
 - **Heatmaps per scan**: `data/predictions/<name>/<variant>/<case>_entropy.nii.gz` (entropy, 0-1 bits) and
   `<case>_m2_diff.nii.gz` (|p_3mm - p_6mm|), NIfTI on the same grid as the CT, for the review interface.
 - **Plausibility check** (paired organs such as the kidneys; GT-free, `src/segreview/plausibility.py`): splits the
@@ -192,7 +192,7 @@ bjobs            # list your jobs;  bpeek <job id>: live output;  bkill <job id>
 
 A browser-based viewer built on [NiiVue](https://github.com/niivue/niivue) (stored in `ui/vendor/niivue`, so no internet
 is needed) with a small local Python server. Settings are in `configs/study.yaml` (scan selection, time limit,
-heatmap, colours, brush sizes, trackpad behaviour). The study runs in **Google Chrome** on a MacBook with a
+heatmap, colors, brush sizes, trackpad behavior). The study runs in **Google Chrome** on a MacBook with a
 **trackpad**; other browsers are not supported (painting does not work in Firefox).
 
 ```bash
@@ -201,7 +201,7 @@ uv run python scripts/run_ui.py        --config configs/study.yaml   # start the
 ```
 
 - **Study mode:** enter a participant id (P01, P02, ...). The participant first sees a short guide (an example image of
-  kidneys and a tumour, made from a development scan used nowhere else, and how to use the trackpad), then a
+  kidneys and a tumor, made from a development scan used nowhere else, and how to use the trackpad), then a
   practice scan, and after it the correct answer (red = marked and kidney, yellow = kidney not marked, blue = marked
   but not kidney). Then 6 scans follow, 3 with and 3 without the uncertainty heatmap, in a balanced order (the number
   in the id sets the order; use a multiple of 4 participants). Each scan has a time limit; the clock starts when the
@@ -209,9 +209,11 @@ uv run python scripts/run_ui.py        --config configs/study.yaml   # start the
   The corrected mask and a log (times, strokes, tools, heatmap use) are saved to
   `data/study/<study name>/sessions/<participant>/`. A session can be resumed: finished scans are skipped.
   Test runs use T ids (T01, ...), which the analysis ignores and `scripts/clean_test_data.py` deletes.
-- **On screen:** a short task ("Fix the red outline so it covers the whole kidney, including any tumour. Press Done
-  when finished.") and a colour key (red = the AI's outline, blue = where the AI is unsure, only when the heatmap is
+- **On screen:** a short task ("Fix the red outline so it covers the whole kidney, including any tumor. Press Done
+  when finished.") and a color key (red = the AI's outline, blue = where the AI is unsure, only when the heatmap is
   shown).
+- **Running the study:** [docs/study/](docs/study/) has the experimenter's [session guide](docs/study/session_guide.md),
+  the [consent form](docs/study/consent_form.md) and the [pilot test plan](docs/study/pilot_plan.md).
 - **Demo queue:** the test scans ranked by the G1 score, most uncertain first. Heatmap always available, no time
   limit, and the ground truth can be shown.
 - **Tools:** Add / Erase with a round brush (a circle shows its size), brush size, Undo (also ⌘Z), Move, two contrast
@@ -232,7 +234,7 @@ uv run python scripts/run_ui.py        --config configs/study.yaml   # start the
   is drawn above the heatmap, and the study flow (guide, practice, time limit, answer, scans without heatmap) works.
   On a Mac, headless Chrome uses the graphics card and the browser tests take about a minute.
 
-## Analysing the user study (G2)
+## Analyzing the user study (G2)
 
 ```bash
 uv run python scripts/analyze_study.py --config configs/study.yaml   # after the study: tables + figure
@@ -244,13 +246,14 @@ uv run python scripts/power_study.py   --config configs/study.yaml   # planning:
 - **Comparison:** per participant, the mean over the 3 scans with and the 3 scans without the heatmap; Wilcoxon
   signed-rank test on the differences (with − without), two-sided, with the rank-biserial correlation as effect size.
   Dice after, Dice gain and time are reported as secondary outcomes.
-- **NASA-TLX** (Raw TLX: mean of 6 scales, 0–100) is the last step in the interface. With `study.tlx:
-  after_each_block` it is asked after each condition, and the analysis then also compares workload with vs without.
-- Only real participant ids (P01, ...) are analysed; test ids (T01, ...) and the practice scan are ignored. Output:
+- **NASA-TLX** (Raw TLX: mean of 6 scales, 0–100) is asked in the interface after each condition block
+  (`study.tlx: after_each_block`, the default), so the analysis also compares workload with vs without the heatmap,
+  paired per participant. With `after_session` it is asked once, at the end.
+- Only real participant ids (P01, ...) are analyzed; test ids (T01, ...) and the practice scan are ignored. Output:
   `results/study_kits/study_{scans,participants,tests,tlx}.csv` and `figures/study_gain_per_min.png`.
 - The analysis is tested on **simulated** sessions (`tests/simulated_sessions.py`), which exist only in temporary
   test folders; simulated output is named `SIMULATED_*` and can never be written to `results/`.
-- **Power simulation** (`results/study_kits/power_simulation.csv`, `power_needed.csv`): for assumed standardised
+- **Power simulation** (`results/study_kits/power_simulation.csv`, `power_needed.csv`): for assumed standardized
   effect sizes d_z (mean / SD of the per-participant differences), the share of simulated studies where the Wilcoxon
   test finds the effect. These are assumptions for planning, not results.
 

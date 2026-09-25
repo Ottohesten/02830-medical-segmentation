@@ -1,1 +1,1 @@
-"""Shared code for the review-prioritisation pipeline (data, model, metrics, uncertainty)."""
+"""Shared code for the review-prioritization pipeline (data, model, metrics, uncertainty)."""

@@ -6,7 +6,7 @@ and the saved model output. Writes results/<config name>/report/:
   fig_g1_auc_vs_volume_test.{pdf,png}    AUC minus the volume baseline with paired 95 % bootstrap CIs
   fig_heatmap_examples_test.{pdf,png}    three test scans: model vs ground truth, and the uncertainty heatmap
   table_g1_test.{csv,tex}                all measures, baselines and the oracle
-  table_heatmaps_test.{csv,tex}          error localisation of the candidate heatmaps
+  table_heatmaps_test.{csv,tex}          error localization of the candidate heatmaps
   heatmap_examples_test.csv              which scans and slices the example figure shows, and why
 
 Usage: uv run python scripts/make_report_figures.py --config configs/kits100.yaml

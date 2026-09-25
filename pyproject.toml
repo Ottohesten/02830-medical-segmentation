@@ -1,7 +1,7 @@
 [project]
 name = "02830-medical-segmentation"
 version = "0.1.0"
-description = "Where to Look First: prioritising human review of AI medical image segmentation"
+description = "Where to Look First: prioritizing human review of AI medical image segmentation"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [

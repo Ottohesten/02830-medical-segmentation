@@ -206,7 +206,7 @@ def organ_definition(cfg: dict, name: str | None = None) -> dict:
     """The ground-truth definition of the organ: which label values count as organ, and which are ignored.
 
     A dataset file lists one or more definitions under organ_definitions; organ_definition picks
-    the one in use. Example for KiTS: "kidney + tumour + cyst" or "kidney + cyst".
+    the one in use. Example for KiTS: "kidney + tumor + cyst" or "kidney + cyst".
     - organ_labels:  label values that together form the organ (a union).
     - ignore_labels: label values left out of the Dice computation entirely (optional). Useful when
                      it is unclear whether a structure should count as organ or not.

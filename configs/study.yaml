@@ -29,27 +29,27 @@ study:
   time_limit_min: 5                   # per scan (study and practice); the scan is locked and saved when the time is up.
                                       # The demo queue has no time limit.
   participant_prefix: P               # participant ids look like P01, P02, ...; the number sets the balancing group
-  test_prefix: T                      # test runs use T01, T02, ... (same balancing, never analysed, and
+  test_prefix: T                      # test runs use T01, T02, ... (same balancing, never analyzed, and
                                       # scripts/clean_test_data.py deletes them; it never touches P ids)
-  tlx: after_session                  # NASA-TLX (Raw TLX, 6 scales) in the interface: after_session (once, at the end)
-                                      # or after_each_block (after each condition, so workload WITH vs WITHOUT the
-                                      # heatmap can be compared per participant)
+  tlx: after_each_block               # NASA-TLX (Raw TLX, 6 scales) in the interface: after_each_block (after each
+                                      # condition, so workload WITH vs WITHOUT the heatmap can be compared per
+                                      # participant) or after_session (once, at the end)
 
 queue:                                # demo mode: scans ranked by the G1 score, heatmap always available
   n_scans: 10                         # the n test scans with the highest score
   score: model_diff_mean_region       # LOCKED primary G1 measure
 
 guide:                                # example image on the instruction screen before the practice scan
-  labels: {kidney: 1, tumour: 2, cyst: 3}   # ground-truth label values of the dataset (KiTS23)
+  labels: {kidney: 1, tumor: 2, cyst: 3}    # ground-truth label values of the dataset (KiTS23)
   min_piece_cm2: 3                    # the slice must show at least two separate pieces of kidney this big
   margin_mm: 60                       # space around the kidneys in the image
-  colours: {kidney: "#3ddc84", tumour: "#ffc233", cyst: "#ff6bd6"}
+  colors: {kidney: "#3ddc84", tumor: "#ffc233", cyst: "#ff6bd6"}
 
 viewer:
   window_presets:                     # contrast buttons (Hounsfield units); the first one is used at start
     - {name: Normal, level: 40, width: 400}
     - {name: High contrast, level: 60, width: 200}
-  heatmap_colormap: blue2cyan         # cold colours, so the heatmap is easy to tell apart from the red mask
+  heatmap_colormap: blue2cyan         # cold colors, so the heatmap is easy to tell apart from the red mask
   heatmap_min: 0.1                    # entropy below this (bits) is not drawn, so only uncertain voxels show
   heatmap_opacity: 0.6
   mask_color: [235, 40, 40]           # red; the mask is always drawn on top of the heatmap
@@ -60,7 +60,7 @@ viewer:
     correct: [235, 40, 40]            # marked and kidney (same red as the mask)
     missed: [255, 205, 0]             # kidney that is not marked
     extra: [60, 130, 255]             # marked, but not kidney
-  pen_sizes: [1, 3, 7, 11]            # brush diameters in voxels (odd, so the round brush is centred on a voxel)
+  pen_sizes: [1, 3, 7, 11]            # brush diameters in voxels (odd, so the round brush is centered on a voxel)
   default_pen_size: 7
   zoom_min: 1                         # 1 = the whole slice fits the window
   zoom_max: 8

@@ -12,7 +12,7 @@
   --toolbar-text: #eeeeea;
   --toolbar-muted: #b9b8b1;
   --danger: #c0392b;
-  --mark: #3ee0ff;                /* high-uncertainty slices on the slider (the top colour of the heatmap) */
+  --mark: #3ee0ff;                /* high-uncertainty slices on the slider (the top color of the heatmap) */
   --correct: rgb(235, 40, 40);    /* legend of the ground-truth comparison; app.js sets these from the config */
   --missed: rgb(255, 205, 0);
   --extra: rgb(60, 130, 255);
@@ -104,7 +104,7 @@ button:disabled { opacity: .5; cursor: default; }
           background: rgba(20, 20, 20, .88); color: #eeeeea; border-radius: 8px; font-size: .9rem; pointer-events: none; }
 .legend i { display: inline-block; width: .8rem; height: .8rem; margin-right: .45rem; vertical-align: -1px; border-radius: 2px; }
 
-/* Task and colour key (top left of the image) */
+/* Task and color key (top left of the image) */
 .key { position: absolute; left: .8rem; top: .7rem; max-width: 19rem; display: flex; flex-direction: column; gap: .25rem;
        padding: .55rem .8rem; background: rgba(20, 20, 20, .88); color: #eeeeea; border-radius: 8px; font-size: .88rem;
        pointer-events: none; }

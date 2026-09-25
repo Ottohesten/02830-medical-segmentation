@@ -6,9 +6,9 @@ report are exactly the evaluated ones. The curves are recomputed from the saved 
 as the evaluation, and their areas are checked against the saved AUCs.
 
 Style: one look for all figures. Sizes follow the ACM template (single column 3.33 in, double column 7 in),
-serif text at 7-8 pt, fonts embedded in the PDF. Colour follows the method: the three highlighted measures
-have fixed colours (a validated colour-blind-safe set), the other GT-free measures are thin grey lines, and the
-baselines and the oracle are black/grey with different line styles, so they can be told apart without colour.
+serif text at 7-8 pt, fonts embedded in the PDF. Color follows the method: the three highlighted measures
+have fixed colors (a validated color-blind-safe set), the other GT-free measures are thin gray lines, and the
+baselines and the oracle are black/gray with different line styles, so they can be told apart without color.
 """
 
 from pathlib import Path
@@ -25,12 +25,12 @@ from segreview.evaluation import area, bad_mask, curves_for, random_curves
 SINGLE, DOUBLE = 3.33, 7.0          # ACM column widths in inches
 
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
-HIGHLIGHT = {                        # method -> colour (checked with the palette validator: CVD-safe as a set)
+HIGHLIGHT = {                        # method -> color (checked with the palette validator: CVD-safe as a set)
     "model_diff_mean_region": "#2a78d6",
     "combo_mean_missing": "#eb6834",
     "entropy_mean_region": "#1baf7a",
 }
-REFERENCE = {                        # method -> (colour, line style, width)
+REFERENCE = {                        # method -> (color, line style, width)
     "oracle": (INK, "-", 0.9),
     "neg_volume_ml": (INK, "--", 1.0),
     "random": ("#8f8e88", ":", 1.2),
@@ -167,9 +167,9 @@ def figure_auc_vs_volume(metrics: pd.DataFrame, out: Path) -> None:
         for yi, meth in zip(y, methods):
             lo, hi = m.loc[meth, f"{curve}_auc_minus_volume_ci_low"], m.loc[meth, f"{curve}_auc_minus_volume_ci_high"]
             est = m.loc[meth, f"{curve}_auc_minus_volume"]
-            colour = HIGHLIGHT.get(meth, MUTED)
-            ax.plot([lo, hi], [yi, yi], color=colour, lw=1.4 if meth in HIGHLIGHT else 0.9, solid_capstyle="butt")
-            ax.plot(est, yi, "o", ms=3.8, color=colour, mec="white", mew=0.6, zorder=3)
+            color = HIGHLIGHT.get(meth, MUTED)
+            ax.plot([lo, hi], [yi, yi], color=color, lw=1.4 if meth in HIGHLIGHT else 0.9, solid_capstyle="butt")
+            ax.plot(est, yi, "o", ms=3.8, color=color, mec="white", mew=0.6, zorder=3)
         ax.axvline(0, color=INK, lw=0.7)
         ax.set_title(title)
         ax.set_xlabel("AUC minus volume baseline")
@@ -351,7 +351,7 @@ def g1_latex(metrics: pd.DataFrame, rules: list[dict], n: int, n_bad: dict) -> s
 
 
 def heatmap_table(summary: pd.DataFrame, n: int) -> tuple[pd.DataFrame, str]:
-    """Error localisation of the candidate heatmaps on the test set (median and range), as CSV table and LaTeX."""
+    """Error localization of the candidate heatmaps on the test set (median and range), as CSV table and LaTeX."""
     s = summary.set_index("measure")
     names = {"entropy": "Voxel entropy (chosen)", "m2_diff": r"3 mm vs 6 mm model, $|p_3 - p_6|$",
              "boundary": "Distance to predicted edge (reference)"}

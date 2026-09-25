@@ -19,7 +19,7 @@
       <input id="participant" placeholder="P01" autocomplete="off">
       <button id="start-study" class="primary">Start</button>
       <p id="start-error" class="error" hidden></p>
-      <p class="note">Test runs: use T01, T02, … (never analysed; delete them with scripts/clean_test_data.py).</p>
+      <p class="note">Test runs: use T01, T02, … (never analyzed; delete them with scripts/clean_test_data.py).</p>
     </div>
     <div class="card">
       <h2>Demo: ranked queue</h2>
@@ -36,13 +36,13 @@
     <button id="queue-back">Back</button>
   </section>
 
-  <!-- Guide before the practice scan: what kidneys and tumours look like, and how to use the trackpad -->
+  <!-- Guide before the practice scan: what kidneys and tumors look like, and how to use the trackpad -->
   <section id="guide" class="screen wide" hidden>
     <h1>Before you start</h1>
     <p class="lead">An AI has marked the kidneys in CT scans in red. It makes mistakes. Your task is to correct the red
       marking so that it covers the kidneys exactly. First a short guide, then a practice scan that does not count.</p>
     <figure id="guide-figure" hidden>
-      <img id="guide-image" alt="Left: a CT slice with both kidneys and a kidney tumour outlined and named.
+      <img id="guide-image" alt="Left: a CT slice with both kidneys and a kidney tumor outlined and named.
         Right: the same slice with everything that should be marked filled in red.">
     </figure>
     <div class="guide-grid">
@@ -51,7 +51,7 @@
         <ul>
           <li><b>The kidneys</b> are two bean-shaped organs at the back of the belly, one on each side of the spine.
             In these scans they are bright, often with a brighter rim.</li>
-          <li><b>A tumour</b> is a round lump that grows from the kidney. It often looks darker or patchy.
+          <li><b>A tumor</b> is a round lump that grows from the kidney. It often looks darker or patchy.
             <b>It counts as kidney: mark it too.</b> So do cysts (round, dark and even).</li>
           <li>You look at the patient from the feet: <b>the patient's right side is on the left of the screen</b>
             (marked R).</li>
@@ -79,11 +79,11 @@
   <!-- Intro before each scan: tells the participant the condition and waits for "Start" -->
   <section id="intro" class="screen" hidden>
     <h1 id="intro-title"></h1>
-    <p class="task">Fix the red outline so it covers the whole kidney, including any tumour. Press Done when finished.</p>
+    <p class="task">Fix the red outline so it covers the whole kidney, including any tumor. Press Done when finished.</p>
     <p id="intro-text" class="lead"></p>
     <ul class="howto">
       <li><b>Add</b>: paint kidney that is missing from the red marking. <b>Erase</b>: remove red that is not kidney.
-        Tumours and cysts count as kidney.</li>
+        Tumors and cysts count as kidney.</li>
       <li><b>Paint</b>: press the trackpad down and move your finger while you keep it pressed.</li>
       <li><b>Slices</b>: ↑ ↓ keys, ▲ ▼ or the slider on the right.</li>
       <li class="move-help"></li>
@@ -128,9 +128,9 @@
       <span class="orient r" title="The patient's right side">R</span>
       <span class="orient l" title="The patient's left side">L</span>
       <div id="loading" class="loading">Loading scan …</div>
-      <!-- Task and colour key, always in view while editing -->
+      <!-- Task and color key, always in view while editing -->
       <div id="key" class="key">
-        <p class="task">Fix the red outline so it covers the whole kidney, including any tumour. Press Done when finished.</p>
+        <p class="task">Fix the red outline so it covers the whole kidney, including any tumor. Press Done when finished.</p>
         <span><i class="swatch red"></i>Red: the AI's kidney outline, which you fix</span>
         <span id="key-blue"><i class="swatch blue"></i>Blue: where the AI is unsure</span>
       </div>

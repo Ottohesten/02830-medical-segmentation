@@ -97,7 +97,7 @@ def perturb(image: nib.Nifti1Image, spec: dict, cfg: dict, case_index: int) -> n
 
     Types (spec["type"]), with spec["strength"]:
     - noise:    add Gaussian noise with standard deviation = strength (HU).
-    - contrast: pull every value towards a fixed grey level (perturbation_settings.contrast_level_hu)
+    - contrast: pull every value towards a fixed gray level (perturbation_settings.contrast_level_hu)
                 by the fraction 'strength': new = level + (old - level) * (1 - strength).
                 0 = unchanged, 1 = completely flat.
     - lowres:   blur by resampling to voxels of 'strength' mm (only along axes that are finer than

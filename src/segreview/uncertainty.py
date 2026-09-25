@@ -17,20 +17,20 @@ probability, not all 117 classes.
 
 Scan-level scores from the saved maps (all GT-free):
 - entropy_sum_ml       total entropy summed over the scan, in bit * ml. Grows with the size of the
-                       organ's surface, so it is NOT normalised for organ size.
+                       organ's surface, so it is NOT normalized for organ size.
 - entropy_mean_region  mean entropy inside the "uncertainty region": the predicted organ plus a
-                       border of uncertainty.border_mm around it. Normalised for size.
-- entropy_per_volume   total entropy divided by the predicted organ volume. Normalised for size.
+                       border of uncertainty.border_mm around it. Normalized for size.
+- entropy_per_volume   total entropy divided by the predicted organ volume. Normalized for size.
 - soft_dice_gap        1 - soft Dice between the probability map and the model's own mask. It is the
-                       model's own guess of how much Dice it loses at uncertain voxels. Normalised.
+                       model's own guess of how much Dice it loses at uncertain voxels. Normalized.
 With TTA (only if TTA maps exist):
 - tta_disagreement     1 - (voxels all passes call organ) / (voxels any pass calls organ), counting the
-                       clean prediction as one more pass. 0 = all passes agree. Normalised.
+                       clean prediction as one more pass. 0 = all passes agree. Normalized.
 - tta_std_mean_region  mean standard deviation of p over the passes, inside the uncertainty region.
 With a second model (only if its maps exist; e.g. the 6 mm model next to the 3 mm model):
 - model_disagreement   1 - Dice(mask of main model, mask of second model). The public weights have
                        only one fold, so we cannot compare folds; the 3 mm and 6 mm networks are two
-                       separately trained models and play that role. Normalised for size.
+                       separately trained models and play that role. Normalized for size.
 - model_diff_mean_region  mean |p_main - p_second| inside the uncertainty region. The voxel-wise
                        |p_main - p_second| is also saved as a heatmap (m2_diff).
                        Caveat: the 6 mm model is coarser, so part of the disagreement is just resolution.
@@ -52,10 +52,10 @@ def binary_entropy(p: np.ndarray) -> np.ndarray:
 
 
 def uncertainty_region(mask: np.ndarray, spacing: tuple[float, float, float], border_mm: float) -> np.ndarray:
-    """The predicted organ plus every voxel within border_mm (in real millimetres) of it.
+    """The predicted organ plus every voxel within border_mm (in real millimeters) of it.
 
     Errors happen at and just outside the organ's edge, so this is where uncertainty matters.
-    Using millimetres (not voxels) makes the border the same physical size in scans with
+    Using millimeters (not voxels) makes the border the same physical size in scans with
     thin and thick slices. The distance transform gives, for every voxel, the distance to the
     nearest organ voxel; to save time it only runs on a box around the organ.
 

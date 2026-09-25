@@ -36,7 +36,7 @@ def main():
     parser.add_argument("--variant", default="clean", help="clean or the name of a perturbation")
     args = parser.parse_args()
     cfg = load_config(args.config)
-    vis = cfg["visualisation"]
+    vis = cfg["visualization"]
 
     cases = list_cases(cfg)
     index = next(i for i, c in enumerate(cases) if c.case_id == args.case) if args.case else 0

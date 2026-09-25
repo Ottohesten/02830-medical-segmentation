@@ -172,7 +172,7 @@ def step_label_check(cfg: dict) -> pd.DataFrame | None:
     For each clean scan:
     - Dice of the model's mask under every definition in dataset.organ_definitions.
     - coverage_label_<v>: the share of the voxels with ground-truth label v that the model calls organ.
-      For KiTS, coverage_label_2 answers "how much of the tumour does TotalSegmentator call kidney or cyst?".
+      For KiTS, coverage_label_2 answers "how much of the tumor does TotalSegmentator call kidney or cyst?".
       Empty (NaN) if the scan has no voxels with that label.
     Writes label_check.csv, label_check_summary.csv (min/median/max per definition) and figures/label_check.png.
     """
@@ -205,9 +205,9 @@ def step_label_check(cfg: dict) -> pd.DataFrame | None:
     summary = df[stat_cols].agg(["count", "min", "median", "max", "mean"]).T.round(4)
     summary.to_csv(out / "label_check_summary.csv", index_label="measure")
     plot_label_check(df, definitions, [f"coverage_label_{v}" for v in label_values],
-                     cfg["visualisation"]["dice_bin_width"], cfg["visualisation"]["share_bin_width"], cfg["seed"],
+                     cfg["visualization"]["dice_bin_width"], cfg["visualization"]["share_bin_width"], cfg["seed"],
                      f"Organ definitions, config '{cfg['name']}' (clean scans, n = {len(df)})",
-                     figures_dir(cfg) / "label_check.png", cfg["visualisation"]["dpi"])
+                     figures_dir(cfg) / "label_check.png", cfg["visualization"]["dpi"])
     print(f"[label check] {len(df)} scans -> {out / 'label_check.csv'}")
     print(summary.to_string())
     return df
@@ -322,9 +322,9 @@ def step_evaluate(cfg: dict) -> None:
             title = (f"G1 on {set_name} scans, config '{cfg['name']}' (n = {len(df)}, bad = {int(bad.sum())}: "
                      f"{rule['rule']} {rule['value']}){note}")
             plot_curves(rows, curves, title, figures_dir(cfg) / f"g1_curves_{set_name}_{rule['name']}.png",
-                        cfg["visualisation"]["dpi"])
+                        cfg["visualization"]["dpi"])
             plot_scatter(scores, d, bad, ids, rows, title,
-                         figures_dir(cfg) / f"g1_scatter_{set_name}_{rule['name']}.png", cfg["visualisation"]["dpi"])
+                         figures_dir(cfg) / f"g1_scatter_{set_name}_{rule['name']}.png", cfg["visualization"]["dpi"])
         df.to_csv(out / f"g1_scores_{set_name}.csv", index=False)
         metrics = pd.DataFrame(all_rows).round(4)
         metrics.to_csv(out / f"g1_metrics_{set_name}.csv", index=False)

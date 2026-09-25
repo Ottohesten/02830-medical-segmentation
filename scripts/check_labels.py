@@ -1,8 +1,8 @@
 """Compare ground-truth definitions of the organ (evaluation only; needs saved predictions).
 
-For every clean scan: Dice under each definition in the dataset file (e.g. KiTS: kidney + tumour + cyst,
+For every clean scan: Dice under each definition in the dataset file (e.g. KiTS: kidney + tumor + cyst,
 kidney + cyst), and the share of each ground-truth label that the model calls organ (e.g. how much of
-the tumour TotalSegmentator calls kidney or kidney cyst). Writes results/<config name>/label_check.csv,
+the tumor TotalSegmentator calls kidney or kidney cyst). Writes results/<config name>/label_check.csv,
 label_check_summary.csv and figures/label_check.png.
 
 Usage: uv run python scripts/check_labels.py --config configs/kits100.yaml

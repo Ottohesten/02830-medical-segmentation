@@ -9,7 +9,7 @@ of the interface (24 September):
 - the mask is drawn on top of the heatmap;
 - the toolbar only shows when a scan is open;
 - the study flow: guide -> practice -> "time is up" lock -> correct answer -> study scans (without heatmap
-  where the balancing says so) -> NASA-TLX -> end.
+  where the balancing says so) -> NASA-TLX after each block -> end.
 Skipped if Chrome is not installed.
 """
 
@@ -91,7 +91,7 @@ def pixel(png: bytes, x: float, y: float) -> np.ndarray:
 
 
 def near_segment(shape, a, b, radius):
-    """Boolean (x, y) map of the voxels whose centre is within radius of the segment a-b (voxel units)."""
+    """Boolean (x, y) map of the voxels whose center is within radius of the segment a-b (voxel units)."""
     xs, ys = np.meshgrid(np.arange(shape[0]), np.arange(shape[1]), indexing="ij")
     a, b = np.asarray(a[:2], float), np.asarray(b[:2], float)
     ab = b - a
@@ -121,7 +121,7 @@ def test_painting_with_pointer_events_changes_the_saved_mask(server, browser):
     case_id = open_queue_scan(b, base)
     pen = b.js("state.viewer.penSize")
     r = pen / 2
-    # A single click (a round stamp) and a stroke, both near the image centre, on the start slice.
+    # A single click (a round stamp) and a stroke, both near the image center, on the start slice.
     cx, cy = b.js("(() => { const r = state.viewer.canvas.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; })()")
     click = (cx - 60, cy + 40)
     stroke = [(cx - 20 + 6 * i, cy - 30 + 2 * i) for i in range(15)]
@@ -307,22 +307,36 @@ def test_study_flow_guide_practice_timeout_answer(quick_server, browser):
     assert log["reason"] == "done" and not log["heatmap_available"] and log["time_limit_s"] == pytest.approx(4)
     assert (root / "sessions" / "P01" / f"{first['case_id']}_mask.nii.gz").exists()
 
-    # Scans 2-6 (pressing Done right away), then the NASA-TLX questionnaire as the last step.
+    # Scans 2-6 (pressing Done right away). The NASA-TLX comes after each block (study.tlx: after_each_block):
+    # after scan 3 for the block without the heatmap, and after scan 6 as the last step.
+    conditions = [s["condition"] for s in assignment("P01", m["study_scans"], "P")]
     for k in range(2, 7):
         b.click("#intro-go")
         b.wait_for("document.getElementById('viewer').dataset.mode === 'edit'")
         b.click("#done")
+        answers = None
+        if k in (3, 6):
+            b.wait_for("!document.getElementById('tlx').hidden")
+            assert b.js("document.getElementById('tlx-submit').disabled")      # nothing answered yet
+            answers = fill_tlx(b, shift=0.05 * (k == 6))
+            b.click("#tlx-submit")
+        # The next screen only shows once the answers are saved.
         b.wait_for(f"document.getElementById('intro-title').textContent === 'Scan {k + 1} of 6'"
-                   if k < 6 else "!document.getElementById('tlx').hidden")
-    assert b.js("document.getElementById('tlx-submit').disabled")          # nothing answered yet
-    for i in range(6):                                                       # click each scale somewhere
+                   if k < 6 else "!document.getElementById('end').hidden")
+        if answers is not None:
+            tlx = json.loads((root / "sessions" / "P01" / f"tlx_{conditions[k - 1]}.json").read_text())
+            assert tlx["scales"] == answers and tlx["raw_tlx"] == pytest.approx(sum(answers.values()) / 6)
+    assert conditions[2] != WITH and conditions[5] == WITH
+
+
+def fill_tlx(b, shift=0.0) -> dict:
+    """Click each of the six TLX scales at its own place, like a participant. Returns the answers the page holds."""
+    for i in range(6):
         x0, y0 = b.center(f".tlx-scale:nth-child({i + 1}) input")
         width = b.js(f"document.querySelectorAll('.tlx-range')[{i}].getBoundingClientRect().width")
-        b.mouse("mousePressed", x0 - width / 2 + width * (0.1 + 0.15 * i), y0, buttons=1)
-        b.mouse("mouseReleased", x0 - width / 2 + width * (0.1 + 0.15 * i), y0)
+        x = x0 - width / 2 + width * (0.1 + 0.15 * i + shift)
+        b.mouse("mousePressed", x, y0, buttons=1)
+        b.mouse("mouseReleased", x, y0)
     answers = b.js("Object.fromEntries([...document.querySelectorAll('.tlx-range')].map((r) => [r.dataset.key, r.valueAsNumber]))")
     assert len(set(answers.values())) == 6                                   # each click set its own value
-    b.click("#tlx-submit")
-    b.wait_for("!document.getElementById('end').hidden")
-    tlx = json.loads((root / "sessions" / "P01" / "tlx_session.json").read_text())
-    assert tlx["scales"] == answers and tlx["raw_tlx"] == pytest.approx(sum(answers.values()) / 6)
+    return answers

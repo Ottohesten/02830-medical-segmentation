@@ -54,7 +54,7 @@ perturbations:
   - {name: contrast_60, type: contrast, strength: 0.6}   # remove 60 % of the contrast around contrast_level_hu
   - {name: lowres_8mm, type: lowres, strength: 8}        # blur by down- and upsampling to 8 mm voxels
 perturbation_settings:
-  contrast_level_hu: 40     # grey value that stays fixed when contrast is reduced (soft tissue)
+  contrast_level_hu: 40     # gray value that stays fixed when contrast is reduced (soft tissue)
 
 evaluation:
   bad_rules:          # which segmentations count as "bad" in the review curve; every rule is reported
@@ -63,8 +63,8 @@ evaluation:
   ci_level: 0.95
   n_random_orders: 1000  # random review orders averaged for the random baseline
 
-visualisation:
-  ct_window_level: 40   # soft-tissue CT window in Hounsfield units (centre)
+visualization:
+  ct_window_level: 40   # soft-tissue CT window in Hounsfield units (center)
   ct_window_width: 400  # (width)
   dice_bin_width: 0.01  # histogram bin width in the Dice plots
   share_bin_width: 0.05 # histogram bin width for shares (0-1) in the label check plot

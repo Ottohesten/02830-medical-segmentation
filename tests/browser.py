@@ -104,14 +104,14 @@ class Browser:
             time.sleep(0.1)
 
     def click(self, selector: str) -> None:
-        """Click the centre of an element with a real (trusted) mouse click."""
+        """Click the center of an element with a real (trusted) mouse click."""
         x, y = self.center(selector)
         self.mouse("mouseMoved", x, y)
         self.mouse("mousePressed", x, y, buttons=1)
         self.mouse("mouseReleased", x, y)
 
     def center(self, selector: str) -> tuple[float, float]:
-        """Centre of an element in CSS pixels, after scrolling it into view (as a user would)."""
+        """Center of an element in CSS pixels, after scrolling it into view (as a user would)."""
         rect = self.js(f"(() => {{ const el = document.querySelector({json.dumps(selector)});"
                        f" el.scrollIntoView({{block: 'nearest'}}); const r = el.getBoundingClientRect();"
                        f" return [r.left + r.width / 2, r.top + r.height / 2]; }})()")

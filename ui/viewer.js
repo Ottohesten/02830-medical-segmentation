@@ -39,7 +39,7 @@ uniform int backgroundMasksOverlays;
 in vec3 texPos;
 out vec4 color;
 
-// Colour of a drawing value, from NiiVue's drawing colour table (the last row of the colormap texture).
+// Color of a drawing value, from NiiVue's drawing color table (the last row of the colormap texture).
 vec4 drawColor(float value) {
   float rows = float(textureSize(colormap, 0).y);
   return texture(colormap, vec2((value * 255.0) / 256.0 + 0.5 / 256.0, (rows - 0.5) / rows));
@@ -47,11 +47,11 @@ vec4 drawColor(float value) {
 
 void main() {
   // How far a few screen pixels are in texture coordinates (for the outline). Computed before any "if":
-  // screen-space derivatives are only defined when neighbouring pixels run the same code.
+  // screen-space derivatives are only defined when neighboring pixels run the same code.
   vec3 dx = dFdx(texPos) * ${px};
   vec3 dy = dFdy(texPos) * ${px};
 
-  // 1. The CT (grey values after the contrast window).
+  // 1. The CT (gray values after the contrast window).
   vec4 background = texture(volume, texPos);
   color = vec4(background.rgb, opacity);
   if (isAlphaClipDark && background.a == 0.0) color.a = 0.0;
@@ -331,7 +331,7 @@ class ReviewViewer {
   }
 
   /**
-   * Round brush: set every voxel whose centre lies within penSize / 2 voxels of the centre voxel.
+   * Round brush: set every voxel whose center lies within penSize / 2 voxels of the center voxel.
    * (NiiVue's own brush is a square; a round one matches the circle that shows the brush on screen.)
    */
   stamp(cx, cy, z, value) {

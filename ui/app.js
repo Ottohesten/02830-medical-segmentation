@@ -2,9 +2,9 @@
 // with or without the uncertainty heatmap. Talks to the local server in src/segreview/ui_server.py; the
 // slice viewer itself (layers, brush, pan/zoom, ground-truth comparison) is in viewer.js.
 //
-// Study mode: participant id -> guide (what kidneys and tumours look like, how to use the trackpad) ->
+// Study mode: participant id -> guide (what kidneys and tumors look like, how to use the trackpad) ->
 // practice scan -> the correct answer for the practice scan -> the 6 study scans in the balanced order the
-// server returns -> NASA-TLX questionnaire (at the end, or after each condition block; study.tlx in the
+// server returns -> NASA-TLX questionnaire (after each condition block, or once at the end; study.tlx in the
 // config) -> thank-you screen. Each scan: intro screen (condition) -> viewer with timer -> "Done" or
 // the time limit -> the corrected mask and a log are sent to the server. When the time is up the scan is
 // locked and a message says so. Scans that already have a saved log are skipped, so a session can be resumed.
@@ -149,10 +149,10 @@ function nextItem() {
   if (it.mode === "tlx") return showTlx(it.which);
   $("intro-title").textContent = it.mode === "practice" ? "Practice scan" : `Scan ${it.position} of ${it.total}`;
   $("intro-text").textContent = it.mode === "practice"
-    ? "Try the tools. This scan does not count. The blue colours show where the AI is uncertain. " +
+    ? "Try the tools. This scan does not count. The blue colors show where the AI is uncertain. " +
       "Afterwards you will see the correct answer."
     : it.condition === "with_heatmap"
-      ? "This time you can see where the AI is uncertain: blue colours in the image, and marks next to the " +
+      ? "This time you can see where the AI is uncertain: blue colors in the image, and marks next to the " +
         "slice slider. Use them to find mistakes."
       : "This time there is no uncertainty information. Find the mistakes yourself.";
   show("intro");

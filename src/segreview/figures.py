@@ -1,9 +1,9 @@
 """Figures for the G1 evaluation: review curve, quality curve, score-vs-Dice scatter plots, and the
 Dice distribution under different ground-truth definitions of the organ.
 
-Colours follow the method, never its rank, so a method has the same colour in every figure.
-Uncertainty measures get distinct colours; the baselines and the oracle are neutral grey/black
-with different line styles, so they read as reference lines and can be told apart without colour.
+Colors follow the method, never its rank, so a method has the same color in every figure.
+Uncertainty measures get distinct colors; the baselines and the oracle are neutral gray/black
+with different line styles, so they read as reference lines and can be told apart without color.
 """
 
 from pathlib import Path
@@ -19,9 +19,9 @@ TEXT = "#0b0b0b"
 TEXT_MUTED = "#52514e"
 GRID = "#e4e3df"
 
-# Readable names and fixed styles per method: (label, colour, line style).
+# Readable names and fixed styles per method: (label, color, line style).
 METHODS = {
-    "entropy_sum_ml":      ("Entropy, total (not size-normalised)", "#2a78d6", "-"),
+    "entropy_sum_ml":      ("Entropy, total (not size-normalized)", "#2a78d6", "-"),
     "entropy_mean_region": ("Entropy, mean in organ + border",      "#eb6834", "-"),
     "entropy_per_volume":  ("Entropy per organ volume",             "#1baf7a", "-"),
     "soft_dice_gap":       ("Soft-Dice gap",                        "#eda100", "-"),
@@ -72,8 +72,8 @@ def plot_curves(rows: list[dict], curves: dict, title: str, path: Path, dpi: int
         for method in sorted(curves, key=lambda m: -auc[m][i]):
             y = curves[method][i]
             x = np.linspace(0, 1, len(y))
-            name, colour, ls = METHODS.get(method, (method, TEXT_MUTED, "-"))
-            ax.plot(x, y, color=colour, linestyle=ls, linewidth=2, label=f"{name}  (AUC {auc[method][i]:.3f})")
+            name, color, ls = METHODS.get(method, (method, TEXT_MUTED, "-"))
+            ax.plot(x, y, color=color, linestyle=ls, linewidth=2, label=f"{name}  (AUC {auc[method][i]:.3f})")
         ax.set_title(panel_title, color=TEXT, loc="left", fontsize=11)
         ax.set_xlabel("share of scans sent to review (most uncertain first)", color=TEXT_MUTED)
         ax.set_ylabel(ylabel, color=TEXT_MUTED)

@@ -57,7 +57,7 @@ plausibility:        # anatomical check for paired organs (only if the dataset f
 # Results on these are reported separately from the clean scans.
 perturbations: []   # none here; see local.yaml
 perturbation_settings:
-  contrast_level_hu: 40     # grey value that stays fixed when contrast is reduced (soft tissue)
+  contrast_level_hu: 40     # gray value that stays fixed when contrast is reduced (soft tissue)
 
 evaluation:
   splits: [dev, test] # splits whose ground truth may be used. 'test' was added 24/9 after the choices were locked (01:43)
@@ -71,8 +71,8 @@ evaluation:
     # mean rank of the best dev uncertainty measure and the missing-side plausibility flag.
     - {name: combo_mean_missing, rule: mean_rank, scores: [model_diff_mean_region, plaus_missing_side]}
 
-visualisation:
-  ct_window_level: 40   # soft-tissue CT window in Hounsfield units (centre)
+visualization:
+  ct_window_level: 40   # soft-tissue CT window in Hounsfield units (center)
   ct_window_width: 400  # (width)
   dice_bin_width: 0.01  # histogram bin width in the Dice plots
   share_bin_width: 0.05 # histogram bin width for shares (0-1) in the label check plot

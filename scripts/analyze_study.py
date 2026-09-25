@@ -1,4 +1,4 @@
-"""Analyse the user study (G2): Dice gain per minute with vs without the uncertainty heatmap (Wilcoxon, paired
+"""Analyze the user study (G2): Dice gain per minute with vs without the uncertainty heatmap (Wilcoxon, paired
 per participant), plus NASA-TLX. See src/segreview/study_analysis.py for the method.
 
 Reads data/study/<study name>/sessions/ (real participant ids only; test ids like T01 are ignored) and writes

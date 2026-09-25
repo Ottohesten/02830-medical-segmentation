@@ -14,7 +14,7 @@ That gives 4 participant types, cycled by participant number (P01 -> type 0, P02
 With a multiple of 4 participants every combination occurs equally often.
 
 Test runs (trying the interface, demos) use ids with the test prefix instead, e.g. T01. They get the same
-balancing, but they are never analysed, and scripts/clean_test_data.py can delete them. Real participant ids
+balancing, but they are never analyzed, and scripts/clean_test_data.py can delete them. Real participant ids
 (P01, ...) can never be deleted by that script.
 """
 

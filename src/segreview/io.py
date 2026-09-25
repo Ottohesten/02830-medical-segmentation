@@ -26,7 +26,7 @@ import nibabel as nib
 import numpy as np
 
 QUANT_LEVELS = 255              # values in [0, 1] are stored as integers 0..255
-QUANTISED = {"prob", "entropy", "tta_std", "m2_prob", "m2_diff"}
+QUANTIZED = {"prob", "entropy", "tta_std", "m2_prob", "m2_diff"}
 
 
 def prediction_dir(cfg: dict, variant: str = "clean") -> Path:
@@ -40,10 +40,10 @@ def map_path(cfg: dict, variant: str, case_id: str, kind: str) -> Path:
 
 
 def save_map(cfg: dict, variant: str, case_id: str, kind: str, data: np.ndarray, affine: np.ndarray) -> None:
-    """Save one per-voxel map as NIfTI. Maps with values in [0, 1] are quantised (see module docstring)."""
+    """Save one per-voxel map as NIfTI. Maps with values in [0, 1] are quantized (see module docstring)."""
     path = map_path(cfg, variant, case_id, kind)
     path.parent.mkdir(parents=True, exist_ok=True)
-    if kind in QUANTISED:
+    if kind in QUANTIZED:
         img = nib.Nifti1Image(np.round(np.clip(data, 0, 1) * QUANT_LEVELS).astype(np.uint8), affine)
         img.header.set_slope_inter(1.0 / QUANT_LEVELS, 0.0)
     else:
@@ -52,9 +52,9 @@ def save_map(cfg: dict, variant: str, case_id: str, kind: str, data: np.ndarray,
 
 
 def load_map(cfg: dict, variant: str, case_id: str, kind: str) -> np.ndarray:
-    """Load one saved map. Quantised maps come back as float32 in [0, 1], the others as uint8."""
+    """Load one saved map. Quantized maps come back as float32 in [0, 1], the others as uint8."""
     img = nib.load(map_path(cfg, variant, case_id, kind))
-    if kind in QUANTISED:
+    if kind in QUANTIZED:
         return img.get_fdata(dtype=np.float32)
     return np.asanyarray(img.dataobj).astype(np.uint8)
 

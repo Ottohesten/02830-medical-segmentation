@@ -2,7 +2,7 @@
 
 The study compares, per participant, the mean Dice gain per minute WITH the heatmap and WITHOUT it (3 scans
 each), with a Wilcoxon signed-rank test on the per-participant differences (see study_analysis.py).
-The effect is described as a standardised effect size
+The effect is described as a standardized effect size
 
     d_z = mean of the per-participant differences / standard deviation of those differences.
 

@@ -139,24 +139,28 @@ def test_bad_uploads_are_rejected(server):
 GOOD_TLX = {"mental": 55, "physical": 10, "temporal": 70, "performance": 25, "effort": 60, "frustration": 30}
 
 
-def test_tlx_is_saved_with_the_raw_score(server):
-    base, study = server
-    plan = json.loads(get(base + "/api/study/P05")[1])
-    assert [t["which"] for t in plan["tlx"]] == ["session"] and not plan["tlx"][0]["done"]
-    assert plan["tlx"][0]["after_position"] == len(plan["scans"])
-    code, reply = post(f"{base}/api/tlx/P05/session", json.dumps({"scales": GOOD_TLX}).encode(), "application/json")
-    assert code == 200 and reply["raw_tlx"] == pytest.approx(sum(GOOD_TLX.values()) / 6)
-    saved = json.loads((study_dir(study) / "sessions" / "P05" / "tlx_session.json").read_text())
-    assert saved["scales"] == GOOD_TLX and saved["raw_tlx"] == pytest.approx(41.6667, abs=1e-3)
-    assert json.loads(get(base + "/api/study/P05")[1])["tlx"][0]["done"]
+def test_tlx_after_session_is_saved_with_the_raw_score(temp_study):
+    from tests.conftest import running_server
+    temp_study["study"]["tlx"] = "after_session"
+    with running_server(temp_study) as base:
+        plan = json.loads(get(base + "/api/study/P05")[1])
+        assert [t["which"] for t in plan["tlx"]] == ["session"] and not plan["tlx"][0]["done"]
+        assert plan["tlx"][0]["after_position"] == len(plan["scans"])
+        code, reply = post(f"{base}/api/tlx/P05/session", json.dumps({"scales": GOOD_TLX}).encode(), "application/json")
+        assert code == 200 and reply["raw_tlx"] == pytest.approx(sum(GOOD_TLX.values()) / 6)
+        saved = json.loads((study_dir(temp_study) / "sessions" / "P05" / "tlx_session.json").read_text())
+        assert saved["scales"] == GOOD_TLX and saved["raw_tlx"] == pytest.approx(41.6667, abs=1e-3)
+        assert json.loads(get(base + "/api/study/P05")[1])["tlx"][0]["done"]
 
 
+# The study config asks the TLX after each block (the default), so "with_heatmap" is a valid questionnaire
+# and "session" is not.
 @pytest.mark.parametrize("scales, which, pid", [
-    ({**GOOD_TLX, "mental": 7}, "session", "P05"),        # not a step of 5
-    ({**GOOD_TLX, "effort": 105}, "session", "P05"),      # out of range
-    ({k: v for k, v in GOOD_TLX.items() if k != "effort"}, "session", "P05"),   # a scale missing
-    (GOOD_TLX, "with_heatmap", "P05"),                    # not a questionnaire of this study (after_session)
-    (GOOD_TLX, "session", "X05"),                         # not a valid id
+    ({**GOOD_TLX, "mental": 7}, WITH, "P05"),             # not a step of 5
+    ({**GOOD_TLX, "effort": 105}, WITH, "P05"),           # out of range
+    ({k: v for k, v in GOOD_TLX.items() if k != "effort"}, WITH, "P05"),   # a scale missing
+    (GOOD_TLX, "session", "P05"),                         # not a questionnaire of this study (after_each_block)
+    (GOOD_TLX, WITH, "X05"),                              # not a valid id
 ])
 def test_bad_tlx_is_rejected(server, scales, which, pid):
     base, study = server
@@ -165,10 +169,10 @@ def test_bad_tlx_is_rejected(server, scales, which, pid):
     assert not (study_dir(study) / "sessions" / pid).exists()
 
 
-def test_tlx_after_each_block(temp_study):
+def test_tlx_after_each_block_is_the_default(temp_study):
     from segreview.study import tlx_schedule
     from tests.conftest import running_server
-    temp_study["study"]["tlx"] = "after_each_block"
+    assert temp_study["study"]["tlx"] == "after_each_block"
     m = manifest(temp_study)
     with running_server(temp_study) as base:
         plan = json.loads(get(base + "/api/study/P02")[1])

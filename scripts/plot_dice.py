@@ -1,4 +1,4 @@
-"""Summarise and plot how Dice is spread over the scans (evaluation only).
+"""Summarize and plot how Dice is spread over the scans (evaluation only).
 
 G1 ranks scans by uncertainty and checks whether that ranking matches the ranking by true Dice.
 That only makes sense if Dice actually differs between scans, so this is the first thing to check.
@@ -20,7 +20,7 @@ from matplotlib.ticker import MaxNLocator
 
 from segreview.config import config_arg_parser, figures_dir, load_config, results_dir
 
-# Colours: one series, so one colour. Text and axes stay neutral grey/black so the data stands out.
+# Colors: one series, so one color. Text and axes stay neutral gray/black so the data stands out.
 BAR = "#2a78d6"
 SURFACE = "#fcfcfb"
 TEXT = "#0b0b0b"
@@ -31,7 +31,7 @@ GRID = "#e4e3df"
 def main():
     args = config_arg_parser(__doc__).parse_args()
     cfg = load_config(args.config)
-    vis = cfg["visualisation"]
+    vis = cfg["visualization"]
     source = results_dir(cfg) / "dice.csv"
     if not source.exists():
         raise FileNotFoundError(f"No {source}. Run scripts/evaluate.py first.")
@@ -66,7 +66,7 @@ def main():
     # Every scan as a dot, so single outliers are visible even when a bar is only 1 high.
     jitter = np.random.default_rng(cfg["seed"]).uniform(-0.3, 0.3, len(d))
     strip.scatter(d, jitter, s=36, color=BAR, edgecolor=SURFACE, linewidth=1.5, zorder=3)
-    # Name the worst scans. Labels alternate above/below the dots so neighbours do not overlap.
+    # Name the worst scans. Labels alternate above/below the dots so neighbors do not overlap.
     worst = df.nsmallest(vis["label_worst_n"], "dice").sort_values("dice")
     for i, (idx, row) in enumerate(worst.iterrows()):
         strip.annotate(row["case_id"], (row["dice"], jitter[df.index.get_loc(idx)]),

@@ -18,7 +18,7 @@ For every ranking method (uncertainty scores, baselines, oracle) we compute:
   This is "Dice per unit of human effort" at dataset level, without a user study.
 
 - Area under each curve (AUC), x from 0 to 1. Higher is better for both curves.
-  Also "normalised" AUC: (method - random) / (oracle - random). 0 = no better than random,
+  Also "normalized" AUC: (method - random) / (oracle - random). 0 = no better than random,
   1 = as good as the perfect ranking.
 
 - The difference in AUC to the volume baseline, with a paired bootstrap CI (same resampled scans

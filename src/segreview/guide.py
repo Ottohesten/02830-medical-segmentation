@@ -1,12 +1,12 @@
-"""Example image for the instruction screen of the user study (G2): what a kidney and a tumour look like in CT.
+"""Example image for the instruction screen of the user study (G2): what a kidney and a tumor look like in CT.
 
 The participants are students, not clinicians, so before the practice scan they see one annotated CT slice.
 The image is made once by scripts/prepare_study.py from a development-set scan that is not used anywhere else
 in the study (not a study, practice or demo scan), so it gives no answers away.
 
 The image shows the same axial slice twice:
-- left:  the CT with the kidneys, the tumour (and a cyst, if there is one) outlined and named;
-- right: everything that should be marked filled in red. Tumours and cysts count as kidney, as in the
+- left:  the CT with the kidneys, the tumor (and a cyst, if there is one) outlined and named;
+- right: everything that should be marked filled in red. Tumors and cysts count as kidney, as in the
          evaluation (organ definition kidney_tumor_cyst).
 The slice is drawn like in the viewer: the patient's right side on the LEFT of the image, the front of
 the body at the top (the radiological convention: you look at the patient from the feet).
@@ -32,17 +32,17 @@ def _to_screen(slice_2d: np.ndarray) -> np.ndarray:
 def pick_guide_slice(study: dict, source: dict, exclude: set[str]) -> tuple[str, int]:
     """Choose the scan and axial slice for the example image.
 
-    Candidates: development-set scans that are not used in the study. The slice should show a tumour that
+    Candidates: development-set scans that are not used in the study. The slice should show a tumor that
     grows from a clearly visible kidney, and the other kidney as well. So, per slice: split everything
-    labelled (kidney, tumour, cyst) into connected pieces; take the piece with the most tumour; its score is
-    min(kidney area, tumour area) within that piece. Slices with fewer than two pieces of at least
+    labeled (kidney, tumor, cyst) into connected pieces; take the piece with the most tumor; its score is
+    min(kidney area, tumor area) within that piece. Slices with fewer than two pieces of at least
     guide.min_piece_cm2 (the two kidneys) are skipped. The highest score wins.
 
     Input: study config, source config, scan ids to leave out.
     Output: (case id, slice index in the canonical array).
     """
     g = study["guide"]
-    kidney_value, tumour_value = g["labels"]["kidney"], g["labels"]["tumour"]
+    kidney_value, tumor_value = g["labels"]["kidney"], g["labels"]["tumor"]
     best = (-1.0, None, None)
     for case in list_cases(source, splits=["dev"]):
         if case.case_id in exclude:
@@ -50,21 +50,21 @@ def pick_guide_slice(study: dict, source: dict, exclude: set[str]) -> tuple[str,
         labels = load_label_map(case)
         zooms = load_canonical(case.label_path).header.get_zooms()[:3]
         pixel_cm2 = zooms[0] * zooms[1] / 100.0
-        tumour_per_slice = (labels == tumour_value).sum(axis=(0, 1)) * pixel_cm2
-        for z in np.flatnonzero(tumour_per_slice > best[0]):     # a slice with less tumour cannot win
+        tumor_per_slice = (labels == tumor_value).sum(axis=(0, 1)) * pixel_cm2
+        for z in np.flatnonzero(tumor_per_slice > best[0]):     # a slice with less tumor cannot win
             sl = labels[:, :, z]
             pieces, n = ndimage.label(sl > 0)
             sizes = np.bincount(pieces.ravel(), minlength=n + 1)[1:] * pixel_cm2
             if (sizes >= g["min_piece_cm2"]).sum() < 2:
                 continue
-            tumour_in = np.bincount(pieces[sl == tumour_value], minlength=n + 1)
-            piece = int(np.argmax(tumour_in))
+            tumor_in = np.bincount(pieces[sl == tumor_value], minlength=n + 1)
+            piece = int(np.argmax(tumor_in))
             kidney_in = np.count_nonzero((pieces == piece) & (sl == kidney_value))
-            score = min(kidney_in, tumour_in[piece]) * pixel_cm2
+            score = min(kidney_in, tumor_in[piece]) * pixel_cm2
             if score > best[0]:
                 best = (score, case.case_id, int(z))
     if best[1] is None:
-        raise ValueError("No development-set slice with kidney and tumour found for the guide image.")
+        raise ValueError("No development-set slice with kidney and tumor found for the guide image.")
     return best[1], best[2]
 
 
@@ -92,7 +92,7 @@ def make_guide_image(study: dict, source: dict, case_id: str, z: int, out_path: 
     lo, hi = w["level"] - w["width"] / 2, w["level"] + w["width"] / 2
     width_mm, height_mm = ct.shape[1] * sx, ct.shape[0] * sy
     extent = (0, width_mm, height_mm, 0)                     # in mm, so the pixels are not stretched
-    xs = (np.arange(ct.shape[1]) + 0.5) * sx                 # pixel centres in mm, for the outlines
+    xs = (np.arange(ct.shape[1]) + 0.5) * sx                 # pixel centers in mm, for the outlines
     ys = (np.arange(ct.shape[0]) + 0.5) * sy
     panel_in = 5.5
     fig, axes = plt.subplots(1, 2, figsize=(2 * panel_in, panel_in * height_mm / width_mm + 0.75), facecolor="white")
@@ -104,13 +104,13 @@ def make_guide_image(study: dict, source: dict, case_id: str, z: int, out_path: 
                     ha="center", va="center")
 
     # Left: outline and name each structure. Outlines follow the outer edge (small holes filled).
-    colours = g["colours"]
+    colors = g["colors"]
     left = axes[0]
     for key, value in g["labels"].items():
         mask = ndimage.binary_fill_holes(labels == value)
         if not mask.any():
             continue
-        left.contour(xs, ys, mask.astype(float), levels=[0.5], colors=[colours[key]], linewidths=2)
+        left.contour(xs, ys, mask.astype(float), levels=[0.5], colors=[colors[key]], linewidths=2)
         pieces, n = ndimage.label(mask)
         sizes = np.bincount(pieces.ravel())[1:]
         # Name the largest piece; for the kidney, the largest piece on each side of the image.
@@ -128,14 +128,14 @@ def make_guide_image(study: dict, source: dict, case_id: str, z: int, out_path: 
             if key == "kidney":          # beside the kidney, towards the edge of the image
                 tx = cols.min() * sx - 0.07 * width_mm if side == "left" else (cols.max() + 1) * sx + 0.07 * width_mm
                 ty, ha = py - 0.12 * height_mm, "right" if side == "left" else "left"
-            else:                        # tumour below, cyst above
+            else:                        # tumor below, cyst above
                 tx, ha = px, "center"
-                ty = (rows.max() + 1) * sy + 0.1 * height_mm if key == "tumour" else rows.min() * sy - 0.1 * height_mm
-            left.annotate(key, xy=(px, py), xytext=(tx, ty), color=colours[key], fontsize=13, fontweight="bold",
-                          ha=ha, va="center", arrowprops={"arrowstyle": "->", "color": colours[key], "lw": 1.8})
-    left.set_title("Kidneys and a tumour", fontsize=13)
+                ty = (rows.max() + 1) * sy + 0.1 * height_mm if key == "tumor" else rows.min() * sy - 0.1 * height_mm
+            left.annotate(key, xy=(px, py), xytext=(tx, ty), color=colors[key], fontsize=13, fontweight="bold",
+                          ha=ha, va="center", arrowprops={"arrowstyle": "->", "color": colors[key], "lw": 1.8})
+    left.set_title("Kidneys and a tumor", fontsize=13)
 
-    # Right: what should be marked, in the viewer's mask colour.
+    # Right: what should be marked, in the viewer's mask color.
     right = axes[1]
     organ = labels > 0
     rgba = np.zeros(organ.shape + (4,))
@@ -143,7 +143,7 @@ def make_guide_image(study: dict, source: dict, case_id: str, z: int, out_path: 
     rgba[organ] = [*red, study["viewer"]["mask_opacity"]]
     right.imshow(rgba, extent=extent, interpolation="nearest")
     right.contour(xs, ys, organ.astype(float), levels=[0.5], colors=[red], linewidths=2)
-    right.set_title("What should be marked (red): kidney + tumour + cyst", fontsize=13)
+    right.set_title("What should be marked (red): kidney + tumor + cyst", fontsize=13)
 
     fig.text(0.5, 0.015, "R = the patient's right side. It is shown on the LEFT, as if you look at the patient "
              "from the feet. The front of the body is at the top.", ha="center", va="bottom", fontsize=11)

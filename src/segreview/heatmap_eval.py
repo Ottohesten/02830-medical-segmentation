@@ -75,7 +75,7 @@ def boundary_map(mask: np.ndarray, region: np.ndarray, spacing: tuple[float, flo
 
 def evaluate_scan(maps: dict[str, np.ndarray], mask: np.ndarray, truth: np.ndarray,
                   spacing: tuple[float, float, float], border_mm: float, top_fraction: float) -> dict:
-    """Voxel-level error localisation of every heatmap for one scan (see module docstring).
+    """Voxel-level error localization of every heatmap for one scan (see module docstring).
 
     Input: {heatmap name: map}, predicted mask, ground-truth organ mask, voxel size, border (mm),
            top fraction for the capture measure.

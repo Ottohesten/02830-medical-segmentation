@@ -8,9 +8,9 @@ catches such cases: people normally have two kidneys of roughly similar size.
 How it works (only the predicted mask and the CT image are used):
 1. Find the body's left-right midline: the average left-right position of all body voxels
    (CT value above plausibility.body_threshold_hu, i.e. not air), in the slices where the organ is
-   predicted. Using the body instead of the image centre handles patients lying off-centre.
+   predicted. Using the body instead of the image center handles patients lying off-center.
 2. Split the predicted organ at that midline into a patient-left and a patient-right part.
-3. On each side, find connected pieces of the mask (connected-component labelling) and count the
+3. On each side, find connected pieces of the mask (connected-component labeling) and count the
    side as "found" if its largest piece is at least plausibility.min_component_ml.
 4. Scores:
    - plaus_asymmetry = 1 - (smaller side volume / larger side volume). 0 = equal sizes,

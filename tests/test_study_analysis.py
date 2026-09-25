@@ -3,7 +3,7 @@
 The sessions are made by tests/simulated_sessions.py in a temporary folder and marked "simulated". The numbers
 checked here say nothing about the real study; they only show that the analysis computes what it should:
 Dice before/after on the right grid, gain per minute, pairing per participant, the Wilcoxon test and its sign,
-and that simulated output is labelled and kept out of results/.
+and that simulated output is labeled and kept out of results/.
 """
 
 import json
@@ -55,7 +55,7 @@ def test_scan_table_from_simulated_sessions(simulated):
     assert (scans.dice_after > scans.dice_before).all()
 
 
-def test_analysis_output_is_labelled_simulated(simulated, tmp_path):
+def test_analysis_output_is_labeled_simulated(simulated, tmp_path):
     study, source, sessions, truths = simulated
     result = analyze(study, source, sessions, tmp_path / "out", truths)
     files = sorted(p.name for p in (tmp_path / "out").rglob("*") if p.is_file())

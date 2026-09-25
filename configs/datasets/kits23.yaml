@@ -1,6 +1,6 @@
 # Dataset description: KiTS23 (2023 Kidney and Kidney Tumor Segmentation Challenge), training set.
 # 489 contrast-enhanced CT scans (corticomedullary or nephrographic phase) of patients with a kidney
-# tumour, with manual masks of kidney, tumour and cyst. Patients were treated at M Health Fairview, but
+# tumor, with manual masks of kidney, tumor and cyst. Patients were treated at M Health Fairview, but
 # many scans were taken at referring hospitals, so scanners and protocols vary. CC BY-NC-SA 4.0.
 # https://kits-challenge.org/kits23/  --  files: https://huggingface.co/datasets/neheller/KiTS-Challenge-Imaging
 
@@ -19,14 +19,14 @@ image_glob: images/*.nii.gz
 label_path: segmentations/{stem}.nii.gz
 case_id: stem
 
-# Ground-truth labels: 1 = kidney, 2 = tumour, 3 = cyst. Which of them count as "the kidney"?
-# TotalSegmentator has classes for kidney and kidney cyst, but not for kidney tumour, so it is not
+# Ground-truth labels: 1 = kidney, 2 = tumor, 3 = cyst. Which of them count as "the kidney"?
+# TotalSegmentator has classes for kidney and kidney cyst, but not for kidney tumor, so it is not
 # obvious which definition matches what the model was trained to do. See the label check
 # (scripts/check_labels.py, results/kits100/label_check_summary.csv).
 organ_definitions:
   kidney_tumor_cyst: {organ_labels: [1, 2, 3]}                  # the whole kidney incl. all masses (KiTS "kidney + masses")
-  kidney_cyst:       {organ_labels: [1, 3]}                     # tumour counts as background
-  kidney_cyst_ignore_tumor: {organ_labels: [1, 3], ignore_labels: [2]}   # tumour voxels left out of Dice
+  kidney_cyst:       {organ_labels: [1, 3]}                     # tumor counts as background
+  kidney_cyst_ignore_tumor: {organ_labels: [1, 3], ignore_labels: [2]}   # tumor voxels left out of Dice
 organ_definition: kidney_tumor_cyst
 
 # Paired organ (left + right)? Then a GT-free plausibility check compares the two sides.

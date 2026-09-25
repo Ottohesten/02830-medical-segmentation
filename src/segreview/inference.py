@@ -12,7 +12,7 @@ and throw the rest away. Only those small maps are kept and saved.
 Steps for one scan (they copy what TotalSegmentator itself does):
 1. Reorient to canonical (RAS) orientation.
 2. Resample to the network's voxel size (6 mm 'fastest', 3 mm 'fast', 1.5 mm 'full').
-3. nnU-Net preprocessing (CT intensity normalisation) and sliding-window prediction -> logits.
+3. nnU-Net preprocessing (CT intensity normalization) and sliding-window prediction -> logits.
 4. Reduce logits to organ maps (see reduce_logits).
 5. Resample the organ maps back to the original voxel grid, so they line up with the ground truth.
 
@@ -118,7 +118,7 @@ class OrganSegmenter:
         image_rs = change_spacing(image, spacing, order=3, dtype=np.int32)
 
         # Step 3: nnU-Net preprocessing. Because the image already has the network's spacing,
-        # nnU-Net's own resampling does nothing here; it only crops and normalises intensities.
+        # nnU-Net's own resampling does nothing here; it only crops and normalizes intensities.
         # nnU-Net's NIfTI reader (the one the model was trained with) flips the axis order from
         # (x, y, z) to (z, y, x), so we do the same; otherwise the network sees the scan sideways.
         volume = np.asanyarray(image_rs.dataobj).astype(np.float32)
