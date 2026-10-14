@@ -1,0 +1,3 @@
+case_id,shape_zyx,kidney_dice_model_vs_truth,voxels_changed_by_correction,kidney_voxels_truth,kidney_voxels_model,prepare_s,predict_s
+case_00183,49x60x60,0.9295392953929539,267,1554,1398,7.5,2.8
+case_00002,44x80x80,0.9046486486486487,522,2487,2138,10.1,10.6

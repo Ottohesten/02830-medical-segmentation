@@ -1,0 +1,33 @@
+# G3 feasibility smoke test (scripts/g3_smoke_test.py). NOT the G3 pipeline; see docs/g3_plan.md.
+# Question: can nnU-Net's own trainer fine-tune a pretrained TotalSegmentator model on a few corrected KiTS scans on
+# this machine, and how much time and memory does one training step take?
+#
+# Run: uv run python scripts/g3_smoke_test.py --config configs/g3_smoke.yaml
+# On a GPU (e.g. the DTU HPC) the same config works; device: auto picks CUDA.
+
+name: g3_smoke                        # results go to results/g3_smoke/
+source_config: configs/kits100.yaml   # dataset paths, model weights and seed. Its 100 scans are NEVER used here
+seed: 42
+
+model_resolution: fastest             # fastest = the 6 mm model (task 298); fast = the 3 mm model (task 297)
+# The next two scans of the same seeded KiTS draw that picked the 100 scans of kits100 (positions 101 and 102),
+# so they are guaranteed not to be in kits100. The script checks this.
+cases: [case_00183, case_00002]
+truth_to_classes:                     # which ground-truth labels (KiTS: 1 kidney, 2 tumor, 3 cyst) become which of the
+  kidney: [1, 2]                      # model's classes; the script adds _left / _right. Tumor counts as kidney, as in
+  kidney_cyst: [3]                    # the organ definition kidney_tumor_cyst
+body_threshold_hu: -500               # CT value above which a voxel counts as body (for the left-right midline)
+
+work_dir: data/g3_smoke               # nnU-Net folders for this test (preprocessed data, trainer output). Not in git
+
+compute:
+  device: auto                        # auto = CUDA, else MPS, else CPU
+  num_threads: 0                      # CPU threads for torch; 0 = all cores
+  augmentation_processes: 0           # nnU-Net data augmentation workers; 0 = in the main process (laptop)
+
+training:
+  batch_sizes: [2, 13]                # one short run per batch size; 13 = the model's own batch size (plans), used
+                                      # in the original training on an A100 GPU. The first one is also used for the
+                                      # loss check. On the Intel Mac a step at batch 13 takes about 9 minutes
+  iterations: 3                       # training steps per batch size; the first is a warm-up and is not counted
+  initial_lr: 0.001                   # fine-tuning: 10x lower than nnU-Net's default of 0.01

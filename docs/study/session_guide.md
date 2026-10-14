@@ -15,13 +15,16 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
 - **Say the same thing to everyone.** Read the script below. Do not tell participants that we expect the heatmap to
   help, and do not point at the screen or comment on their work.
 - **No names in the data.** The only link between a person and their data is the ID slip they keep themselves.
+- **No peeking.** Nobody runs `scripts/analyze_study.py` or looks at Dice values of P sessions before the last
+  session. The data rules and the analysis are fixed in the [analysis plan](analysis_plan.md), locked before P01.
 
 ## Before the study day
 
 1. On the study MacBook, pull the latest version and run `uv sync`. The study must already be prepared on this
    Mac: `data/study/study_kits/` must exist. It is made by `scripts/prepare_study.py`, which needs the KiTS data and
    the model output, so prepare the study on the Mac that has them.
-2. Check that `configs/study.yaml` has the settings agreed after the pilot (`time_limit_min`, `tlx: after_each_block`).
+2. Check that `configs/study.yaml` has the settings agreed after the pilot and written in the
+   [analysis plan](analysis_plan.md) under "Lock" (`time_limit_min`, `heatmap_display`, `tlx: after_each_block`).
    **Do not change the config once P01 has started.**
 3. Run `uv run pytest` (about two minutes). All tests should pass.
 4. Print for each participant: two copies of the [consent form](consent_form.md). Print one
@@ -36,7 +39,9 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
    uv run python scripts/run_ui.py --config configs/study.yaml
    ```
 
-   Chrome opens at http://127.0.0.1:8765. Leave the terminal open for the whole session.
+   Chrome opens at http://127.0.0.1:8765. Leave the terminal open for the whole session. The terminal prints
+   `Heatmap display: ...`; check that it is the setting locked after the pilot (see the session log). Never change
+   `configs/study.yaml` during the study.
 3. In Chrome: full screen (⌃⌘F), zoom 100 % (⌘0). The start page should show the "Participant ID" field.
 4. Look up the next unused P ID in the session log. Write it on the participant's ID slip (the bottom part of their
    copy of the consent form), not on the copy you keep.
@@ -96,8 +101,8 @@ Write their comments in the session log (no names). Then:
 
 ## After each session
 
-1. Check the saved files in `data/study/study_kits/sessions/<ID>/`: 6 `*_mask.nii.gz`, 6 `*_log.json`,
-   `tlx_with_heatmap.json`, `tlx_without_heatmap.json` and a `practice/` folder.
+1. Check the saved files in `data/study/study_kits/sessions/<ID>/`: `session.json`, 6 `*_mask.nii.gz`,
+   6 `*_log.json`, `tlx_with_heatmap.json`, `tlx_without_heatmap.json` and a `practice/` folder.
 2. Fill in the row in the session log.
 3. Copy `data/study/study_kits/sessions/<ID>/` to the group's backup location. **Never put study data in git.**
 4. Leave the interface running for the next session, or stop it with Ctrl+C in the terminal.
@@ -108,6 +113,7 @@ Write their comments in the session log (no names). Then:
 |---------|-----------|
 | "Could not save" message | Click "Try again". If it fails again, check that the terminal with the server is still running. Do not close the page. |
 | The page was closed or reloaded, or Chrome crashed | Restart the server if it stopped, open http://127.0.0.1:8765, and enter the **same ID**. Finished scans are skipped. A scan that was not finished starts again from the AI outline with the full time. Write in the log which scan was restarted. |
+| "Could not start: … started with …" when an ID is entered | The session was started with other settings (e.g. another heatmap display) than the server runs with now. Someone changed `configs/study.yaml`. Put the locked setting back, restart the server, and enter the ID again. Never delete `session.json`. |
 | Painting does not work | Check that Add or Erase is selected (not Move) and that the scan is not locked. Press on the trackpad and keep it pressed while moving. |
 | The image is zoomed or moved away | Press "Reset view". |
 | "Time is up" | Expected: the scan is saved and locked. The participant clicks Continue. |
@@ -115,6 +121,7 @@ Write their comments in the session log (no names). Then:
 | Wrong, unused ID typed, noticed before scan 1 is finished | Delete `data/study/study_kits/sessions/<wrong ID>/`, reload the page, and start again with the right ID (the participant sees the guide and practice again). |
 | Wrong, unused ID, noticed later | Let the participant finish with that ID. Give the unused right ID to the next participant, so every group of four stays complete. Write it in the log. |
 | The participant wants to stop | Stop at once, no questions asked. Ask if we may keep the data collected so far. If not, delete their folder. If yes, move it to `data/study/study_kits/excluded/<ID>_stopped/`, since the analysis needs both conditions. Either way, give the **same ID** to the next participant, so the groups of four stay complete. Write it in the log. |
+| A P ID was used for a test by mistake | Move `data/study/study_kits/sessions/<ID>/` to `data/study/study_kits/excluded/<ID>_test/`, give the ID to the next real participant, and write it in the log and under "Changes after locking" in the analysis plan. |
 | The participant asks to have their data deleted later | Delete `data/study/study_kits/sessions/<ID>/` (and its backup copy). Write the date in the log. |
 
 ## Cleaning up

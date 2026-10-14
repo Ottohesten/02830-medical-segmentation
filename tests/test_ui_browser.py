@@ -259,6 +259,20 @@ def test_mask_is_drawn_on_top_of_the_heatmap(server, browser):
     assert heat_only[2] > heat_only[0] + 50, heat_only                # without the mask the (blue) heatmap is there
 
 
+def test_contour_display_in_the_page(temp_study, browser):
+    """study.heatmap_display = contour: the viewer gets only full-strength outline voxels, and the key says so."""
+    from tests.conftest import running_server
+    temp_study["study"]["heatmap_display"] = {"mode": "contour", "top_percent": 10, "contour_margin_mm": 3}
+    with running_server(temp_study) as base:
+        b = browser
+        case_id = open_queue_scan(b, base)
+        assert b.js("document.getElementById('key-blue-text').textContent") == "Blue outline: where the AI is most unsure"
+        values = b.js("[...new Set(state.viewer.nv.volumes[1].img)].sort((a, b) => a - b)")
+        assert values == [0, 255] and b.js("state.marks.length") > 0      # outline only; slider marks still work
+        log = finish_queue_scan(b, temp_study, case_id)
+    assert log["heatmap_display"] == {"mode": "contour", "top_percent": 10, "contour_margin_mm": 3}
+
+
 def test_study_flow_guide_practice_timeout_answer(quick_server, browser):
     base, study = quick_server
     b = browser
@@ -269,6 +283,9 @@ def test_study_flow_guide_practice_timeout_answer(quick_server, browser):
     b.click("#start-study")
     # Guide with the example image, before the practice scan.
     b.wait_for("!document.getElementById('guide').hidden")
+    # The session is recorded with the settings it runs with (e.g. how the heatmap is shown).
+    session = json.loads((root / "sessions" / "P01" / "session.json").read_text())
+    assert session["settings"]["heatmap_display"]["mode"] == "full" and len(session["starts"]) == 1
     b.wait_for("document.getElementById('guide-image').naturalWidth > 0", timeout=20)
     assert b.js("document.querySelector('.toolbar').getClientRects().length") == 0
     b.click("#guide-go")

@@ -12,19 +12,23 @@ from pathlib import Path
 import nibabel as nib
 import numpy as np
 
+from segreview.heatmap_display import check_display
 from segreview.study import TLX_SCALES, assignment, study_dir
 from segreview.study_analysis import TruthCache
 
 
 def simulate_sessions(study: dict, source: dict, sessions_dir: Path, participants: list[str], fraction_fixed,
-                      minutes, seed: int = 0, tlx=None, tlx_which: tuple = ("session",), truths=None) -> None:
+                      minutes, seed: int = 0, tlx=None, tlx_which: tuple = ("session",), truths=None,
+                      display: dict | None = None) -> None:
     """Write SIMULATED sessions for the given participant ids into sessions_dir.
 
     fraction_fixed(pid, condition) -> share (0-1) of the wrong voxels the participant fixes.
     minutes(pid, condition) -> time spent on each scan.
     tlx(pid, which) -> dict of the six scales, for each questionnaire in tlx_which; tlx=None: no questionnaires.
     truths: a TruthCache to reuse (optional).
+    display: the heatmap display written into the logs, as the server does (default: full).
     """
+    display = check_display(display)
     root = study_dir(study)
     manifest = json.loads((root / "manifest.json").read_text())
     truths = truths or TruthCache(study, source)
@@ -44,7 +48,7 @@ def simulate_sessions(study: dict, source: dict, sessions_dir: Path, participant
                      out / f"{a['case_id']}_mask.nii.gz")
             log = {"simulated": True, "condition": a["condition"], "position": a["position"], "reason": "done",
                    "duration_s": 60.0 * minutes(pid, a["condition"]), "strokes": 0, "undo_count": 0,
-                   "heatmap_visible_s": 0.0, "events": []}
+                   "heatmap_visible_s": 0.0, "heatmap_display": display, "events": []}
             (out / f"{a['case_id']}_log.json").write_text(json.dumps(log))
         if tlx is not None:
             for which in tlx_which:

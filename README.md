@@ -213,7 +213,8 @@ uv run python scripts/run_ui.py        --config configs/study.yaml   # start the
   when finished.") and a color key (red = the AI's outline, blue = where the AI is unsure, only when the heatmap is
   shown).
 - **Running the study:** [docs/study/](docs/study/) has the experimenter's [session guide](docs/study/session_guide.md),
-  the [consent form](docs/study/consent_form.md) and the [pilot test plan](docs/study/pilot_plan.md).
+  the [consent form](docs/study/consent_form.md), the [pilot test plan](docs/study/pilot_plan.md) and the
+  [analysis plan](docs/study/analysis_plan.md) (locked before P01).
 - **Demo queue:** the test scans ranked by the G1 score, most uncertain first. Heatmap always available, no time
   limit, and the ground truth can be shown.
 - **Tools:** Add / Erase with a round brush (a circle shows its size), brush size, Undo (also ⌘Z), Move, two contrast
@@ -224,7 +225,11 @@ uv run python scripts/run_ui.py        --config configs/study.yaml   # start the
 - **Layers:** the mask is always drawn on top of the heatmap (a see-through fill with a solid outline). NiiVue's own
   slice shader puts overlays over the drawing, so `ui/viewer.js` gives NiiVue its own shader.
 - **Heatmap:** voxel entropy, chosen on the KiTS development set because it points best at wrong voxels
-  (`scripts/evaluate_heatmaps.py`).
+  (`scripts/evaluate_heatmaps.py`). `study.heatmap_display` sets how it is shown: `full` (default), `top` (only the
+  `top_percent` most uncertain voxels near the kidney) or `contour` (a thin line around them). The pilot decides
+  (see the pilot plan). The server computes the shown map from the prepared heatmap (no new preparation needed),
+  records the setting per session (`sessions/<id>/session.json`) and in every scan log, and refuses to resume a
+  session with a different setting.
 - **Ground truth:** only the practice scan and the demo queue have it (`truth.nii.gz`); the server refuses it for
   study scans.
 - **Tests:** `uv run pytest` checks the balancing, the scan selection and the server (files, heatmap and ground-truth
@@ -243,19 +248,38 @@ uv run python scripts/power_study.py   --config configs/study.yaml   # planning:
 
 - **Primary metric per corrected scan:** (Dice after − Dice before) / minutes. Dice before = the model's mask, Dice after
   = the participant's saved mask, both against the ground truth (used only here, never shown in the study scans).
+- The script carries out the [analysis plan](docs/study/analysis_plan.md), which is locked before the first
+  participant; run it once, after the last session. Settings: `analysis:` in `configs/study.yaml`.
 - **Comparison:** per participant, the mean over the 3 scans with and the 3 scans without the heatmap; Wilcoxon
-  signed-rank test on the differences (with − without), two-sided, with the rank-biserial correlation as effect size.
-  Dice after, Dice gain and time are reported as secondary outcomes.
+  signed-rank test on the differences (with − without), two-sided, α = 0.05, with an exact sign-flip p-value.
+  Effect sizes: the rank-biserial correlation and the mean difference with a 95 % bootstrap interval.
+  **H1** (primary): gain per minute is higher with the heatmap. **H2**: raw NASA-TLX is lower with it; tested only if
+  H1 is supported (fixed order). Dice after, Dice gain, time, timeouts, unchanged scans and order are exploratory.
 - **NASA-TLX** (Raw TLX: mean of 6 scales, 0–100) is asked in the interface after each condition block
-  (`study.tlx: after_each_block`, the default), so the analysis also compares workload with vs without the heatmap,
-  paired per participant. With `after_session` it is asked once, at the end.
+  (`study.tlx: after_each_block`, the default), so the analysis can compare workload with vs without the heatmap,
+  paired per participant. With `after_session` it is asked once, at the end (and H2 cannot be tested).
+- Only complete sessions count; incomplete ones are listed in `study_exclusions.csv`. Scans where the time ran out
+  and scans the participant left unchanged are kept (and counted).
+- All participants must have seen the same heatmap display; the analysis stops otherwise.
 - Only real participant ids (P01, ...) are analyzed; test ids (T01, ...) and the practice scan are ignored. Output:
-  `results/study_kits/study_{scans,participants,tests,tlx}.csv` and `figures/study_gain_per_min.png`.
+  `results/study_kits/study_{tests,participants,scans,exclusions,conditions,order,tlx}.csv` and
+  `figures/study_gain_per_min.png`.
 - The analysis is tested on **simulated** sessions (`tests/simulated_sessions.py`), which exist only in temporary
   test folders; simulated output is named `SIMULATED_*` and can never be written to `results/`.
 - **Power simulation** (`results/study_kits/power_simulation.csv`, `power_needed.csv`): for assumed standardized
   effect sizes d_z (mean / SD of the per-participant differences), the share of simulated studies where the Wilcoxon
   test finds the effect. These are assumptions for planning, not results.
+
+## G3 (stretch): fine-tuning on corrected scans — plan only
+
+[docs/g3_plan.md](docs/g3_plan.md) describes the experiment (simulated corrections of the top of the review queue,
+fine-tuning, evaluation on the `kits100` test set) and what needs the HPC. It is not built. A feasibility smoke test
+checks that nnU-Net's own trainer can fine-tune the pretrained model on this setup and measures time and memory per
+training step (2 KiTS scans that are not in `kits100`; nothing is saved as a model):
+
+```bash
+uv run python scripts/g3_smoke_test.py --config configs/g3_smoke.yaml   # -> results/g3_smoke/
+```
 
 ## Layout
 

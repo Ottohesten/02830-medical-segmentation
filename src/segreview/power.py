@@ -11,7 +11,8 @@ minute with a spread of the per-participant differences of 0.010 gives d_z = 0.8
 
 Method: for each assumed d_z and number of participants n (a multiple of 4, because of the balancing), draw
 n differences from a normal distribution with mean d_z and standard deviation 1, run the same two-sided
-Wilcoxon test as the analysis, and repeat many times. The power is the share of repetitions with p < alpha.
+Wilcoxon test as the analysis (scipy's exact p-value; for such differences, which have no ties, it is the same as
+the analysis's sign-flip p-value), and repeat many times. The power is the share of repetitions with p < alpha.
 d_z = 0 is included as a check: its "power" is the false-positive rate and must stay at or below alpha.
 
 These are ASSUMED effect sizes, not study results.

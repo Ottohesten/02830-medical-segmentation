@@ -15,6 +15,7 @@ import threading
 import webbrowser
 from pathlib import Path
 
+from segreview.heatmap_display import display_label
 from segreview.study import load_study_config
 from segreview.ui_server import make_server
 
@@ -53,6 +54,10 @@ def main():
     host, port = server.server_address[:2]
     url = f"http://{host}:{port}/"
     print(f"Review interface running at {url}  (stop with Ctrl+C)")
+    print(f"Heatmap display: {display_label(server.app.display)}  (study.heatmap_display)")
+    if server.app.display["mode"] != "full":
+        # Only the top/contour displays are computed; that takes a few seconds per scan, so start at once.
+        threading.Thread(target=server.app.prepare_heatmaps, daemon=True).start()
     threading.Timer(0.5, open_browser, args=(url, choice)).start()
     try:
         server.serve_forever()

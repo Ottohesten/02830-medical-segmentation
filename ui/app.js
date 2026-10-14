@@ -83,6 +83,17 @@ function viewerData(key, value) {
   $("viewer").dataset[key] = value;
 }
 
+/**
+ * How the heatmap is described on screen. It depends on study.heatmap_display: the whole heatmap (full), only
+ * the most uncertain voxels (top), or only their outline (contour).
+ */
+function heatmapWords() {
+  const mode = state.settings.heatmap_display.mode;
+  if (mode === "contour") return { key: "Blue outline: where the AI is most unsure", intro: "blue outlines in the image" };
+  if (mode === "top") return { key: "Blue: where the AI is most unsure", intro: "blue colors in the image" };
+  return { key: "Blue: where the AI is unsure", intro: "blue colors in the image" };
+}
+
 /** How to move the image, in words (depends on what a two-finger swipe does in the config). */
 function moveHelp() {
   const swipe = { pan: "or swipe with two fingers", slice: "(a two-finger swipe changes the slice)",
@@ -100,6 +111,7 @@ async function init() {
   for (const [name, rgb] of Object.entries(v.compare_colors)) {
     document.documentElement.style.setProperty(`--${name}`, `rgb(${rgb.join(",")})`);
   }
+  $("key-blue-text").textContent = heatmapWords().key;
   if (state.settings.guide_image) {
     $("guide-image").src = "/files/guide/example.png";
     $("guide-figure").hidden = false;
@@ -124,6 +136,9 @@ async function startStudy() {
   $("start-error").hidden = true;
   try {
     const plan = await api(`/api/study/${encodeURIComponent(pid)}`);
+    // Records the start (or resume) of the session with the study settings, e.g. how the heatmap is shown.
+    // The server refuses a resume with other settings than the session started with.
+    await api(`/api/session/${encodeURIComponent(pid)}`, { method: "POST" });
     state.participant = pid;
     // Each study scan (if not done yet), followed by the questionnaire(s) due after its position.
     const tlxAfter = {};
@@ -149,10 +164,10 @@ function nextItem() {
   if (it.mode === "tlx") return showTlx(it.which);
   $("intro-title").textContent = it.mode === "practice" ? "Practice scan" : `Scan ${it.position} of ${it.total}`;
   $("intro-text").textContent = it.mode === "practice"
-    ? "Try the tools. This scan does not count. The blue colors show where the AI is uncertain. " +
+    ? `Try the tools. This scan does not count. The ${heatmapWords().intro} show where the AI is uncertain. ` +
       "Afterwards you will see the correct answer."
     : it.condition === "with_heatmap"
-      ? "This time you can see where the AI is uncertain: blue colors in the image, and marks next to the " +
+      ? `This time you can see where the AI is uncertain: ${heatmapWords().intro}, and marks next to the ` +
         "slice slider. Use them to find mistakes."
       : "This time there is no uncertainty information. Find the mistakes yourself.";
   show("intro");

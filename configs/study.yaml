@@ -26,6 +26,15 @@ selection:                            # which KiTS scans are suitable for the st
 
 study:
   heatmap: entropy                    # LOCKED on the development set (results/kits100/heatmap_eval_dev_summary.csv)
+  heatmap_display:                    # how the heatmap is shown (src/segreview/heatmap_display.py). The pilot decides;
+                                      # lock it before P01. It is saved in every session (session.json) and scan log.
+    mode: full                        # full = the whole heatmap (as in the first user tests);
+                                      # top = only the top_percent most uncertain voxels of the region;
+                                      # contour = a thin line around those voxels, per slice (they stay uncovered)
+    top_percent: 10                   # top/contour: share (%) of the region's voxels that is kept. Region = the
+                                      # predicted kidney + uncertainty.border_mm (source config), as in heatmap_eval,
+                                      # so top 10 % = what heatmap_eval's top-10 % capture measured
+    contour_margin_mm: 3              # contour: distance (mm, in the slice) from the kept voxels to the line
   time_limit_min: 5                   # per scan (study and practice); the scan is locked and saved when the time is up.
                                       # The demo queue has no time limit.
   participant_prefix: P               # participant ids look like P01, P02, ...; the number sets the balancing group
@@ -70,6 +79,11 @@ viewer:
   scroll_px_per_slice: 40             # only for two_finger_scroll: slice
   slice_marks_fraction: 0.5           # "with heatmap": slices whose uncertainty (sum of shown heatmap values) is at
                                       # least this fraction of the most uncertain slice are marked on the slider
+
+analysis:                             # scripts/analyze_study.py; LOCKED with docs/study/analysis_plan.md before P01
+  alpha: 0.05                         # two-sided; H2 (NASA-TLX) is only tested if H1 (gain per minute) is supported
+  n_bootstrap: 10000                  # resamples of participants for the confidence interval of the mean difference
+  ci_level: 0.95                      # (the bootstrap uses the study seed)
 
 power:                                # planning: participants needed for an assumed effect (scripts/power_study.py)
   effect_sizes_dz: [0, 0.5, 0.8, 1.0, 1.2]   # d_z = mean / SD of the per-participant differences (with - without);

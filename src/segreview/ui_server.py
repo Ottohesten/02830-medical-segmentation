@@ -8,6 +8,7 @@ Endpoints:
   GET  /ui/<file>                               static files (JavaScript, CSS, NiiVue)
   GET  /api/settings                            viewer settings and time limit from the study config
   GET  /api/study/<participant>                 the participant's practice + study scans, in order, with 'done' flags
+  POST /api/session/<participant>               the page starts (or resumes) a session: records the study settings
   GET  /api/queue                               demo queue: scans ranked by the G1 score
   GET  /files/<participant>/<set>/<case>/<name>.nii.gz   ct, mask, heatmap or truth (set = scans or queue)
   GET  /files/guide/example.png                 example image for the instruction screen
@@ -16,11 +17,15 @@ Endpoints:
   POST /api/tlx/<participant>/<which>           body = JSON NASA-TLX answers (which = session or a condition)
 
 The heatmap of a study scan is only handed out if that participant has the scan in the WITH-heatmap
-condition, so the "without" condition cannot show it by mistake. The ground truth (truth) is only handed
-out for the practice scan (shown as the answer after the practice) and the demo queue, never for a study
-scan. Only known scan ids and file names are accepted, and the server only listens on this computer (127.0.0.1).
+condition, so the "without" condition cannot show it by mistake. It is handed out the way study.heatmap_display
+says (full, top or contour; see heatmap_display.py), computed from the prepared heatmap on first request.
+The ground truth (truth) is only handed out for the practice scan (shown as the answer after the practice) and
+the demo queue, never for a study scan. Only known scan ids and file names are accepted, and the server only
+listens on this computer (127.0.0.1).
 
 Saved files (data/study/<study name>/):
+  sessions/<participant>/session.json                             study settings of the session (heatmap display,
+                                                                  time limit, TLX) and when it was started/resumed
   sessions/<participant>/<case>_mask.nii.gz and <case>_log.json   study scans
   sessions/<participant>/practice/...                             practice scans
   sessions/<participant>/tlx_<which>.json                         NASA-TLX answers
@@ -30,7 +35,9 @@ Saved files (data/study/<study name>/):
 import gzip
 import json
 import mimetypes
+import threading
 import time
+from datetime import datetime, timezone
 from functools import partial
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -38,13 +45,18 @@ from pathlib import Path
 
 import nibabel as nib
 
-from segreview.config import REPO_ROOT
+from segreview.config import REPO_ROOT, load_config
+from segreview.heatmap_display import check_display, display_nifti_bytes
 from segreview.study import (GUIDE_IMAGE, TLX_SCALES, WITH, assignment, id_prefixes, load_manifest, participant_type,
                              raw_tlx, study_dir, tlx_schedule)
 
 UI_DIR = REPO_ROOT / "ui"
 FILE_NAMES = {"ct", "mask", "heatmap", "truth"}
 MODES = {"study", "practice", "queue"}
+
+
+class SessionConflict(Exception):
+    """A session is resumed with other study settings than it was started with."""
 
 
 class StudyServer:
@@ -55,6 +67,69 @@ class StudyServer:
         self.root = study_dir(study)
         self.manifest = load_manifest(study)
         self.prefixes = id_prefixes(study)     # participant ids (P01, ...) and test ids (T01, ...)
+        self.display = check_display(study["study"].get("heatmap_display"))
+        # The "top" and "contour" displays rank the voxels of the same region as G1 and heatmap_eval.py:
+        # the predicted organ plus uncertainty.border_mm of the config the model output comes from.
+        self.border_mm = load_config(REPO_ROOT / study["source_config"])["uncertainty"]["border_mm"]
+        self.shown_heatmaps = {}               # (file set, case id) -> NIfTI bytes of the shown heatmap
+        self.heatmap_lock = threading.Lock()   # the server answers requests in parallel threads
+        self.session_lock = threading.Lock()
+
+    def session_settings(self) -> dict:
+        """The study settings a participant's whole session must keep. Recorded in session.json and in every log."""
+        s = self.study["study"]
+        return {"heatmap": s["heatmap"], "heatmap_display": self.display, "time_limit_min": s["time_limit_min"],
+                "tlx": s["tlx"]}
+
+    def start_session(self, participant: str) -> dict:
+        """Record that a participant's session starts (or is resumed) in sessions/<id>/session.json.
+
+        The first start writes the settings the session runs with. Resuming with other settings (e.g. the heatmap
+        display was changed in the config between two participants and the server restarted) raises
+        SessionConflict: one participant must see one setting only, or the comparison with vs without is mixed up.
+        Output: the session record.
+        """
+        participant_type(participant, self.prefixes)            # validates the id
+        path = self.output_dir("study", participant) / "session.json"
+        now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        with self.session_lock:
+            if path.exists():
+                record = json.loads(path.read_text())
+                if record["settings"] != self.session_settings():
+                    raise SessionConflict(
+                        f"{participant} started with {record['settings']}, but the server now runs with "
+                        f"{self.session_settings()}. Put the config back, or use a new id.")
+                record["starts"].append(now)
+            else:
+                record = {"participant": participant, "settings": self.session_settings(), "starts": [now]}
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(record, indent=2))
+        return record
+
+    def heatmap_bytes(self, file_set: str, case_id: str) -> bytes:
+        """The heatmap file as the participant sees it (study.heatmap_display). 'full' is the prepared file itself."""
+        folder = self.root / file_set / case_id
+        if self.display["mode"] == "full":
+            return (folder / "heatmap.nii.gz").read_bytes()
+        key = (file_set, case_id)
+        with self.heatmap_lock:
+            if key not in self.shown_heatmaps:
+                self.shown_heatmaps[key] = display_nifti_bytes(nib.load(folder / "heatmap.nii.gz"),
+                                                               nib.load(folder / "mask.nii.gz"), self.border_mm,
+                                                               self.display)
+            return self.shown_heatmaps[key]
+
+    def prepare_heatmaps(self) -> None:
+        """Compute every shown heatmap once, practice scan first (run_ui.py runs this in the background at start).
+
+        Takes a few seconds per scan on a laptop; done ahead, no scan has to wait for it when it is opened.
+        """
+        if self.display["mode"] == "full":
+            return
+        m = self.manifest
+        for file_set, ids in (("scans", m["practice_scans"] + m["study_scans"]), ("queue", m["queue_scans"])):
+            for case_id in ids:
+                self.heatmap_bytes(file_set, case_id)
 
     def output_dir(self, mode: str, participant: str) -> Path:
         """Where a scan's corrected mask and log are written."""
@@ -137,7 +212,7 @@ class Handler(BaseHTTPRequestHandler):
                 s = self.app.study
                 return self._json({"viewer": s["viewer"], "time_limit_min": s["study"]["time_limit_min"],
                                    "participant_prefix": self.app.prefixes[0], "test_prefix": self.app.prefixes[1],
-                                   "tlx": s["study"]["tlx"],
+                                   "tlx": s["study"]["tlx"], "heatmap_display": self.app.display,
                                    "guide_image": (self.app.root / "guide" / GUIDE_IMAGE).exists()})
             if parts[:2] == ["api", "study"] and len(parts) == 3:
                 return self._json(self.app.plan(parts[2]))
@@ -167,6 +242,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._error(HTTPStatus.FORBIDDEN, "no heatmap in this condition")
         if name == "truth" and not self.app.truth_allowed(file_set, case_id):
             return self._error(HTTPStatus.FORBIDDEN, "no ground truth for study scans")
+        if name == "heatmap":
+            return self._send(HTTPStatus.OK, self.app.heatmap_bytes(file_set, case_id), "application/gzip")
         self._send(HTTPStatus.OK, (self.app.root / file_set / case_id / filename).read_bytes(), "application/gzip")
 
     # --- POST ----------------------------------------------------------------------------------
@@ -174,6 +251,13 @@ class Handler(BaseHTTPRequestHandler):
         parts = [p for p in self.path.split("?")[0].split("/") if p]
         if parts[:2] == ["api", "tlx"] and len(parts) == 4:
             return self._save_tlx(parts[2], parts[3])
+        if parts[:2] == ["api", "session"] and len(parts) == 3:
+            try:
+                return self._json(self.app.start_session(parts[2]))
+            except ValueError as e:
+                return self._error(HTTPStatus.BAD_REQUEST, str(e))
+            except SessionConflict as e:
+                return self._error(HTTPStatus.CONFLICT, str(e))
         if len(parts) != 5 or parts[0] != "api" or parts[1] not in {"save", "log"} or parts[2] not in MODES:
             return self._error(HTTPStatus.NOT_FOUND, "unknown path")
         _, kind, mode, participant, case_id = parts
@@ -191,8 +275,9 @@ class Handler(BaseHTTPRequestHandler):
         if kind == "save":
             return self._save_mask(body, out, file_set, case_id)
         log = json.loads(body)
+        # The server adds what it knows for sure, e.g. how the heatmap was shown, rather than trusting the page.
         log.update({"case_id": case_id, "participant": participant, "mode": mode,
-                    "server_received_unix": time.time()})
+                    "heatmap_display": self.app.display, "server_received_unix": time.time()})
         (out / f"{case_id}_log.json").write_text(json.dumps(log, indent=2))
         return self._json({"ok": True})
 
@@ -238,4 +323,6 @@ def make_server(study: dict, host: str | None = None, port: int | None = None) -
     app = StudyServer(study)
     host = host or study["server"]["host"]
     port = study["server"]["port"] if port is None else port
-    return ThreadingHTTPServer((host, port), partial(Handler, app=app))
+    server = ThreadingHTTPServer((host, port), partial(Handler, app=app))
+    server.app = app                           # so run_ui.py can prepare the heatmaps ahead
+    return server
