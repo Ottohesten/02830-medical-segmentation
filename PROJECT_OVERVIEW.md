@@ -35,7 +35,7 @@ opened, **show where in the scan the AI is unsure**. The goal is the most improv
 |---|---|---|
 | **G1** (core) | Rank scans by likely failure, without ground truth | **Done.** Locked and tested once on 80 test scans |
 | **G2** (core) | Review interface with an uncertainty heatmap + user study | Interface and analysis built and tested; **pilot and study not run yet** |
-| **G3** (stretch) | Fine-tune the model on corrections | Plan and smoke test only; real training needs the DTU HPC |
+| **G3** (stretch) | Fine-tune the model on corrections | Plan and smoke test only. Now run in parallel by Frederik on an RTX 4090 |
 
 ### G1 — how the ranking works and how well it does
 
@@ -123,7 +123,7 @@ The full working rules (git, branches, locked results, new experiments, what to 
 2. Everyone installs the project and tries the demo (`README.md` → Quick start).
 3. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
 4. Add the 6 mm-alone analysis to the repo (answers part of Kristine's question about 3 mm vs. 6 mm).
-5. Decide on G3 and HPC access.
+5. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.
 6. Create the mandatory Trello board; divide the report sections.
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).

@@ -253,8 +253,12 @@ Overview of the project and where everything is: [PROJECT_OVERVIEW.md](PROJECT_O
   push, locked kits100 results, one config per experiment, models compared only within one machine, and what to log
   for long runs (config, commit, machine, training log, per-scan predictions and Dice) so questions can be answered
   without training again.
-- `[idea]` G3 on a group member's PC with an NVIDIA GPU instead of the DTU HPC. First step: run the smoke test there
-  and measure the time per training step.
+- `[decision]` Runs on different machines are allowed; the machine is recorded for every run and the possible
+  differences are discussed in the report. Global seed 42 for everything random (already used in all configs).
+- `[decision]` G3 runs in parallel with the user study instead of after it (Kristine's training question), on
+  Frederik's PC with an NVIDIA RTX 4090 (24 GB) instead of the DTU HPC. Frederik owns G3. First step: run the smoke
+  test on the GPU and measure the time per training step; then build the pipeline with the 6 mm model.
+- `[dropped]` Waiting for HPC access — nobody has it set up, and a local GPU is available now.
 - `[idea]` Add the 6 mm-alone analysis from 2026-10-06 to the repository as a script and result file, so the numbers
   can be reproduced (from saved predictions only, no new inference).
 

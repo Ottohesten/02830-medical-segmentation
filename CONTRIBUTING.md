@@ -30,11 +30,11 @@ first to understand the project. If a rule here gets in the way, raise it with t
 
 - Every experiment has its **own config** in `configs/` (copy one, give it a new `name`) and therefore its own
   output folders: `results/<name>/` and `data/predictions/<name>/`. No hard-coded paths or numbers in the code.
-- **Results from different machines are not mixed.** CPU, Apple GPU (MPS) and NVIDIA GPU (CUDA) give slightly
-  different numbers, and GPU training is not exactly repeatable. All models that are compared with each other are
-  trained and evaluated on the same machine, including the "original model" reference (do not reuse the kits100
-  numbers for it). Record the machine in the log.
-- Set seeds explicitly.
+- **Record the machine** (CPU/GPU model, OS, torch and CUDA versions) for every run, in the result folder and the log.
+  Different machines (CPU, Apple GPU, NVIDIA GPU) give slightly different numbers, and GPU training is not exactly
+  repeatable. We accept this and discuss it in the report, so it must be clear which machine produced which number.
+- **Seed 42** is the project's global seed (`seed:` in every config). Use it for everything random (data selection,
+  bootstrap, training) unless an experiment deliberately repeats with several seeds; then list them in the config.
 - Exploratory analyses are fine, but label them **exploratory** in file names or output and in the log.
 
 ## 4. Log everything
