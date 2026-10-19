@@ -249,6 +249,12 @@ Overview of the project and where everything is: [PROJECT_OVERVIEW.md](PROJECT_O
 - `[decision]` Keep this log in the repository so the whole group can see what was tried and why. Every result,
   experiment, idea and decision is logged with a date, also when it is dropped.
 - `[decision]` Add [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) as the starting point for anyone who opens the project.
+- `[decision]` Add [CONTRIBUTING.md](CONTRIBUTING.md) with shared working rules: own branch + pull request, tests before
+  push, locked kits100 results, one config per experiment, models compared only within one machine, and what to log
+  for long runs (config, commit, machine, training log, per-scan predictions and Dice) so questions can be answered
+  without training again.
+- `[idea]` G3 on a group member's PC with an NVIDIA GPU instead of the DTU HPC. First step: run the smoke test there
+  and measure the time per training step.
 - `[idea]` Add the 6 mm-alone analysis from 2026-10-06 to the repository as a script and result file, so the numbers
   can be reproduced (from saved predictions only, no new inference).
 

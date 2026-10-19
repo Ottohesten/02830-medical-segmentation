@@ -76,6 +76,7 @@ trained, so there is no result yet.
 |---|---|
 | **Dated log of everything tried, measured, decided or dropped** | [PROJECT_LOG.md](PROJECT_LOG.md) |
 | How to install and run each part | [README.md](README.md) |
+| Working rules (git, locked results, logging) | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | Configurations (one per environment, one per dataset) | `configs/`, `configs/datasets/` |
 | Shared code | `src/segreview/` (inference, uncertainty, evaluation, heatmaps, plausibility, UI server, study analysis) |
 | Runnable steps | `scripts/` (`run_g1.py` runs all of G1; `run_ui.py` starts the interface; `analyze_study.py` after the study) |
@@ -90,6 +91,9 @@ trained, so there is no result yet.
 | Scans, model output, weights (not in git) | `data/`, `models/` — download with `scripts/download_data.py` and `download_model.py` |
 
 ## 4. Rules everyone should know
+
+The full working rules (git, branches, locked results, new experiments, what to log) are in
+[CONTRIBUTING.md](CONTRIBUTING.md). The most important ones:
 
 - **Ground truth is only used for evaluation**, never in a score or shown in a study scan.
 - **The test set is evaluated once.** Choices are made on the development set and locked first. Changes after

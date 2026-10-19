@@ -5,6 +5,7 @@ DTU 02830 Advanced Project in Digital Media Engineering, group 2.
 
 **New to the project? Start with [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** (what it is, status, where everything is)
 and [PROJECT_LOG.md](PROJECT_LOG.md) (dated log of every result, experiment, idea and decision, including what was dropped and why).
+**Before you change code or run experiments, read [CONTRIBUTING.md](CONTRIBUTING.md)** (branches, locked results, logging).
 
 A pretrained segmentation model (TotalSegmentator / nnU-Net) segments an organ in many CT scans.
 Instead of chasing higher Dice, we rank the scans by the model's own uncertainty, so a human reviewer
