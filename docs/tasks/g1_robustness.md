@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| **Owner** | Rasmus |
+| **Owner** | Otto |
 | **Contact / lead** | Bjørn |
-| **Branch** | `rasmus/robustness` |
+| **Branch** | `otto/robustness` |
 | **Created** | 2026-10-20 |
-| **Status** | Not started |
+| **Status** | Step 1 complete; step 2 next |
 | **Target** | Steps 1–4 by 2026-10-30, all steps by 2026-11-13 |
 
 This document is the task description **and** the working notes. Whoever works on the task (with or without an
@@ -46,10 +46,38 @@ How the code works is in [README.md](../../README.md) (perturbations: section "R
 
 Tick each box when done and write the date and a short note (numbers + file paths) under it.
 
-- [ ] **1. Get started.** Install the project (`uv sync`), run `uv run pytest`, download the KiTS data and model
+- [x] **1. Get started.** Install the project (`uv sync`), run `uv run pytest`, download the KiTS data and model
   weights (`scripts/download_data.py`, `scripts/download_model.py` with `configs/kits100.yaml`). Read
   [PROJECT_OVERVIEW.md](../../PROJECT_OVERVIEW.md) and be able to explain G1 in two sentences.
   *Notes:*
+  - 2026-10-20: Read the overview, contributing rules, and this task. `git pull --ff-only` reported
+    "Already up to date" at `eb1cef2`; created `otto/robustness`. No local environment, data, or model folders
+    were present at the initial check.
+  - 2026-10-20: Otto reported running `uv sync`; verified `.venv/` with Python 3.12.15, torch 2.2.2+cu121,
+    TotalSegmentator 2.18.0, and pytest 9.1.1 on Linux x86_64 (kernel 7.2.10-1-cachyos, glibc 2.44).
+    PyTorch reports CUDA build 12.1 but `torch.cuda.is_available()` is false in the current environment.
+  - 2026-10-20: Ran `UV_OFFLINE=1 UV_NO_SYNC=1 UV_CACHE_DIR=/tmp/otto-robustness-uv-cache uv run pytest -ra`
+    against the installed environment, without downloads or dependency changes: **72 passed, 36 skipped,
+    0 failed in 3.11 s** (108 collected). Of the skips, 30 require a prepared study and 6 require Google Chrome.
+    See `tests/test_study.py`, `tests/test_study_analysis.py`, `tests/test_ui_server.py`, and
+    `tests/test_ui_browser.py`.
+  - 2026-10-20: Otto approved the data and model downloads. Ran `uv run python -u scripts/download_data.py
+    --config configs/kits100.yaml` and `uv run python -u scripts/download_model.py --config configs/kits100.yaml`
+    in the existing environment (`UV_OFFLINE=1 UV_NO_SYNC=1`, with the uv cache under `/tmp/`). Both exited 0.
+    The scripts needed network access outside the sandbox after sandbox DNS lookups failed.
+  - 2026-10-20: Downloaded and verified **100 CT images + 100 labels** in `data/raw/kits23/`:
+    20 development and 80 test cases, seed 42. Images total 9,904,809,672 bytes; labels 33,410,151 bytes.
+    All pairs have matching shapes and affines; all 200 gzip streams pass CRC and payload-length checks.
+    No partial downloads remain. Model tasks **297 (3 mm)** and **298 (6 mm)** are in
+    `models/totalsegmentator/nnunet/results/`, each with fold `[0]`, `plans.json`, `dataset.json`, and
+    `fold_0/checkpoint_final.pth`; the full model directory is 331,490,973 bytes.
+    Machine: AMD Ryzen 5 7500F, Linux, Python 3.12.15, torch 2.2.2+cu121; CUDA unavailable in this environment.
+    Verification took 85.78 s. File paths, byte counts, SHA-256 hashes, config hash, source commit, and machine
+    details are in `results/robustness_setup/download_verification.json` (setup evidence only).
+    No inference or evaluation was run, and no locked G1 files were changed. Data and weights remain outside git.
+  - G1 in two sentences: We run the 3 mm and 6 mm TotalSegmentator models on each CT scan and measure their
+    disagreement about the kidneys. Scans with more disagreement go earlier in the review queue so a person
+    can check likely segmentation errors first, without ground truth being used to rank them.
 
 - [ ] **2. Measure the time.** Run the 3 mm and 6 mm models on 2 development scans with one perturbation on your
   machine. Write down seconds per scan per model, and estimate the time for 20 scans × 3–4 perturbations and for
@@ -87,7 +115,8 @@ Tick each box when done and write the date and a short note (numbers + file path
 
 ## 5. Decisions made in this task
 
-*(Date — decision — why. Also add each one to PROJECT_LOG.md.)*
+- 2026-10-20 — Otto owns this task and works on `otto/robustness`, replacing the original Rasmus assignment,
+  following Otto's explicit instruction for this work session.
 
 ## 6. Questions for Bjørn
 
@@ -99,3 +128,10 @@ Tick each box when done and write the date and a short note (numbers + file path
 A new chat starts by reading this section.)*
 
 - 2026-10-20: Task created. Next action: step 1.
+- 2026-10-20: **Step 1 complete** on `otto/robustness`: installation verified; tests 72 passed, 36 skipped,
+  no failures; 100 KiTS image/label pairs and both model checkpoints downloaded and verified.
+  Evidence: `results/robustness_setup/download_verification.json`. No inference or evaluation has been run.
+  Next action: explain step 2, check compute availability (PyTorch reports no CUDA and `nvidia-smi` cannot
+  communicate with the driver in this environment), then prepare a separate `configs/kits_perturbed.yaml`
+  with its own output name for a timing run on 2 development scans with 1 perturbation. Do not start a run
+  expected to exceed 30 minutes without Otto's approval. Steps 2–7 are untouched.

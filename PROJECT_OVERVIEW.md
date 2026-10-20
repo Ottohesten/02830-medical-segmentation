@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-20 (exploratory scores from the real 3 mm vs. 6 mm differences).*
+*Last updated: 2026-10-20 (exploratory scores from the real 3 mm vs. 6 mm differences; Otto completed robustness setup).*
 
 | | |
 |---|---|
@@ -103,7 +103,7 @@ trained, so there is no result yet.
 | Power simulation | `results/study_kits/` |
 | User-study documents | `docs/study/` — session guide, consent form, pilot plan, analysis plan (locked after the pilot) |
 | G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` |
-| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Rasmus) |
+| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Otto; step 1 complete, timing run next) |
 | HPC job scripts (never run on the cluster) | `jobs/` |
 | Scans, model output, weights (not in git) | `data/`, `models/` — download with `scripts/download_data.py` and `download_model.py` |
 

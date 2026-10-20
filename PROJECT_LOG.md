@@ -397,6 +397,40 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 
 ---
 
+## 2026-10-20: Otto starts the robustness task
+
+- `[decision]` Otto takes ownership of `docs/tasks/g1_robustness.md` on branch `otto/robustness`, replacing the
+  original Rasmus assignment, following Otto's explicit instruction. Updated the task and `PROJECT_OVERVIEW.md`.
+- `[admin]` Step 1 started: read `PROJECT_OVERVIEW.md`, `CONTRIBUTING.md`, and `docs/tasks/g1_robustness.md`;
+  `git pull --ff-only` reported "Already up to date" at `eb1cef2`, then created `otto/robustness`.
+  No `.venv/`, `data/`, or `models/` existed at the initial check. No inference or evaluation was run.
+- `[admin]` Otto subsequently reported running `uv sync`. Verified `.venv/`: Python 3.12.15,
+  torch 2.2.2+cu121 (CUDA build 12.1; CUDA unavailable to PyTorch in the current environment),
+  TotalSegmentator 2.18.0, pytest 9.1.1; Linux x86_64, kernel 7.2.10-1-cachyos, glibc 2.44.
+- `[result]` Step 1 installation check: `UV_OFFLINE=1 UV_NO_SYNC=1 UV_CACHE_DIR=/tmp/otto-robustness-uv-cache
+  uv run pytest -ra` completed with **72 passed, 36 skipped, 0 failed in 3.11 s** (108 collected).
+  No downloads or dependency changes. Skips: 30 require a prepared study (`tests/test_study.py`,
+  `tests/test_study_analysis.py`, `tests/test_ui_server.py`), 6 require Google Chrome
+  (`tests/test_ui_browser.py`). Recorded in `docs/tasks/g1_robustness.md`, step 1.
+  At that point, KiTS data and model downloads awaited Otto's approval (completed below).
+- `[admin]` Otto approved both downloads. Ran `scripts/download_data.py` and `scripts/download_model.py` with
+  `configs/kits100.yaml` through `uv run python -u` in the installed environment (`UV_OFFLINE=1 UV_NO_SYNC=1`,
+  uv cache under `/tmp/`). Both exited 0. Sandbox DNS failed for Hugging Face/GitHub; the approved downloads
+  succeeded with network access outside the sandbox.
+- `[result]` Robustness step 1 complete: **100 images + 100 ground-truth masks** in `data/raw/kits23/`
+  (20 dev / 80 test, seed 42). Images 9,904,809,672 bytes; labels 33,410,151 bytes. All pairs have matching
+  shapes/affines; all 200 gzip files passed full-stream CRC and payload-length checks; no partial files remain.
+  Model tasks 297 (3 mm) and 298 (6 mm) are in `models/totalsegmentator/nnunet/results/`, each with fold `[0]`,
+  plans, dataset metadata, and final checkpoint; model directory total 331,490,973 bytes.
+  Setup verification took 85.78 s on AMD Ryzen 5 7500F, Linux x86_64, Python 3.12.15, torch 2.2.2+cu121,
+  CUDA build 12.1, CUDA unavailable to PyTorch. `results/robustness_setup/download_verification.json` records
+  per-file paths, byte counts, SHA-256 hashes, config hash, source commit, machine, and model details.
+  Data and weights are excluded from git. No inference/evaluation or changes to locked G1 files.
+- `[admin]` Updated `docs/tasks/g1_robustness.md` (step 1 checked and "Where we are") and `PROJECT_OVERVIEW.md`.
+  Next: explain step 2, check compute availability (`nvidia-smi` also cannot communicate with the driver in
+  this environment), and prepare a separate timing config for 2 dev scans and 1 perturbation. Steps 2–7
+  have not started; ask Otto before any run expected to exceed 30 minutes.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the
