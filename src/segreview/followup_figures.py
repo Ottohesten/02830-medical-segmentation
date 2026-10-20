@@ -1,4 +1,5 @@
-"""Figures of the exploratory follow-up analyses (3 mm vs. 6 mm disagreement, simulated voxel correction).
+"""Figures of the exploratory follow-up analyses (3 mm vs. 6 mm disagreement, simulated voxel correction,
+scores from the real 3 mm vs. 6 mm differences).
 
 They use the report's style (report.use_style: ACM sizes, serif text, PDF + PNG) and its method colors, so the
 entropy and model-disagreement heatmaps have the same color here as in the G1 figures. The numbers come from the
@@ -15,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 from segreview.model_comparison import distance_bin_names
-from segreview.report import DOUBLE, GRID, HIGHLIGHT, INK, MUTED, save, use_style
+from segreview.report import DOUBLE, GRID, HIGHLIGHT, INK, LABELS, MUTED, RULE_TITLES, method_style, save, use_style
 
 GROUP_TITLES = {"bad": "3 mm bad", "false_alarm": "false alarm (6 mm bad)", "good": "both fine", "all": "all scans"}
 # Far-away disagreement by ground-truth label: categorical slots 1-4 of the validated palette (adjacent pairs pass
@@ -127,5 +128,57 @@ def plot_correction(summary: pd.DataFrame, cases: pd.DataFrame, path: Path, titl
     fig.tight_layout()
     handles, labels = axes[0, 0].get_legend_handles_labels()
     fig.legend(handles, labels, ncol=len(labels), loc="upper center", bbox_to_anchor=(0.5, 0.0))
+    save(fig, path.parent, path.stem)
+    plt.close(fig)
+
+
+# Scores from the real 3 mm vs. 6 mm differences (explore_disagreement_scores.py). The locked measure and entropy
+# keep their report colors; the four candidates take the next free slots of the validated palette (the six colors
+# pass the color-blind check as a set). The control (6 mm drops) is dashed, so it reads as "expected poor".
+CANDIDATE_STYLE = {   # candidate -> (label, color, line style, marker)
+    "far_disagree": ("Far disagreement", "#eb6834", "-", None),
+    "far_6mm_adds": ("Far, 6 mm adds", "#6250d6", "-", "o"),
+    "far_6mm_drops": ("Far, 6 mm drops (control)", "#e87ba4", "--", None),
+    "6mm_adds_all": ("6 mm adds, any distance", "#eda100", "-", "s"),
+}
+NORM_TITLES = {"ml": "ml", "per_volume": "per 3 mm volume"}
+
+
+def plot_review_curves_explore(curves: dict, metrics: pd.DataFrame, candidates: list[str], norm: str,
+                               primary: str, path: Path, title: str) -> None:
+    """Review curves of the new disagreement scores against the locked measure and the baselines, one panel per
+    'bad' rule. One shared legend below the panels; each entry carries the review AUC for every panel, in panel order.
+
+    Input: {bad rule: {method: (review curve, quality curve)}} from evaluate_methods, the matching metric rows
+           (columns bad_rule, n_bad, method, review_auc), the candidate names, which normalization to show
+           (ml / per_volume), the locked primary measure, output path, title.
+    """
+    use_style()
+    rules = list(curves)
+    fig, axes = plt.subplots(1, len(rules), figsize=(DOUBLE, 3.0), sharey=True, squeeze=False)
+    lines = [(f"{c}_{norm}", f"{CANDIDATE_STYLE[c][0]} ({NORM_TITLES[norm]})",
+              {"color": CANDIDATE_STYLE[c][1], "ls": CANDIDATE_STYLE[c][2], "lw": 1.3, "zorder": 5,
+               "marker": CANDIDATE_STYLE[c][3], "ms": 3, "markevery": 8}) for c in candidates]
+    lines += [(m, LABELS[m].replace(" (primary)", " (locked primary)") if m == primary else LABELS[m],
+               method_style(m)) for m in [primary, "entropy_mean_region", "neg_volume_ml", "random", "oracle"]]
+    by_rule = {rule: metrics[metrics.bad_rule == rule].set_index("method") for rule in rules}
+    for ax, rule in zip(axes[0], rules):
+        for method, label, style in lines:
+            y = curves[rule][method][0]
+            aucs = " / ".join(f"{by_rule[r].loc[method, 'review_auc']:.3f}" for r in rules)
+            ax.plot(np.linspace(0, 1, len(y)), y, label=f"{label}: {aucs}", **style)
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1.02)
+        ax.xaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0))
+        ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0))
+        ax.set_xlabel("scans sent to review (from the top of the queue)")
+        ax.set_title(f"bad = {RULE_TITLES.get(rule, rule)} (n bad = {int(by_rule[rule].n_bad.iloc[0])})", loc="left")
+    axes[0, 0].set_ylabel("bad segmentations found")
+    fig.suptitle(title, x=0.0, ha="left", fontsize=8)
+    fig.tight_layout()
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, ncol=2, loc="upper center", bbox_to_anchor=(0.5, 0.0), handlelength=2.4,
+               columnspacing=1.5, title="method: review AUC (" + " / ".join(RULE_TITLES.get(r, r) for r in rules) + ")",
+               title_fontsize=7)
     save(fig, path.parent, path.stem)
     plt.close(fig)

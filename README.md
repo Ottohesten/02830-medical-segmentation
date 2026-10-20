@@ -159,6 +159,7 @@ and never change the locked G1 files. Settings: `exploratory:` in `configs/kits1
 ```bash
 uv run python scripts/compare_models.py            --config configs/kits100.yaml   # ~10 min on a MacBook Air M5
 uv run python scripts/simulate_voxel_correction.py --config configs/kits100.yaml   # ~10 min
+uv run python scripts/explore_disagreement_scores.py --config configs/kits100.yaml  # ~5 min
 ```
 
 - `compare_models.py` (`src/segreview/model_comparison.py`): **the 6 mm model alone** (Dice of both models per
@@ -171,6 +172,13 @@ uv run python scripts/simulate_voxel_correction.py --config configs/kits100.yaml
   help?** In each scan the k % most uncertain voxels of the region (organ + border) are set to ground truth and the
   Dice gain is measured, for entropy, |p_3mm - p_6mm|, distance to the edge, random order and an oracle. Outputs:
   `voxel_correction_*.csv`, `figures/voxel_correction_gain.png`.
+- `explore_disagreement_scores.py` (`src/segreview/disagreement_scores.py`): **scores from only the real
+  differences** between the 3 mm and 6 mm masks (farther than `grid_band_mm` from the 3 mm edge, and/or only where
+  the 6 mm model adds organ), in ml and per 3 mm volume. Candidates and the selection rule are fixed in
+  `exploratory.disagreement_scores`; evaluated with the G1 functions per split, with paired bootstrap differences
+  to the locked measure and entropy, and false alarms in the top of each queue. kits100 is development data for
+  this question. Outputs: `exploratory_disagreement_*.csv`, `exploratory_queue_*.csv`,
+  `figures/exploratory_review_curves_test.png`.
 - Each script writes the machine, library versions and git commit to `<name>_machine.json` next to its results.
 
 ## Running on the DTU HPC (not tested on the cluster yet)

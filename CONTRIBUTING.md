@@ -55,7 +55,13 @@ path to the result file. Update the status and next steps in [PROJECT_OVERVIEW.m
 
 Small files (CSV, figures, logs) go in `results/<name>/` and in git. Big files go outside git, and the log says where.
 
-## 5. Code style
+## 5. Task documents
+
+Larger tasks owned by one person have a document in `docs/tasks/` (goal, rules, steps with checkboxes, notes,
+"Where we are"). Whoever works on the task updates it after every step and at the end of every work session, and
+pushes it, so the group can follow and a new session can continue from it.
+
+## 6. Code style
 
 - Code, comments, docs and the report in English (American spelling).
 - Every file starts with a short comment on what it does and where it fits in the pipeline; every function has a

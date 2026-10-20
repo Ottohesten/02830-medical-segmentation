@@ -323,6 +323,78 @@ Machine: MacBook Air (Mac17,3, Apple M5, 16 GB), macOS 27.0.1, Python 3.12, torc
   the locked choice of entropy for the interface; entropy's advantage over the edge reference is small, which matches
   the known risk that it mostly lights up the edge.
 
+## 2026-10-20: scores from the real 3 mm vs. 6 mm differences (exploratory)
+
+**Exploratory**, a new question asked after the G1 lock. Saved kits100 predictions only (no new inference); the
+locked files are not changed. For this question kits100 is **development data**: dev (20) and test (80) are reported
+separately, and a score chosen here must later be tested once on the G3 pool before it can be claimed.
+
+- `[experiment]` Background (2026-10-19 entries): ~89 % of the 3 mm vs. 6 mm disagreement is the grid effect at the
+  edge; the real differences (> 6 mm from the 3 mm edge) are mostly tumor. In bad scans the 6 mm model often includes
+  tumor the 3 mm model missed; in false alarms it leaves out tumor the 3 mm model included. Hypothesis: counting only
+  far disagreement where "6 mm says organ, 3 mm says not organ" ranks better and gives fewer false alarms.
+- `[decision]` Written down before anything was computed (config `exploratory.disagreement_scores`). Candidates, all
+  GT-free, each in ml and divided by the 3 mm mask volume (8 scores): (a) `far_disagree`: masks disagree and > 6 mm
+  from the 3 mm edge, both directions; (b) `far_6mm_adds`: as (a), only 6 mm = organ and 3 mm = not organ;
+  (c) `far_6mm_drops`: as (a), only 6 mm = not organ and 3 mm = organ (control, expected poor); (d) `6mm_adds_all`:
+  6 mm = organ and 3 mm = not organ, no distance filter. Selection: highest review AUC (bad = Dice < 0.83) on dev;
+  ties broken by dev quality AUC, then the listed order. Everything else (worst-10 % review AUC, quality AUC,
+  Spearman rho, paired bootstrap differences to `model_diff_mean_region` and `entropy_mean_region`, test results,
+  false alarms in the top 10 / 20) is secondary. Dev has only 4 bad scans, so the choice is noisy.
+- `[experiment]` `scripts/explore_disagreement_scores.py` (307 s; MacBook Air Mac17,3, Apple M5, 16 GB, macOS 27.0.1,
+  Python 3.12, torch 2.2.2, CPU; seed 42; `results/kits100/exploratory_disagreement_machine.json`). Evaluated with the
+  G1 `evaluate_methods` (2000 bootstrap resamples, 1000 random orders) plus a new paired bootstrap of the difference
+  to the locked measure and to entropy. Checks passed: the new GT-free counts equal those rebuilt from
+  `model_disagreement_counts.csv` for all 100 scans; 3 mm volume and Dice equal the locked files; the metric rows of
+  the locked measure, entropy, volume, random and oracle equal `g1_metrics_clean_{dev,test}.csv` exactly. The 52
+  existing files in `results/kits100/` are unchanged (checksums before and after).
+- `[result]` **Exploratory**, dev (selection; review AUC, Dice < 0.83, 4 bad): `far_6mm_drops_ml` 0.788,
+  `far_6mm_drops_per_volume` 0.775, `far_disagree_per_volume` 0.763, `far_disagree_ml` 0.750, `far_6mm_adds_ml`
+  0.706, `far_6mm_adds_per_volume` 0.694, `6mm_adds_all_per_volume` 0.675, `6mm_adds_all_ml` 0.663; locked measure
+  0.763, entropy 0.688. **The pre-registered rule chooses `far_6mm_drops_ml`, the control expected to be poor.** All
+  dev CIs overlap widely (e.g. chosen vs. locked +0.025 [−0.050, 0.133]). `results/kits100/exploratory_disagreement_choice.csv`.
+- `[result]` **Exploratory**, test (80; review AUC Dice < 0.83 / worst 10 %): `far_disagree_per_volume` 0.887 / 0.895,
+  `far_disagree_ml` 0.872 / 0.866, `far_6mm_adds_ml` 0.848 / 0.816, `far_6mm_adds_per_volume` 0.847 / 0.827,
+  `6mm_adds_all_per_volume` 0.840 / 0.814, `6mm_adds_all_ml` 0.768 / 0.702, `far_6mm_drops_ml` 0.747 / 0.716,
+  `far_6mm_drops_per_volume` 0.745 / 0.713; locked measure 0.831 / 0.855, entropy 0.895 / 0.894, volume 0.390 / 0.487,
+  random 0.505 / 0.506, oracle 0.931 / 0.950. Spearman rho: `far_disagree_per_volume` −0.645, locked −0.633,
+  `far_6mm_adds_ml` −0.573, chosen `far_6mm_drops_ml` −0.401, entropy −0.795.
+  `results/kits100/exploratory_disagreement_metrics.csv`, `figures/exploratory_review_curves_test.png`.
+- `[result]` **Exploratory**, paired bootstrap on test (difference, 95 % CI): the chosen `far_6mm_drops_ml` is worse
+  than the locked measure (review AUC Dice < 0.83 −0.084 [−0.225, 0.023]; worst 10 % −0.139 [−0.339, −0.007]; rho
+  +0.232 [0.061, 0.400]) and than entropy (review AUC −0.148 [−0.292, −0.041]). `far_disagree_per_volume` beats the
+  locked measure (review AUC +0.056 [0.008, 0.131] and +0.041 [0.005, 0.088]; quality AUC +0.0014 [−0.0002, 0.0034])
+  and ties with entropy on review AUC (−0.008 [−0.044, 0.028]) but has a weaker rho (+0.150 [0.023, 0.291]).
+  `far_6mm_adds_ml` vs. locked: +0.017 [−0.159, 0.158]. `results/kits100/exploratory_disagreement_paired.csv`.
+- `[result]` **Exploratory**, false alarms (3 mm fine, 6 mm < 0.83) and real finds (3 mm < 0.83) in the queue's top,
+  test: top 10 locked 4 false alarms / 6 real finds, entropy 1 / 8, `far_6mm_adds_ml` 0 / 8, `far_6mm_adds_per_volume`
+  0 / 9, `6mm_adds_all` 0 / 7 (ml) and 0 / 9 (per volume), `far_disagree` 3 / 7 and 2 / 8, `far_6mm_drops` 3 / 5 and
+  4 / 5. Top 20: locked 4 / 9, entropy 3 / 10, `far_6mm_adds` 2 / 9, `6mm_adds_all` 0 / 8 and 1 / 9, `far_disagree`
+  4 / 10, `far_6mm_drops` 4 / 8 and 4 / 7. The 4 false alarms of the locked top 10 move to ranks 42, 19, 13 and 66.5
+  under `far_6mm_adds_ml` (case_00280, 00079, 00203, 00526), but the real find case_00192 (locked rank 2) drops to 66.5,
+  because the 6 mm model adds nothing far from the edge there. Dev top 10: locked 3 / 4, `far_6mm_adds` 1 / 3,
+  `far_6mm_drops` 3 / 4 (dev top 20 = all 20 scans). `results/kits100/exploratory_queue_{counts,ranks}.csv`.
+- `[result]` **Exploratory**, summary: the direction filter does what the hypothesis said about false alarms on
+  test (none in the top 10), but it does not rank better overall, and on dev the control direction ranked best.
+  Removing the grid band alone (`far_disagree_per_volume`) gave the best test result of the new scores, about as
+  good as entropy on review AUC. These are test-set observations on a question asked after the lock, so they are
+  not a result yet.
+- `[idea]` Test the chosen score once on the G3 pool (scans not in kits100). Under the pre-registered rule that is
+  `far_6mm_drops_ml`. Choosing a different score (e.g. `far_disagree_per_volume` or `far_6mm_adds_*`) would be based
+  on the kits100 test results and must be logged with the date and reason before the G3 pool is opened.
+
+
+## 2026-10-20: task documents, robustness task
+
+- `[decision]` Course weeks skip the autumn break: week 7 is 2026-10-19 – 23, the pilot is in week 8 (by 2026-10-28),
+  the user study in weeks 9–10 (2026-11-02 – 11-13).
+- `[decision]` Larger tasks get a task document in `docs/tasks/` with steps, notes and status, so the group can follow
+  and work can continue across sessions.
+- `[decision]` Rasmus owns the robustness task ([docs/tasks/g1_robustness.md](docs/tasks/g1_robustness.md)): does the
+  G1 ranking still work when KiTS scans are degraded on purpose (noise, lower resolution, contrast)? Planned on
+  2026-09-23, so far only tried on 3 spleen scans.
+- `[admin]` Trello board created by Rasmus (date not recorded).
+
 ---
 
 ## Open questions (update when answered, with the date)
@@ -336,4 +408,4 @@ Machine: MacBook Air (Mac17,3, Apple M5, 16 GB), macOS 27.0.1, Python 3.12, torc
 - Group confirmation of the plan and of G1 "go".
 - `configs/hpc.yaml` still points to MSD Spleen.
 - Are all KiTS cases separate patients? Check before fixing the G3 pool.
-- Trello board (mandatory) is missing. Report sections and contribution appendix not divided yet.
+- Report sections and contribution appendix not divided yet.

@@ -254,3 +254,50 @@ def evaluate_methods(scores: dict[str, np.ndarray], dice: np.ndarray, cfg: dict,
         "quality_auc_norm": 0.0,
     })
     return rows, curves
+
+
+def paired_differences(scores: dict[str, np.ndarray], references: list[str], dice: np.ndarray,
+                       bad_rules: list[dict], n_bootstrap: int, level: float,
+                       rng: np.random.Generator) -> list[dict]:
+    """Difference between each score and each reference score, with a paired bootstrap CI.
+
+    "Paired" means both scores are evaluated on the SAME resampled scan sets, so the CI is about the difference
+    itself (much narrower than comparing two separate CIs when the two scores agree on most scans).
+    Compared: Spearman rho with Dice (more negative = better, so a negative difference favors the score),
+    the review AUC for every 'bad' rule and the quality AUC (higher = better, so a positive difference favors it).
+
+    Input: {name: score per scan} (must contain the references), the reference names, true Dice per scan,
+           evaluation.bad_rules, number of resamples, CI level and a random generator.
+    Output: one row per (score, reference, measure): method, reference, measure, bad_rule ('' when the measure does
+            not depend on it), diff (on all scans), diff_ci_low, diff_ci_high, share_boot_better (share of resamples
+            where the score beats the reference).
+    """
+    n = len(dice)
+    bads = {rule["name"]: bad_mask(dice, rule["rule"], rule["value"]) for rule in bad_rules}
+    boot_idx = [rng.integers(0, n, size=n) for _ in range(n_bootstrap)]
+
+    def stats(s: np.ndarray, idx: np.ndarray | None) -> dict[tuple[str, str], float]:
+        d, sc = (dice, s) if idx is None else (dice[idx], s[idx])
+        out = {("spearman_rho", ""): spearmanr(sc, d).statistic if np.ptp(sc) > 0 and np.ptp(d) > 0 else np.nan,
+               ("quality_auc", ""): area(quality_curve_from_score(sc, d))}
+        for name, bad in bads.items():
+            b = bad if idx is None else bad[idx]
+            out[("review_auc", name)] = area(review_curve_from_score(sc, b)) if b.any() else np.nan
+        return out
+
+    full = {name: stats(s, None) for name, s in scores.items()}
+    boots = {name: [stats(s, idx) for idx in boot_idx] for name, s in scores.items()}
+    rows = []
+    for name in scores:
+        if name in references:
+            continue
+        for ref in references:
+            for key in full[name]:
+                diff = np.array([b[key] - r[key] for b, r in zip(boots[name], boots[ref])])
+                better = diff[np.isfinite(diff)]
+                better = (better < 0) if key[0] == "spearman_rho" else (better > 0)
+                low, high = _ci(diff, level)
+                rows.append({"method": name, "reference": ref, "measure": key[0], "bad_rule": key[1],
+                             "diff": full[name][key] - full[ref][key], "diff_ci_low": low, "diff_ci_high": high,
+                             "share_boot_better": float(better.mean()) if len(better) else np.nan})
+    return rows

@@ -1,0 +1,9 @@
+split,bad_rule,method,review_auc,quality_auc,config_order,chosen,locked_primary_review_auc,entropy_review_auc
+dev,dice_below_083,far_6mm_drops_ml,0.7875,0.9437,4,True,0.7625,0.6875
+dev,dice_below_083,far_6mm_drops_per_volume,0.775,0.943,5,False,0.7625,0.6875
+dev,dice_below_083,far_disagree_per_volume,0.7625,0.9472,1,False,0.7625,0.6875
+dev,dice_below_083,far_disagree_ml,0.75,0.945,0,False,0.7625,0.6875
+dev,dice_below_083,far_6mm_adds_ml,0.7062,0.9442,2,False,0.7625,0.6875
+dev,dice_below_083,far_6mm_adds_per_volume,0.6938,0.9431,3,False,0.7625,0.6875
+dev,dice_below_083,6mm_adds_all_per_volume,0.675,0.9402,7,False,0.7625,0.6875
+dev,dice_below_083,6mm_adds_all_ml,0.6625,0.938,6,False,0.7625,0.6875

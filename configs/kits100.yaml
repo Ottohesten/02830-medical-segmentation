@@ -100,3 +100,21 @@ exploratory:
     methods: [entropy, m2_diff, boundary, random, oracle]   # voxel orders compared (see voxel_correction.py)
     random_seeds: [42, 43, 44, 45, 46] # the random order is averaged over these seeds
     auc_up_to_percent: [10, 50]        # area under the gain-vs-k curve from 0 up to these k (in %)
+  disagreement_scores:          # 2026-10-20: GT-free scan scores built from only PART of the 3 mm vs. 6 mm disagreement
+    # Written down BEFORE any of these scores was computed or evaluated. kits100 is used as development data for this
+    # new question (dev and test reported separately); a score chosen here must later be tested ONCE on the G3 pool.
+    # "Far" = more than exploratory.model_comparison.grid_band_mm (6 mm) from the 3 mm mask's edge (the grid effect
+    # is left out). Script: scripts/explore_disagreement_scores.py.
+    candidates:                 # which disagreeing voxels are counted
+      - far_disagree            # masks disagree and far from the 3 mm edge (both directions)
+      - far_6mm_adds            # as far_disagree, but only where 6 mm = organ and 3 mm = not organ
+      - far_6mm_drops           # as far_disagree, but only where 6 mm = not organ and 3 mm = organ (control, expected poor)
+      - 6mm_adds_all            # 6 mm = organ and 3 mm = not organ, no distance filter
+    normalizations: [ml, per_volume]   # ml = volume of those voxels; per_volume = their number / 3 mm mask voxels
+    selection:                  # how ONE score is chosen among the 4 x 2 candidates (on dev only)
+      split: dev
+      bad_rule: dice_below_083
+      metric: review_auc        # highest wins; ties: higher quality_auc on dev, then the order listed above (ml first)
+    compare_to: [model_diff_mean_region, entropy_mean_region]   # paired bootstrap CI of the AUC / rho difference
+    queue_top_n: [10, 20]       # real finds and false alarms in the top of each score's queue
+    figure: {split: test, bad_rule: dice_below_083}   # review curves of the new scores vs. locked measure and baselines

@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-19 (follow-up analyses added).*
+*Last updated: 2026-10-20 (exploratory scores from the real 3 mm vs. 6 mm differences).*
 
 | | |
 |---|---|
@@ -58,6 +58,13 @@ The usual trick (ask several copies of the same model) is impossible because onl
 - Where the two models disagree: about 89 % of the disagreeing voxels lie within 6 mm of the 3 mm outline, i.e. the
   coarser grid. The remaining ~11 % are real differences, mostly tumor (79 % on test), and they concentrate in the
   bad scans and the false alarms. So the score mixes a large grid effect with a smaller signal about tumors.
+- Exploratory scores from only the real differences (2026-10-20, `scripts/explore_disagreement_scores.py`; kits100
+  used as development data for this new question). Counting only disagreement where the 6 mm model adds organ far
+  from the 3 mm outline removes all 4 false alarms from the test top 10 (8 real finds instead of 6), but does not
+  rank better overall (review-AUC 0.848). Leaving out only the grid band (`far_disagree_per_volume`) gave 0.887 on
+  test, better than the locked measure (0.831 with this "bad" rule; paired CI above 0) and level with entropy
+  (0.895). The rule fixed in advance picked a different score on the 20 dev scans (the control direction, 0.747 on
+  test), so nothing here is a result yet: a chosen score must be tested once on new scans (the G3 pool).
 
 ### G2 — interface and user study
 
@@ -96,6 +103,7 @@ trained, so there is no result yet.
 | Power simulation | `results/study_kits/` |
 | User-study documents | `docs/study/` — session guide, consent form, pilot plan, analysis plan (locked after the pilot) |
 | G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` |
+| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Rasmus) |
 | HPC job scripts (never run on the cluster) | `jobs/` |
 | Scans, model output, weights (not in git) | `data/`, `models/` — download with `scripts/download_data.py` and `download_model.py` |
 
@@ -119,20 +127,22 @@ The full working rules (git, branches, locked results, new experiments, what to 
 
 | Date | What |
 |---|---|
-| Week 8 (≈ 2026-10-19 – 23) | Pilot with a group member; choose heatmap display; lock the analysis plan |
+| Week 8 (by 2026-10-28; course weeks skip the autumn break) | Pilot with a group member; choose heatmap display; lock the analysis plan |
 | 2026-10-28 | Lecture on scientific writing |
-| Weeks 9–10 | User study (≥ 16 participants) |
+| Weeks 9–10 (2026-11-02 – 11-13) | User study (≥ 16 participants) |
 | 2026-11-25 | Final presentation |
 | 2026-12-02 | Report hand-in (ACM two-column, max 5 pages for 4 people, plus contribution appendix and declaration of generative-AI use) |
 | 2026-12-18 | Defense |
 
-## 6. Next steps (2026-10-19)
+## 6. Next steps (2026-10-20)
 
 1. Send Kristine the three follow-up results (6 mm alone, where 3 mm and 6 mm differ, simulated voxel correction;
    see the log of 2026-10-19) and decide with the group what goes into the report (as exploratory results).
-2. Everyone installs the project and tries the demo (`README.md` → Quick start).
-3. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
-4. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.
-5. Create the mandatory Trello board; divide the report sections.
+2. Decide with the group which disagreement score (if any) to test once on the G3 pool: the pre-registered choice
+   (`far_6mm_drops_ml`) or a different one, logged with date and reason before the pool is opened (log 2026-10-20).
+3. Everyone installs the project and tries the demo (`README.md` → Quick start).
+4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
+5. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.
+6. Divide the report sections (the Trello board exists).
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).

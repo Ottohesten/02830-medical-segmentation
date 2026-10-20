@@ -181,3 +181,35 @@ def disagreement_shares(counts: pd.DataFrame, grid_band_mm: float, edges_mm: lis
     row["near_right_3mm_share"] = share(a_right, near)
     row["far_right_3mm_share"] = share(a_right, ~near)
     return row
+
+
+def directional_disagreement(mask_a: np.ndarray, mask_b: np.ndarray, spacing: tuple[float, float, float],
+                             grid_band_mm: float) -> dict[str, int]:
+    """Count disagreeing voxels by direction and by distance to mask A's edge. GT-free: only the two masks are used.
+
+    "Far" means more than grid_band_mm from the edge of mask A (the 3 mm mask), i.e. outside the band where the
+    coarse 6 mm grid alone makes the masks differ. Same distance rule as disagreement_counts: a voxel exactly
+    grid_band_mm away is still "near"; if mask A is empty, every voxel is far.
+
+    Input: mask of model A (3 mm) and model B (6 mm) on the same voxel grid, voxel size (mm), the grid band (mm).
+    Output: dict with voxel counts
+      n_mask_a       voxels in mask A (used to normalize by the 3 mm volume)
+      far_disagree   masks disagree and the voxel is far from A's edge (both directions)
+      far_b_adds     far, B says organ and A says not organ (the 6 mm model "adds" something)
+      far_b_drops    far, B says not organ and A says organ (the 6 mm model "leaves something out")
+      b_adds_all     B says organ and A says not organ, at any distance
+    """
+    mask_a, mask_b = mask_a.astype(bool), mask_b.astype(bool)
+    disagree = mask_a != mask_b
+    b_adds = mask_b & ~mask_a
+    row = {"n_mask_a": int(mask_a.sum()), "far_disagree": 0, "far_b_adds": 0, "far_b_drops": 0,
+           "b_adds_all": int(b_adds.sum())}
+    if not disagree.any():
+        return row
+    # Distances only on a box around mask A and the disagreement (see disagreement_counts for why this is exact).
+    box = _bounding_box([mask_a, disagree], pad=2)
+    far = disagree[box] & (edge_distance_mm(mask_a[box], spacing) > grid_band_mm)
+    row["far_disagree"] = int(far.sum())
+    row["far_b_adds"] = int((far & b_adds[box]).sum())
+    row["far_b_drops"] = row["far_disagree"] - row["far_b_adds"]   # where they disagree, it is one or the other
+    return row
