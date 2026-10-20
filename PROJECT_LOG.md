@@ -503,6 +503,87 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   needs support for variants before larger robustness runs. Steps 3–7 have not started. Publish this step on
   `otto/robustness` to update PR #1; if noninteractive Git still lacks credentials, Otto pushes from his terminal.
 
+## 2026-10-21: robustness step 3 prepared, candidate-run approval pending
+
+- `[admin]` Confirmed `6f1bc0a` pushed on `otto/robustness`; pull up to date, offline `uv sync --locked`
+  checked 133 packages. Steps 1–2 complete; no step 3 inference or Dice analysis has started.
+- `[decision]` Prepared a separate candidate config `configs/kits_robustness_dev.yaml`, name
+  `kits_robustness_dev`, all 20 dev scans, seed 42, CUDA, 6 CPU threads. Candidates fixed before outcomes:
+  noise SD 30/60/120 HU, lowres 6/8/12 mm, contrast removal 0.8/0.9 (20/10% retained around 40 HU).
+  Clean reference plus 8 candidates = 180 predictions of the 3 mm model. No 6 mm inference, scores, or test use.
+- `[decision]` Operational choice rule, recorded before candidate outcomes: at least 5 scans lose ≥ 0.02 Dice,
+  at least 5 remain ≥ 0.83, at most 2 newly fall below 0.50 (only clean ≥ 0.50 count as new). Suggest the mildest
+  eligible strength per type; explicitly report types without an eligible candidate. This defines useful
+  degradation for this task; it does not change locked G1 metrics. Final strengths must be logged before scores.
+- `[result]` Planning only: `scripts/select_robustness_strengths.py --config configs/kits_robustness_dev.yaml
+  --plan` wrote `results/kits_robustness_dev/{run_plan.json,planned_cases.csv,run_config.yaml}`.
+  All 20 dev headers read; no labels read. From step 2's noisy 3 mm times: unscaled estimate 18.27 min;
+  dev/sample mean raw-voxel ratio 2.1775 gives **39.78 min**. Rough planning proxy from two scans and one noise
+  type; other perturbations and Dice analysis add uncertainty. Configured cap 90 min. **Await Otto's explicit
+  approval before this >30-minute run.**
+- `[result]` Added `src/segreview/robustness.py`, `scripts/select_robustness_strengths.py`, and 11 synthetic
+  tests in `tests/test_robustness_selection.py`: 11 passed in 0.06 s. Tests cover dev/test isolation, locked
+  folders, paired median drops, genuinely new failures, mildest eligible choices, and incomplete/invalid data.
+  Usage documented in `README.md`. Task, overview, and "Where we are" updated; step 3 remains unchecked.
+- `[result]` Complete preflight suites passed in both environments: **92 passed, 36 skipped, 0 failed**
+  (1.92 s shared; 1.99 s GPU). Outputs: `results/kits_robustness_dev/preflight_tests_{main,gpu}.txt`.
+  Skips remain 30 study-dependent and 6 Chrome-dependent tests. Long-run approval is still pending.
+
+## 2026-10-21: robustness candidate run approved
+
+- `[admin]` Otto approved the 180-prediction step 3 development run and Dice comparison, explicitly allowing
+  an overnight runtime of 8 hours or more. No further approval is needed for this candidate run.
+- `[decision]` Increased `robustness_selection.max_run_minutes` from 90 to 480 before inference.
+  Candidates and selection rule are unchanged. Preserved the preapproval plan/config in
+  `results/kits_robustness_dev/preapproval_run_{plan.json,config.yaml}`; refreshed `run_plan.json` and
+  `run_config.yaml` with the new cap. The planning proxy remains 39.78 minutes; 480 minutes is a reserve limit.
+  Run only development inference and Dice, then document the final strength choice. Do not start step 4.
+
+## 2026-10-21: robustness step 3 complete, lowres_8mm selected before scores/test
+
+- `[experiment]` Completed `scripts/select_robustness_strengths.py --config configs/kits_robustness_dev.yaml
+  --run` in `.venv-gpu/` with GPU access outside the sandbox: **180 predictions** (20 dev cases × clean +
+  8 candidates, 3 mm model only) and dev Dice in **2,663.65 s / 44.39 min**. The approved 480-minute cap was
+  not approached. AMD Ryzen 5 7500F, RTX 5060 Ti, NVIDIA driver 615.78.08, Linux 7.2.10-1-cachyos,
+  Python 3.12.15, torch 2.7.1+cu128 / CUDA 12.8, 6 CPU threads, seed 42. Peak allocated GPU memory
+  **3,099.21 MiB**, process peak RSS **7,345.41 MiB**. `results/kits_robustness_dev/{machine.json,
+  run_attempts.json,run_config.yaml,run_log.txt,inference_times.csv}` records baseline `6f1bc0a`, dirty state,
+  and exact source/config hashes; source is committed with the results.
+- `[result]` Clean dev median Dice **0.9033**, with **4/20** below 0.83. Lowres 6 / 8 / 12 mm:
+  median paired Dice drops **0.00825 / 0.02795 / 0.10230**, clear drops ≥ 0.02 in **4 / 14 / 20** scans;
+  bad counts **5 / 6 / 12**, remaining good **15 / 14 / 8**, new catastrophic counts **0 / 0 / 2**.
+  Both 8 and 12 mm meet the unchanged predeclared criteria; 8 mm is the milder choice.
+  `results/kits_robustness_dev/{dice.csv,dev_dice_drops.csv,dev_degradation_summary.csv}`.
+- `[result]` Noise SD 30 / 60 / 120 HU: median paired drops **-0.00115 / -0.00350 / -0.00485**, clear drops
+  in **0 / 2 / 2** cases. Contrast removal 0.8 / 0.9: median paired drops **-0.00270 / -0.00235**, clear drops
+  in **0 / 0** cases. Negative drops mean improvement. No tested noise/contrast candidate meets the five-case
+  clear-drop criterion; these results concern the tested strengths on dev, not general robustness.
+  Source: `results/kits_robustness_dev/dev_degradation_summary.csv` (full table in task step 3).
+- `[decision]` **Lock `lowres_8mm` only** by the original mildest-eligible-per-type rule: 14 clear losses,
+  14 still ≥ 0.83, no new Dice < 0.50. Exclude noise/contrast for insufficient clear losses and lowres_12mm
+  because a milder eligible choice exists. Recorded before any uncertainty scoring or test inference in
+  `configs/kits_perturbed.yaml` and `results/kits_robustness_dev/strength_lock.json`, with evidence hashes,
+  excluded types, primary `model_diff_mean_region`, and secondary `entropy_mean_region`. The final config
+  retains 20 dev cases / dev evaluation only; it does not unlock test. Candidate config/results remain intact.
+- `[result]` Verification passed: **180 timing rows, 180 dev Dice rows, 360 saved prediction files**
+  (**252,949,887 bytes**), matching paired grids and source/config hashes, no test Dice rows or score files.
+  `results/kits_robustness_dev/{verification.json,prediction_manifest.csv}`. Predictions remain outside Git in
+  `data/predictions/kits_robustness_dev/`. Development figure: `results/kits_robustness_dev/figures/dev_dice_degradation.png`;
+  `report_source.py` in the same result folder reproduces the verification and figure. Locked G1 files unchanged.
+- `[result]` Final config validated; complete suites pass in both environments: **92 passed, 36 skipped,
+  0 failed** (2.23 s shared; 2.26 s GPU), with unchanged study/Chrome skips.
+  `results/kits_robustness_dev/{tests_main.txt,tests_gpu.txt}`.
+- `[admin]` Checked step 3 and updated task notes, decisions, "Where we are", overview, and README.
+  Wrote a question for Bjørn in task section 6: is the single selected resolution perturbation sufficient,
+  or should additional dev search / a stronger secondary resolution be planned before test? The earlier timing
+  plan assumed 3–4 perturbations; the current rule selects one. No message was sent to Bjørn.
+  Step 4 waits for Otto to return; first discuss scope and prepare second-model support for perturbed scans
+  and fresh runtime estimates. Publish the step 3 commit on `otto/robustness` to update PR #1; use Otto's terminal
+  if the assistant still lacks HTTPS credentials. Steps 4–7 are untouched.
+- `[admin]` Saved the completed step 3 in a local commit. The assistant's `git push origin otto/robustness`
+  failed because noninteractive Git cannot read a GitHub username. Otto must push from his authenticated
+  terminal to publish the step and update PR #1. No test-set work has started.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

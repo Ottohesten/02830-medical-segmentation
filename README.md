@@ -212,6 +212,41 @@ Projections estimate clean reference plus 3 or 4 perturbations on 20 or 80 scans
 they are planning estimates, not confidence intervals or measured full-run times. The config caps the benchmark
 at 30 minutes. Existing timings are protected; use `--overwrite` only for a deliberate complete rerun.
 
+## Robustness strength selection on development scans
+
+Use the GPU environment above. Step 3 runs only the 3 mm model on the original 20 development scans,
+each clean and with 8 candidate perturbations (180 predictions). It evaluates Dice, not uncertainty scores.
+
+```bash
+PYTHONPATH=src .venv-gpu/bin/python scripts/select_robustness_strengths.py --config configs/kits_robustness_dev.yaml --plan
+# Ask Otto before --run: the voxel-scaled estimate is about 40 minutes; Otto approved an 8-hour reserve cap.
+PYTHONPATH=src .venv-gpu/bin/python scripts/select_robustness_strengths.py --config configs/kits_robustness_dev.yaml --run
+```
+
+The config fixes the candidates and an operational selection rule before outcomes are seen: at least 5 cases
+lose 0.02 Dice, at least 5 retain Dice >= 0.83, and no more than 2 newly fall below Dice 0.50. The mildest eligible
+strength of each type is suggested; a type with no eligible candidate is explicitly excluded from the suggestion.
+Contrast strengths 0.8/0.9 remove 80/90% of contrast around the configured 40 HU level.
+
+`--plan` saves the candidate list, rule, case IDs, and runtime proxy using image headers only. `--run` validates
+dev-only scope before inference, resumes already saved predictions under an identical config, and writes
+per-scan runtime, Dice, paired drops, candidate summaries, suggestions, and machine/config/code provenance to
+`results/kits_robustness_dev/`. Predictions stay outside Git in `data/predictions/kits_robustness_dev/`.
+`--summarize` repeats development Dice analysis from saved masks without inference. A changed candidate config
+requires a new output name. The runtime estimate is a rough size-scaled proxy from two scans and one noise type;
+other perturbations and Dice analysis add uncertainty.
+
+Strength suggestions must be reviewed and written into the task, log, and final config before running uncertainty
+analysis. The test set remains untouched. This is a development selection rule, not a change to locked G1 metrics.
+
+The completed 2026-10-21 run took 44.39 minutes. The predeclared rule selects **lowres_8mm only**; tested noise
+and contrast strengths have too few clear Dice drops. Lowres_12mm is also eligible, but 8 mm is milder.
+`configs/kits_perturbed.yaml` records the locked choice and retains development-only scope (20 scans).
+The candidate results remain intact. Per-scan Dice, candidate summary, evidence hashes, prediction manifest,
+and the development plot are under `results/kits_robustness_dev/`; `report_source.py` there reproduces the
+verification and figure from the repository root. Discuss the single-perturbation scope (task section 6) before
+planning test inference. The shared second-model step still needs support for perturbed variants.
+
 ## Running on the DTU HPC (not tested on the cluster yet)
 
 > **Untested.** The job scripts in `jobs/` follow the DTU HPC (LSF) documentation, and their commands have been run
