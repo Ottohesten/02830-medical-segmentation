@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-20 (exploratory scores from the real 3 mm vs. 6 mm differences).*
+*Last updated: 2026-10-20 (G3: Windows environment on Frederik's RTX 4090 ready).*
 
 | | |
 |---|---|
@@ -35,7 +35,7 @@ opened, **show where in the scan the AI is unsure**. The goal is the most improv
 |---|---|---|
 | **G1** (core) | Rank scans by likely failure, without ground truth | **Done.** Locked and tested once on 80 test scans |
 | **G2** (core) | Review interface with an uncertainty heatmap + user study | Interface and analysis built and tested; **pilot and study not run yet** |
-| **G3** (stretch) | Fine-tune the model on corrections | Plan and smoke test only. Now run in parallel by Frederik on an RTX 4090 |
+| **G3** (stretch) | Fine-tune the model on corrections | Plan and Mac smoke test only. Frederik: Windows environment on the RTX 4090 ready, GPU smoke test next ([task](docs/tasks/g3_finetuning.md)) |
 
 ### G1 — how the ranking works and how well it does
 
@@ -102,9 +102,10 @@ trained, so there is no result yet.
 | Heatmap evaluation | `results/kits100/heatmap_eval_*.csv` |
 | Power simulation | `results/study_kits/` |
 | User-study documents | `docs/study/` — session guide, consent form, pilot plan, analysis plan (locked after the pilot) |
-| G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` |
-| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Rasmus) |
+| G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` (Mac), `results/g3_smoke_gpu*/` (RTX 4090) |
+| Task documents (owner, steps, status) | `docs/tasks/` — [g1_robustness.md](docs/tasks/g1_robustness.md) (Rasmus), [g3_finetuning.md](docs/tasks/g3_finetuning.md) (Frederik) |
 | HPC job scripts (never run on the cluster) | `jobs/` |
+| Running on Frederik's Windows GPU PC (G3) | [frederik/README.md](frederik/README.md) |
 | Scans, model output, weights (not in git) | `data/`, `models/` — download with `scripts/download_data.py` and `download_model.py` |
 
 ## 4. Rules everyone should know
@@ -142,7 +143,8 @@ The full working rules (git, branches, locked results, new experiments, what to 
    (`far_6mm_drops_ml`) or a different one, logged with date and reason before the pool is opened (log 2026-10-20).
 3. Everyone installs the project and tries the demo (`README.md` → Quick start).
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
-5. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.
+5. G3 (Frederik): the GPU smoke test on the RTX 4090 (Windows environment and configs ready), then the pipeline
+   with the 6 mm model ([docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)).
 6. Divide the report sections (the Trello board exists).
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).

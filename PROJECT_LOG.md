@@ -395,6 +395,69 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   2026-09-23, so far only tried on 3 spleen scans.
 - `[admin]` Trello board created by Rasmus (date not recorded).
 
+## 2026-10-20: G3 phase 1 on Frederik's PC — Windows environment, nothing trained yet
+
+Task document: [docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md) (Frederik), branch `frederik/g3`.
+
+- `[admin]` Machine check (`results/g3_smoke_gpu/machine_windows.txt`): NVIDIA GeForce RTX 4090, 24,564 MiB, compute
+  capability 8.9 (Ada, not Blackwell, so torch 2.2.2 with CUDA 12.1 should support it), driver 617.14; Intel Core
+  i9-14900K, 24 cores / 32 threads; 34.1 GB RAM (31.7 GiB); Windows 11 Home 10.0.26200; free disk C: 1,035 GB
+  (D: 2,048 GB, E: and F: 4,000 GB each, empty).
+- `[dropped]` Running G3 inside WSL2 (Linux inside Windows), planned first because `uv.lock` has no Windows packages
+  (`uv sync --dry-run` fails on Windows; checked 2026-10-06). WSL2 was not installed (it needs administrator rights
+  and a restart); a setup script and a `.wslconfig` for it were written and deleted again; nothing was installed.
+  Reason: Frederik prefers to stay on Windows.
+- `[decision]` G3 runs natively on Windows, in a separate environment `.venv` built by `frederik/windows_setup.ps1`:
+  every package version of `uv.lock` is a constraint; torch 2.2.2 and torchvision 0.17.2 come as CUDA 12.1 builds from
+  PyTorch's own server (`--torch-backend cu121`; the Windows torch on PyPI has no CUDA); `psutil` is added (Windows
+  only, to measure memory). `uv.lock` and `pyproject.toml` are not changed. Packages that only Windows needs are not
+  in `uv.lock` and get their newest compatible version (`results/g3_smoke_gpu/windows_env.txt`). `uv sync` and
+  `uv run` do not work on Windows, so scripts run with `.venv\Scripts\python.exe`.
+- `[decision]` Tools that only Frederik's Windows PC needs live in `frederik/` (setup script, README), at Frederik's
+  request; the G3 code itself stays in `configs/`, `scripts/` and `src/segreview/`, where `docs/g3_plan.md` puts it.
+  None of it changes how results are computed: the code is the same on every machine, only the machine differs
+  (GPU instead of CPU, Windows torch with cuDNN 8.8.1), so G3 compares models only within this PC.
+- `[admin]` Git for Windows 2.55.0 installed (winget; `C:\Program Files\Git`), so `machine.json` can record the git
+  commit (before, `git` was only inside GitHub Desktop and not on PATH).
+- `[decision]` GPU smoke test with its own configs: `configs/g3_smoke_gpu.yaml` (6 mm, batch 2 and 13) and
+  `configs/g3_smoke_gpu_3mm.yaml` (3 mm, batch 2), results in `results/g3_smoke_gpu/` and `results/g3_smoke_gpu_3mm/`.
+  Rerunning `configs/g3_smoke.yaml` would overwrite the Mac's results in `results/g3_smoke/`. Settings: device `cuda`
+  forced (no silent fallback to the CPU); torch threads 1, as nnU-Net's own training start does on a GPU (nnU-Net's
+  data loader limits each augmentation worker to 1 thread itself); augmentation with 0 workers (the time to prepare
+  one batch) and with 16 of the 24 cores (whether the GPU waits for data, as in a real run; nnU-Net adds 8 validation
+  workers); 30 training steps per run, the first 10 not counted (warm-up); 10 validation steps; cuDNN benchmark on, as
+  in nnU-Net's training.
+- `[decision]` `scripts/g3_smoke_test.py` extended; the Mac config runs as before and only gets new output files.
+  New: peak RAM of the main process plus all worker processes (PSS on Linux, private memory on Windows;
+  `src/segreview/memory.py`) and peak GPU memory (allocated and reserved) per run; validation steps; several worker
+  settings per batch size; `summary.csv`; `machine.json` with CPU model, OS, memory, GPU, driver, torch/CUDA/cuDNN
+  versions and git commit (`src/segreview/machine.py` now also reads Linux and Windows hardware and nvidia-smi); it
+  runs on Windows (the Unix-only `resource` module is no longer imported). The kits100 overlap check uses the
+  dataset's full case list and the scans in the locked `results/kits100/dice.csv` (read only), so the 100 kits100
+  scans need not be downloaded; it stops if the case list does not reproduce kits100.
+- `[admin]` `scripts/download_data.py --cases`: downloads only the given scans plus the full case list
+  (`download_cases` and `selected_case_ids` in `src/segreview/data.py`; `list_cases` behaves as before).
+- `[decision]` Every G3 run sets `nnUNet_compile=false`: nnU-Net turns `torch.compile` on by default on a Linux GPU
+  (nnU-Net 2.8.1's `_do_i_compile`; off on Windows), and torch 2.2 does not support it on Python 3.12. Setting it
+  explicitly keeps a run the same on Windows and on the HPC.
+- `[result]` Windows environment (`results/g3_smoke_gpu/windows_env.txt`, `setup_check.txt`): 123 packages; none
+  differs from the 132 versions pinned by `uv.lock`; torch 2.2.2+cu121 and torchvision 0.17.2+cu121; Windows-only:
+  colorama 0.4.6, psutil 7.2.2, tzdata 2026.5. The Windows torch build brings cuDNN 8.8.1 (8801), while the Linux
+  build in `uv.lock` uses `nvidia-cudnn-cu12` 8.9.2.26: one more reason why numbers from this PC and from Linux or the
+  HPC can differ slightly.
+- `[result]` GPU check (no training): torch sees the RTX 4090 (compute capability 8.9, 24.0 GiB, CUDA 12.1), and one
+  float16 3D convolution runs on it (`results/g3_smoke_gpu/setup_check.txt`).
+- `[result]` Tests in the Windows environment: 87 passed, 37 skipped (30 need a prepared user study; 6 browser tests
+  do not find Chrome, because the test helper only looks where Chrome is on macOS/Linux; 1 Linux-only memory test).
+  Includes the new tests `tests/test_data_selection.py`, `test_memory.py` and `test_machine.py`.
+- `[admin]` Downloaded (not in git): TotalSegmentator weights for task 297 (3 mm) and 298 (6 mm), fold 0 each
+  (`models/`, 0.33 GB); the 2 smoke-test scans case_00183 and case_00002 with the full KiTS case list
+  (`data/raw/kits23/`, 0.20 GB).
+- `[result]` The downloaded case list reproduces the 100 kits100 scans exactly (`selected_case_ids` of
+  `configs/kits100.yaml` = the 100 scans in `results/kits100/dice.csv`), and the 2 smoke-test scans are not among them.
+- `[admin]` Not run yet, on purpose (Frederik: set up, do not train yet): the GPU smoke test and therefore the
+  estimates for one fine-tuning run, the whole plan and the disk space (phase 1, steps 4b–6).
+
 ---
 
 ## Open questions (update when answered, with the date)

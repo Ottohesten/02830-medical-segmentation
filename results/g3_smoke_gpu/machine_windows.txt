@@ -1,0 +1,20 @@
+# Machine check on the Windows side (G3 phase 1, step 1), 2026-10-20 18:51
+# Written by PowerShell (Get-CimInstance Win32_OperatingSystem / Win32_ComputerSystem / Win32_Processor /
+# Win32_LogicalDisk / Win32_OptionalFeature, and nvidia-smi --query-gpu=name,memory.total,driver_version,compute_cap).
+# GB = 10^9 bytes, GiB = 2^30 bytes. torch, CUDA and the git commit are recorded in setup_check.txt and, for every
+# run, in machine.json.
+
+OS: Microsoft Windows 11 Home 10.0.26200 (build 26200, 64-bit)
+Computer: ASUS System Product Name
+CPU: Intel(R) Core(TM) i9-14900K, 24 cores, 32 threads
+RAM: 34.1 GB (31.7 GiB)
+GPU (name, memory, driver, compute capability): NVIDIA GeForce RTX 4090, 24564 MiB, 617.14, 8.9
+Hypervisor running: True
+Windows features for WSL2:
+  VirtualMachinePlatform: disabled
+  Microsoft-Windows-Subsystem-Linux: disabled
+Disks:
+  C: size 2046.9 GB, free 1034.6 GB
+  D: size 2048.4 GB, free 2048.2 GB
+  E: size 4000.8 GB, free 4000.5 GB
+  F: size 4000.8 GB, free 4000.5 GB

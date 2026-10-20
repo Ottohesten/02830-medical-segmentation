@@ -1,0 +1,41 @@
+# G3 smoke test on an NVIDIA GPU: Frederik's PC (RTX 4090, 24 GB; Intel i9-14900K, 24 cores / 32 threads), on Windows
+# (environment from frederik/windows_setup.ps1). The same test as configs/g3_smoke.yaml (scripts/g3_smoke_test.py;
+# NOT the G3 pipeline, see docs/g3_plan.md and docs/tasks/g3_finetuning.md), with GPU settings. This file: the 6 mm
+# model at batch 2 and 13. The 3 mm model: configs/g3_smoke_gpu_3mm.yaml.
+#
+# Run (from the repository root): .venv\Scripts\python.exe scripts\g3_smoke_test.py --config configs\g3_smoke_gpu.yaml
+
+name: g3_smoke_gpu                    # results go to results/g3_smoke_gpu/
+source_config: configs/kits100.yaml   # dataset paths, model weights and seed. Its 100 scans are NEVER used here
+seed: 42
+
+model_resolution: fastest             # fastest = the 6 mm model (task 298); fast = the 3 mm model (task 297)
+# The next two scans of the same seeded KiTS draw that picked the 100 scans of kits100 (positions 101 and 102),
+# so they are guaranteed not to be in kits100. The script checks this.
+cases: [case_00183, case_00002]
+truth_to_classes:                     # which ground-truth labels (KiTS: 1 kidney, 2 tumor, 3 cyst) become which of the
+  kidney: [1, 2]                      # model's classes; the script adds _left / _right. Tumor counts as kidney, as in
+  kidney_cyst: [3]                    # the organ definition kidney_tumor_cyst
+body_threshold_hu: -500               # CT value above which a voxel counts as body (for the left-right midline)
+
+work_dir: data/g3_smoke_gpu           # nnU-Net folders for this test (preprocessed data, trainer output). Not in git
+
+compute:
+  device: cuda                        # forced, not auto: without a usable GPU the test stops instead of silently
+                                      # measuring the CPU
+  num_threads: 1                      # torch CPU threads of the main process. 1, as nnU-Net's own training start does
+                                      # on a GPU. (The augmentation workers limit themselves to 1 thread each in
+                                      # nnU-Net's data loader, so many workers do not compete for the same cores)
+  augmentation_processes: [0, 16]     # one timing run per value. 0 = batches prepared in the main process: measures
+                                      # the CPU time to prepare one batch. 16 = nnU-Net's worker processes, as in a
+                                      # real fine-tuning run: measures whether the GPU waits for data. 16 of the 24
+                                      # cores; nnU-Net adds half as many workers for validation batches (24 in all)
+
+training:
+  batch_sizes: [2, 13]                # one run per batch size (and worker setting); 13 = the model's own batch size
+                                      # (plans), used in the original training on an A100 GPU. The first one is also
+                                      # used for the loss check
+  iterations: 30                      # training steps per run
+  warmup_iterations: 10               # not counted: cuDNN tries its algorithms and the workers fill their queue
+  validation_iterations: 10           # validation steps (forward pass only) after the training steps of each run
+  initial_lr: 0.001                   # fine-tuning: 10x lower than nnU-Net's default of 0.01

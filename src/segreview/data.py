@@ -92,25 +92,55 @@ def _download_tar(cfg: dict, target: Path) -> None:
     tar_path.unlink()
 
 
-def _download_files(cfg: dict, target: Path) -> None:
-    """Download only the selected scans, one image + one label file each.
+def _fetch_case_list(cfg: dict, target: Path) -> list[str]:
+    """Get the dataset's full list of scan ids from download.list_url and save it to case_list.txt.
 
-    The dataset's full list of scan ids comes from download.list_url (a JSON file listing, as the
-    Hugging Face API returns it) and is saved to case_list.txt, so the random selection is always
-    drawn from the same full list.
+    download.list_url is a JSON file listing, as the Hugging Face API returns it. Saving the full list
+    means the random selection is always drawn from the same list, whichever scans are on disk.
+    Output: all scan ids, sorted.
     """
-    dl = cfg["dataset"]["download"]
-    listing = requests.get(dl["list_url"], timeout=60)
+    listing = requests.get(cfg["dataset"]["download"]["list_url"], timeout=60)
     listing.raise_for_status()
     all_ids = sorted(_stem(Path(f["path"])) for f in listing.json() if f["type"] == "file")
     target.mkdir(parents=True, exist_ok=True)
     (target / CASE_LIST_FILE).write_text("\n".join(all_ids) + "\n")
+    return all_ids
 
+
+def _download_case(cfg: dict, target: Path, case_id: str) -> None:
+    """Download the image and the label file of one scan (files that are already there are skipped)."""
+    dl = cfg["dataset"]["download"]
+    for template in (dl["image_file"], dl["label_file"]):
+        rel = template.format(case_id=case_id)
+        if not (target / rel).exists():
+            _download_file(f"{dl['base_url']}/{rel}", target / rel)
+
+
+def _download_files(cfg: dict, target: Path) -> None:
+    """Download only the selected scans, one image + one label file each, and the full case list."""
+    all_ids = _fetch_case_list(cfg, target)
     for case_id in tqdm(select_case_ids(cfg, all_ids), desc="scans"):
-        for template in (dl["image_file"], dl["label_file"]):
-            rel = template.format(case_id=case_id)
-            if not (target / rel).exists():
-                _download_file(f"{dl['base_url']}/{rel}", target / rel)
+        _download_case(cfg, target, case_id)
+
+
+def download_cases(cfg: dict, case_ids: list[str]) -> Path:
+    """Download only the given scans, plus the dataset's full case list (download format 'files' only).
+
+    For scans outside the config's own selection, e.g. the 2 scans of the G3 smoke test, which must not be
+    among the 100 scans of kits100. The full case list is saved too, so the config's selection can still be
+    computed (selected_case_ids) without downloading it.
+    Input: the loaded config, the scan ids to download.
+    Output: the folder with the dataset.
+    """
+    if cfg["dataset"]["download"]["format"] != "files":
+        raise ValueError("Single scans can only be downloaded from a dataset with download format 'files'.")
+    target = dataset_dir(cfg)
+    unknown = sorted(set(case_ids) - set(_fetch_case_list(cfg, target)))
+    if unknown:
+        raise ValueError(f"Not in the dataset's case list: {unknown}")
+    for case_id in tqdm(case_ids, desc="scans"):
+        _download_case(cfg, target, case_id)
+    return target
 
 
 def download_dataset(cfg: dict) -> Path:
@@ -133,17 +163,12 @@ def download_dataset(cfg: dict) -> Path:
     return target
 
 
-def list_cases(cfg: dict, splits: list[str] | None = None) -> list[Case]:
-    """List the scans to use (selection from the config), with their image and label paths.
+def _local_cases(cfg: dict) -> dict[str, Case]:
+    """The scans that are on disk, as {scan id: Case}.
 
     Image files are found with dataset.image_glob. The matching label file is dataset.label_path,
     where {stem} is replaced by the image file name without extension and {parent} by the folder
     the image is in. Hidden files (starting with '.', e.g. macOS '._' metadata files) are skipped.
-    If the dataset has a case_list.txt (partial downloads), the selection is drawn from that full list.
-
-    Input: the loaded config, and optionally a list of splits to keep (e.g. ["dev"]); only those scans
-           then have to be downloaded.
-    Output: a list of Case objects, sorted by id.
     """
     ds = cfg["dataset"]
     root = dataset_dir(cfg)
@@ -152,12 +177,41 @@ def list_cases(cfg: dict, splits: list[str] | None = None) -> list[Case]:
     for image in images:
         names = {"stem": _stem(image), "parent": image.parent.name}
         local[names[ds["case_id"]]] = Case(names[ds["case_id"]], image, root / ds["label_path"].format(**names))
+    return local
 
-    case_list = root / CASE_LIST_FILE
-    all_ids = case_list.read_text().split() if case_list.exists() else list(local)
+
+def selected_case_ids(cfg: dict, local: dict[str, Case] | None = None) -> list[str]:
+    """The ids of the scans the config selects. The scans themselves need not be downloaded.
+
+    If the dataset has a case_list.txt (written at download time), the selection is drawn from that full
+    list; otherwise from the scans on disk. So only the case list is needed to know, for example, which
+    100 scans kits100 uses on a machine where they are not downloaded.
+    Input: the loaded config, and optionally the scans on disk (from _local_cases, to avoid a second search).
+    Output: the selected ids, sorted.
+    """
+    case_list = dataset_dir(cfg) / CASE_LIST_FILE
+    if case_list.exists():
+        all_ids = case_list.read_text().split()
+    else:
+        all_ids = list(_local_cases(cfg) if local is None else local)
     if not all_ids:
-        raise FileNotFoundError(f"No scans matching {root / ds['image_glob']}. Run scripts/download_data.py first.")
-    selected = select_case_ids(cfg, all_ids)
+        raise FileNotFoundError(f"No scans matching {dataset_dir(cfg) / cfg['dataset']['image_glob']}. "
+                                "Run scripts/download_data.py first.")
+    return select_case_ids(cfg, all_ids)
+
+
+def list_cases(cfg: dict, splits: list[str] | None = None) -> list[Case]:
+    """List the scans to use (selection from the config), with their image and label paths.
+
+    The selection comes from selected_case_ids (from case_list.txt if the dataset has one), the paths
+    from the files on disk (see _local_cases). Every selected scan must be downloaded.
+
+    Input: the loaded config, and optionally a list of splits to keep (e.g. ["dev"]); only those scans
+           then have to be downloaded.
+    Output: a list of Case objects, sorted by id.
+    """
+    local = _local_cases(cfg)
+    selected = selected_case_ids(cfg, local)
     if splits is not None:
         selected = [i for i in selected if case_split(cfg, i) in splits]
     missing = [i for i in selected if i not in local]

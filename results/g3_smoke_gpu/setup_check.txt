@@ -1,0 +1,65 @@
+# Windows setup check (frederik/windows_setup.ps1), 2026-10-20 19:51
+# Commit: eb1cef2 on branch frederik/g3 (with uncommitted changes)
+
+## GPU (nvidia-smi; memory.used and utilization are from other programs at this moment)
+name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], compute_cap
+NVIDIA GeForce RTX 4090, 617.14, 24564 MiB, 4600 MiB, 70 %, 8.9
+
+## Environment (.venv, see windows_env.txt)
+123 packages installed, 132 versions pinned by uv.lock.
+Versions that differ from uv.lock: none
+Packages not in uv.lock (Windows only): colorama==0.4.6, psutil==7.2.2, tzdata==2026.5
+
+## torch and the GPU
+torch 2.2.2+cu121, CUDA 12.1, cuDNN 8801
+GPU NVIDIA GeForce RTX 4090, compute capability 8.9, 24.0 GiB
+3D convolution on the GPU in float16: OK, output (2, 8, 64, 64, 64)
+
+## pytest (.venv\Scripts\python.exe -m pytest -q -rs)
+...........................................................s............ [ 58%]
+.........s.sssssss..s...ssssssssssssssssssssss.sssss                     [100%]
+============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_memory.py:70: needs Linux (/proc)
+SKIPPED [1] tests\test_study.py:47: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study.py:73: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study.py:93: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study_analysis.py:43: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study_analysis.py:60: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study_analysis.py:90: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study_analysis.py:96: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study_analysis.py:109: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study_analysis.py:151: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_study_analysis.py:207: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_browser.py:118: Google Chrome not installed
+SKIPPED [1] tests\test_ui_browser.py:168: Google Chrome not installed
+SKIPPED [1] tests\test_ui_browser.py:196: Google Chrome not installed
+SKIPPED [1] tests\test_ui_browser.py:242: Google Chrome not installed
+SKIPPED [1] tests\test_ui_browser.py:262: Google Chrome not installed
+SKIPPED [1] tests\test_ui_browser.py:276: Google Chrome not installed
+SKIPPED [1] tests\test_ui_server.py:37: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:46: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:57: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:70: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:81: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:89: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:102: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:127: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:142: study not prepared (run scripts/prepare_study.py)
+SKIPPED [5] tests\test_ui_server.py:158: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:172: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:206: study not prepared (run scripts/prepare_study.py)
+SKIPPED [2] tests\test_ui_server.py:215: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:244: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests\test_ui_server.py:251: study not prepared (run scripts/prepare_study.py)
+87 passed, 37 skipped, 3 warnings in 3.72s
