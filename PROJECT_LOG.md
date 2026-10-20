@@ -438,6 +438,23 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   records this blocker. Next action: configure GitHub authentication, run `git push -u origin otto/robustness`,
   and open a PR into `main` for group review before proceeding to step 2.
 
+## 2026-10-20: robustness setup push confirmed
+
+- `[admin]` Otto reported pushing `otto/robustness`. Verified via `git ls-remote --heads origin otto/robustness`:
+  remote HEAD is `f388b74b52e4aeb7a58b5405e72ad334df2798d7`, matching local HEAD and including setup commit
+  `b2269e9`. The earlier push blocker is resolved. Updated `docs/tasks/g1_robustness.md` and `PROJECT_OVERVIEW.md`.
+- `[admin]` `git pull --ff-only` reported "Already up to date"; offline `uv sync --locked` checked 133 packages.
+  Before publishing the status update, `UV_OFFLINE=1 UV_NO_SYNC=1 UV_CACHE_DIR=/tmp/otto-robustness-uv-cache
+  uv run pytest -ra` completed with **72 passed, 36 skipped, 0 failed in 1.97 s**. Skip reasons are unchanged:
+  30 need a prepared study, 6 need Chrome (test file paths listed in the step 1 notes above).
+- `[admin]` No open PR was found for the branch. Attempting to create a draft PR into `main` via the connected
+  GitHub integration returned HTTP 403 ("Resource not accessible by integration"); no PR was created.
+  Open a PR through GitHub for group review. Step 2 has not started; next explain the timing run and check
+  compute availability. No inference/evaluation or changes to locked G1 files.
+- `[admin]` The follow-up status-note commit could not be pushed by the assistant: noninteractive HTTPS Git
+  still reports "could not read Username". Otto's confirmed setup push remains on GitHub; only this subsequent
+  documentation update needs `git push origin otto/robustness` from his authenticated terminal.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the
