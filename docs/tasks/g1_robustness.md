@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/robustness` |
 | **Created** | 2026-10-20 |
-| **Status** | Step 1 complete and pushed; step 2 next |
+| **Status** | Step 2 complete; development strength selection next |
 | **Target** | Steps 1–4 by 2026-10-30, all steps by 2026-11-13 |
 
 This document is the task description **and** the working notes. Whoever works on the task (with or without an
@@ -93,10 +93,50 @@ Tick each box when done and write the date and a short note (numbers + file path
     disagreement about the kidneys. Scans with more disagreement go earlier in the review queue so a person
     can check likely segmentation errors first, without ground truth being used to rank them.
 
-- [ ] **2. Measure the time.** Run the 3 mm and 6 mm models on 2 development scans with one perturbation on your
+- [x] **2. Measure the time.** Run the 3 mm and 6 mm models on 2 development scans with one perturbation on your
   machine. Write down seconds per scan per model, and estimate the time for 20 scans × 3–4 perturbations and for
   80 scans. If it is too slow (more than a night), ask Bjørn; Frederik's GPU machine is an option.
   *Notes:*
+  - 2026-10-21: PR [#1](https://github.com/Ottohesten/02830-medical-segmentation/pull/1) exists; the step 1
+    follow-up commit `366dcf1` is pushed. `git pull --ff-only` reported "Already up to date"; offline
+    `uv sync --locked` checked 133 packages before starting step 2.
+  - 2026-10-21: Corrected the GPU diagnosis: the sandbox hides the NVIDIA device, while host `nvidia-smi`
+    works (RTX 5060 Ti, 16,311 MiB, driver 615.78.08). Host torch 2.2.2+cu121 detects the GPU but cannot execute
+    kernels on its `sm_120` architecture. Otto approved a separate GPU environment and downloads.
+    `.venv-gpu/` now uses torch 2.7.1+cu128 / torchvision 0.22.1+cu128; tensor and Conv3d checks pass.
+    Pinned packages: `requirements/robustness-gpu.in` and `requirements/robustness-gpu.txt`; installation
+    requires `--torch-backend cu128`. `uv pip check` verified 136 compatible packages. Shared `.venv/`,
+    `pyproject.toml`, and `uv.lock` are preserved. Evidence: `results/kits_robustness_timing/gpu_compatibility.json`.
+  - 2026-10-21: Ran `scripts/benchmark_robustness.py` with `configs/kits_robustness_timing.yaml` on CUDA,
+    6 CPU threads, seed 42, `nnUNet_compile=false`, with a 30-minute cap. Chose the first two sorted dev IDs
+    (`case_00040`, `case_00051`) without inspecting Dice or scores. Ran both models on clean and `noise_60`
+    copies (Gaussian noise SD 60 HU, timing example only): **8 predictions in 68.90 s**.
+    Per-scan prediction times (including resampling and preprocessing, excluding load/perturb/save):
+
+    | Scan | Clean 3 mm | Noise 3 mm | Clean 6 mm | Noise 6 mm |
+    |---|---:|---:|---:|---:|
+    | `case_00040` | 23.75 s | 6.64 s | 4.55 s | 4.33 s |
+    | `case_00051` | 3.45 s | 2.68 s | 1.61 s | 1.70 s |
+
+    First prediction per model includes CUDA warm-up. Canonical shapes: 512 × 512 × 207 and 512 × 512 × 68.
+    Peak allocated GPU memory was 2,503.01 MiB; process peak RSS was 3,907.35 MiB (a cumulative process peak).
+    Machine: AMD Ryzen 5 7500F / RTX 5060 Ti, Linux 7.2.10-1-cachyos, Python 3.12.15, torch 2.7.1+cu128,
+    CUDA 12.8. Exact rows and machine/config/code hashes: `results/kits_robustness_timing/timings.csv`,
+    `machine.json`, `run_config.yaml`, `model_load_times.csv`, and `run_log.txt`.
+  - 2026-10-21: **Planning estimates**, not measured full runs: clean reference + 3 / 4 perturbations,
+    both models, including loading/perturbing/saving and loading each model once:
+    **20 scans: 16.95 / 20.45 min; 80 scans: 67.40 / 81.39 min**.
+    Formula: model-load time + N × (mean clean time for both models + P × mean noisy time for both models).
+    These use only two scans and one perturbation, include first-use warm-up, and exclude later analysis;
+    scan size and other perturbation types can change runtime. Source: `results/kits_robustness_timing/runtime_projections.csv`.
+    No overnight/GPU-machine request to Bjørn is needed based on this timing sample. Ask Otto before any
+    actual run expected to exceed 30 minutes, including the projected 80-scan runs.
+  - 2026-10-21: Verified all 8 timing rows, matching saved config/script hashes, and 16 prediction maps with
+    matching grids in `data/predictions/kits_robustness_timing/` (outside Git). No test scans, ground truth,
+    Dice, or uncertainty scores were read. Locked G1 files are unchanged.
+    Added 9 synthetic tests for dev/test isolation, locked-folder protection, and complete runtime estimates;
+    full suites: **81 passed, 36 skipped, 0 failed** in both environments (2.28 s shared; 2.53 s GPU).
+    Evidence: `results/kits_robustness_timing/tests_main.txt` and `tests_gpu.txt`; usage is in `README.md`.
 
 - [ ] **3. Choose the strengths on the development set (20 scans).** Try a few strengths per type, e.g.
   noise 30/60/120 HU, lowres 6/8/12 mm, contrast 0.8/0.9 (0.6 had no effect on spleen). Goal: perturbations that
@@ -131,6 +171,12 @@ Tick each box when done and write the date and a short note (numbers + file path
 
 - 2026-10-20 — Otto owns this task and works on `otto/robustness`, replacing the original Rasmus assignment,
   following Otto's explicit instruction for this work session.
+- 2026-10-21 — Keep the group's torch 2.2.2 lock and use a separate pinned Linux GPU environment for Otto's
+  RTX 5060 Ti, as approved by Otto. The GPU needs a newer CUDA/PyTorch build; record this environment difference.
+- 2026-10-21 — Use `case_00040` and `case_00051` (first two sorted dev IDs) and `noise_60` for timing only.
+  Strength selection remains step 3 and must happen before inspecting uncertainty performance.
+- 2026-10-21 — Use a separate benchmark for both models and variants. The existing `step_second_model` handles
+  clean scans only; production support for perturbed second-model predictions is still needed before large runs.
 
 ## 6. Questions for Bjørn
 
@@ -154,3 +200,11 @@ A new chat starts by reading this section.)*
   communicate with the driver in this environment), then prepare a separate `configs/kits_perturbed.yaml`
   with its own output name for a timing run on 2 development scans with 1 perturbation. Do not start a run
   expected to exceed 30 minutes without Otto's approval. Steps 2–7 are untouched.
+- 2026-10-21: **Steps 1–2 complete.** PR #1 exists and step 1's follow-up is pushed. The separate GPU environment
+  works; both models ran on two dev scans, clean and noisy. Evidence and timing estimates are in
+  `results/kits_robustness_timing/`; no accuracy/scoring evaluation or test-set inference was performed.
+  Publish the step 2 commit on `otto/robustness` (use Otto's terminal if the assistant still lacks HTTPS
+  credentials), which updates PR #1. Next: explain step 3 and choose candidate strengths on the 20 dev scans
+  using Dice degradation only. Do not inspect score performance before logging the chosen strengths.
+  Before larger runs, add second-model support for perturbed scans; the current shared step handles clean only.
+  Ask Otto before any actual run expected to exceed 30 minutes. Steps 3–7 have not started.

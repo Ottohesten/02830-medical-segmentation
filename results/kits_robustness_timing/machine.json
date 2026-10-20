@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-21T00:08:52",
+  "platform": "Linux-7.2.10-1-cachyos-x86_64-with-glibc2.44",
+  "cpu": "x86_64",
+  "cpu_count": 12,
+  "python": "3.12.15",
+  "torch": "2.7.1+cu128",
+  "numpy": "1.26.4",
+  "cuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "mps_available": false,
+  "git_commit": "366dcf1b7b42de10a0f9969f5c4183296252a327",
+  "git_uncommitted_changes": true,
+  "os": "Linux-7.2.10-1-cachyos-x86_64-with-glibc2.44",
+  "config": "configs/kits_robustness_timing.yaml",
+  "status": "complete",
+  "device": "cuda",
+  "config_sha256": "97da2b8a48b851779d5a9d5fd774cd6a820a07939f44352b91a67b4235f56830",
+  "script_sha256": "78242a08535568386bf07c089f5e3929c48002101f72570917fe5d85ef6e64d2",
+  "cpu_model": "AMD Ryzen 5 7500F 6-Core Processor",
+  "torch_threads": 6,
+  "case_ids": [
+    "case_00040",
+    "case_00051"
+  ],
+  "warmup": "First prediction per model is included, not discarded",
+  "timing_scope": "prediction includes resampling, preprocessing, network, reduction, back-resampling",
+  "elapsed_seconds": 68.89924752800016,
+  "completed_predictions": 8
+}

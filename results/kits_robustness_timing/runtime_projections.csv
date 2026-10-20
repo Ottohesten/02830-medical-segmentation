@@ -1,0 +1,5 @@
+n_cases,n_perturbations,includes_clean_reference,prediction_seconds,end_to_end_seconds,basis
+20,3,True,794.0196927299803,1017.108734015992,Two dev scans; clean plus P variants; both models; load each model once
+20,4,True,947.4817653599712,1226.9129842459915,Two dev scans; clean plus P variants; both models; load each model once
+80,3,True,3176.078770919921,4044.2037423959664,Two dev scans; clean plus P variants; both models; load each model once
+80,4,True,3789.9270614398847,4883.4207433159645,Two dev scans; clean plus P variants; both models; load each model once

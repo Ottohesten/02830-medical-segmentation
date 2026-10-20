@@ -181,6 +181,37 @@ uv run python scripts/explore_disagreement_scores.py --config configs/kits100.ya
   `figures/exploratory_review_curves_test.png`.
 - Each script writes the machine, library versions and git commit to `<name>_machine.json` next to its results.
 
+## Robustness timing on an RTX 5060 Ti
+
+The shared environment pins torch 2.2.2 for Intel Macs. It cannot execute kernels on Blackwell GPUs such as
+the RTX 5060 Ti. For Otto's robustness experiment, use the separate Linux/Python 3.12 environment below.
+`requirements/robustness-gpu.txt` pins the same non-GPU packages plus torch 2.7.1 and torchvision 0.22.1
+with CUDA 12.8. It leaves the shared `.venv/`, `pyproject.toml`, and `uv.lock` intact.
+
+```bash
+uv venv .venv-gpu --python .venv/bin/python
+uv pip sync --python .venv-gpu/bin/python --torch-backend cu128 requirements/robustness-gpu.txt
+PYTHONPATH=src .venv-gpu/bin/python scripts/benchmark_robustness.py --config configs/kits_robustness_timing.yaml
+```
+
+`PYTHONPATH=src` imports the project code without installing the main project's torch 2.2.2 dependency into
+the GPU environment. Run these commands from the repository root, with access to the NVIDIA device.
+The CUDA driver must work (`nvidia-smi`); an agent sandbox may hide the GPU even when the host driver works.
+The cu128 flag is required when installing from this requirements file.
+
+The benchmark runs the first two development IDs in sorted order with both models, each clean and with
+`noise_60`. This is a timing example, not the strength selection for step 3. No ground truth or scores are
+read. Unlike `run_second_model.py` (clean scans only), the benchmark also runs the 6 mm model on the noisy copies.
+Results go to `results/kits_robustness_timing/`: per-prediction `timings.csv`, `timing_summary.csv`, separate
+model-load times, the config snapshot, machine metadata, and `runtime_projections.csv`.
+Predictions go to `data/predictions/kits_robustness_timing/` and remain outside Git.
+
+The synchronized prediction interval includes resampling, preprocessing, inference, and resampling back;
+the total interval also includes reading, perturbing, and saving. First-use CUDA warm-up is included.
+Projections estimate clean reference plus 3 or 4 perturbations on 20 or 80 scans from only two measured scans;
+they are planning estimates, not confidence intervals or measured full-run times. The config caps the benchmark
+at 30 minutes. Existing timings are protected; use `--overwrite` only for a deliberate complete rerun.
+
 ## Running on the DTU HPC (not tested on the cluster yet)
 
 > **Untested.** The job scripts in `jobs/` follow the DTU HPC (LSF) documentation, and their commands have been run

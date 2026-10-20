@@ -455,6 +455,54 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   still reports "could not read Username". Otto's confirmed setup push remains on GitHub; only this subsequent
   documentation update needs `git push origin otto/robustness` from his authenticated terminal.
 
+## 2026-10-21: robustness step 2, GPU compatibility and timing
+
+- `[admin]` Otto created PR [#1](https://github.com/Ottohesten/02830-medical-segmentation/pull/1).
+  `366dcf1` is pushed; `git pull --ff-only` was up to date and offline `uv sync --locked` checked 133 packages.
+- `[result]` GPU diagnosis corrected: the sandbox hides the device. On the host the RTX 5060 Ti works
+  (16,311 MiB, NVIDIA driver 615.78.08), but torch 2.2.2+cu121 lacks `sm_120` kernels and a tensor operation fails
+  with "no kernel image is available for execution on the device". Source:
+  `results/kits_robustness_timing/gpu_compatibility.json`.
+- `[decision]` Otto explicitly approved a separate GPU environment and downloads. Installed `.venv-gpu/`
+  with torch 2.7.1+cu128 and torchvision 0.22.1+cu128; tensor and Conv3d checks pass. `uv pip check`: 136 compatible
+  packages. Non-GPU versions are retained from the installed shared lock. Pins are in
+  `requirements/robustness-gpu.{in,txt}`; use `uv pip sync --python .venv-gpu/bin/python --torch-backend cu128
+  requirements/robustness-gpu.txt`. Shared `.venv/`, `pyproject.toml`, and `uv.lock` are unchanged.
+  Official basis: [PyTorch 2.7 Blackwell support](https://pytorch.org/blog/pytorch-2-7/) and
+  [versioned CUDA installation commands](https://pytorch.org/get-started/previous-versions/).
+- `[decision]` For timing only, choose the first two sorted development IDs (`case_00040`, `case_00051`) and
+  one perturbation, Gaussian noise SD 60 HU (`noise_60`). No Dice or scores were inspected to choose these.
+  This is not the perturbation-strength decision for step 3. Config: `configs/kits_robustness_timing.yaml`,
+  seed 42, CUDA, 6 CPU threads, no TTA, 30-minute cap, development only.
+- `[experiment]` `PYTHONPATH=src nnUNet_compile=false .venv-gpu/bin/python -u scripts/benchmark_robustness.py
+  --config configs/kits_robustness_timing.yaml`: both models on clean and noisy copies of both scans,
+  **8 predictions in 68.90 s**. AMD Ryzen 5 7500F, RTX 5060 Ti, Linux 7.2.10-1-cachyos, Python 3.12.15,
+  torch 2.7.1+cu128, CUDA 12.8. Metadata records source baseline `366dcf1`, uncommitted changes, and exact
+  config/script SHA-256 hashes; code and config are committed with this run's evidence.
+  `results/kits_robustness_timing/{machine.json,run_config.yaml,run_log.txt,model_load_times.csv}`.
+- `[result]` Per-scan prediction times (includes preprocessing/resampling, excludes loading/perturbing/saving),
+  `case_00040` / `case_00051`: 3 mm clean **23.75 / 3.45 s**, 3 mm noise **6.64 / 2.68 s**;
+  6 mm clean **4.55 / 1.61 s**, 6 mm noise **4.33 / 1.70 s**. First prediction per model includes CUDA warm-up.
+  Canonical shapes 512 × 512 × 207 / 512 × 512 × 68. Peak allocated GPU memory 2,503.01 MiB;
+  cumulative process peak RSS 3,907.35 MiB. `results/kits_robustness_timing/{timings.csv,timing_summary.csv}`.
+- `[result]` **Planning estimates**, not measured full runs: clean reference + 3 / 4 perturbations, both models,
+  loading/perturbing/saving and one model load each: **20 scans 16.95 / 20.45 min; 80 scans 67.40 / 81.39 min**.
+  Formula: model-load time + N × (mean paired clean time + P × mean paired noisy time). Based on only two scans
+  and one perturbation, with first-use warm-up included; different scan sizes/perturbations and later analysis
+  add uncertainty. `results/kits_robustness_timing/runtime_projections.csv`. No overnight fallback is indicated
+  by this sample. Ask Otto before actual runs expected to exceed 30 minutes.
+- `[result]` Verified all 8 timing rows, config/script hashes, and 16 saved prediction maps with matching grids
+  in `data/predictions/kits_robustness_timing/` (not in Git). No test scans, ground truth, Dice, or uncertainty
+  scores were read; locked G1 files are unchanged. Added 9 synthetic tests covering dev/test isolation,
+  locked-folder guards, and estimates that require all 8 measurements. Both complete test suites passed:
+  **81 passed, 36 skipped, 0 failed** (2.28 s shared; 2.53 s GPU). Skip reasons unchanged: 30 need a prepared study,
+  6 need Chrome. `results/kits_robustness_timing/{tests_main.txt,tests_gpu.txt}`.
+- `[admin]` Step 2 checked in `docs/tasks/g1_robustness.md`; overview and README updated. Next: step 3, choose
+  strengths from Dice degradation on 20 dev scans before inspecting score performance. The benchmark handles
+  perturbed predictions for both models; the shared `step_second_model` still handles clean scans only and
+  needs support for variants before larger robustness runs. Steps 3–7 have not started. Publish this step on
+  `otto/robustness` to update PR #1; if noninteractive Git still lacks credentials, Otto pushes from his terminal.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the
