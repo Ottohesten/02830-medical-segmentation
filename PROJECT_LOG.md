@@ -262,6 +262,67 @@ Overview of the project and where everything is: [PROJECT_OVERVIEW.md](PROJECT_O
 - `[idea]` Add the 6 mm-alone analysis from 2026-10-06 to the repository as a script and result file, so the numbers
   can be reproduced (from saved predictions only, no new inference).
 
+
+## 2026-10-19: follow-up on the 2026-10-07 meeting (exploratory)
+
+All three analyses below are **exploratory**: they were asked after the G1 choices were locked, so they cannot change
+the locked G1 result. They use only the saved kits100 predictions (no new inference), report the dev (20) and test
+(80) sets separately, and leave the locked G1 files unchanged (checked with checksums before and after).
+Machine: MacBook Air (Mac17,3, Apple M5, 16 GB), macOS 27.0.1, Python 3.12, torch 2.2.2, CPU only
+(`results/kits100/model_comparison_machine.json`, `voxel_correction_machine.json`). Settings: `exploratory:` in
+`configs/kits100.yaml`; seed 42 (random voxel order averaged over seeds 42–46).
+
+- `[decision]` The settings go under a new `exploratory:` key in `configs/kits100.yaml` and the results in
+  `results/kits100/`, not in a separate config: the analyses only read kits100's saved predictions, and a copy of
+  the config could drift from the locked one.
+- `[experiment]` 6 mm model alone: Dice of the 3 mm (`mask`) and 6 mm (`m2_mask`) masks against ground truth
+  (kidney + tumor + cyst, same Dice function as `dice.csv`) for all 100 scans (`scripts/compare_models.py`).
+  The 3 mm Dice is identical to `dice.csv` for all 100 scans.
+- `[result]` **Exploratory**, test (80): median Dice 3 mm 0.910 vs. 6 mm 0.894; mean 0.870 vs. 0.848; Dice < 0.83 in
+  11 vs. 16 scans; 6 mm better in 12 of 80 (3 mm in 68); Spearman between the two models' Dice 0.89. Dev (20):
+  median 0.904 vs. 0.895, mean 0.848 vs. 0.830, < 0.83 in 4 vs. 7, 6 mm better in 5 of 20, Spearman 0.81.
+  `results/kits100/model_dice_3mm_vs_6mm.csv`, `model_dice_3mm_vs_6mm_summary.csv`.
+- `[result]` **Exploratory**, locked queue (`model_diff_mean_region`), test: top 10 = 6 real finds (3 mm Dice < 0.83)
+  and 4 false alarms (3 mm fine, 6 mm < 0.83: case_00280, 00079, 00203, 00526); top 20 = 9 real finds, 4 false alarms,
+  7 where both are fine. Dev: top 10 = 4 real finds, 3 false alarms. `results/kits100/queue_top_3mm_vs_6mm.csv`.
+  These numbers match the exploratory calculation of 2026-10-06 exactly (medians, means, counts below 0.83,
+  "3 mm better in 68 of 80", and the same 6 + 4 scans in the top 10), which is now reproducible from the repository.
+- `[experiment]` Where the 3 mm and 6 mm masks disagree: every disagreeing voxel by ground-truth label, distance to the
+  3 mm mask's edge (≤ 6 mm ≈ one 6 mm voxel = grid effect; farther = real difference) and which model is right.
+  Groups: bad (3 mm Dice < 0.83), false alarm (3 mm fine, 6 mm < 0.83), good (both fine).
+- `[result]` **Exploratory**: **about 89 % of the disagreeing voxels lie within 6 mm of the 3 mm edge (grid effect;
+  median scan 99 %); the other ~11 % are real differences, and on test 79 % of those are tumor.** Pooled over
+  voxels: dev 89 % / test 89 % near the edge. The real differences concentrate in the scans that matter: test bad
+  scans 32 % far from the edge (87 % of it tumor), false alarms 26 % (79 % tumor), good scans 3 %. In false alarms
+  the 3 mm model is right in 99 % of the far voxels (the 6 mm model leaves out tumor the 3 mm model includes); in
+  bad scans only in 49 % (pooled; median scan 22 %), i.e. there the 6 mm model often includes tumor the 3 mm model
+  missed. On dev the far part is 45 % tumor and 38 % kidney (one scan, case_00135, dominates). Near the edge the
+  3 mm model is right in 61–67 % of the voxels. `results/kits100/model_disagreement_{counts,per_case,summary}.csv`,
+  `figures/model_disagreement_where.png`.
+- `[experiment]` Simulated correction inside a scan: set the k % most uncertain voxels of the G1 region (predicted
+  kidney + 5 mm) to ground truth, k = 1, 2, 5, 10, 20, 50, and measure the Dice gain. Orders: entropy (locked
+  heatmap), |p_3mm − p_6mm|, distance to the edge (reference), random (mean of seeds 42–46), oracle (wrong voxels
+  first). Ties at the cut-off are shared in proportion, as in the heatmap evaluation (`scripts/simulate_voxel_correction.py`).
+- `[result]` **Exploratory**, test, mean Dice gain at k = 10 %: entropy +0.034, edge distance +0.032,
+  |p_3mm − p_6mm| +0.017, random +0.008, oracle +0.067. Area under the gain curve for k = 0–10 % (mean gain over that
+  range): entropy 0.018 (51 % of the oracle), edge 0.016 (46 %), |Δp| 0.009 (25 %), random 0.004 (12 %); for 0–50 %:
+  0.051 / 0.048 / 0.034 / 0.021, oracle 0.069. Entropy beats the edge reference in 77 of 80 test scans (19 of 20 dev)
+  on the 0–10 % area, but only by a little. Dev shows the same order and nearly the same numbers.
+  `results/kits100/voxel_correction_{summary,auc_summary,auc,per_case}.csv`, `figures/voxel_correction_gain.png`.
+- `[result]` **Exploratory**: errors outside the region (e.g. a whole missed kidney) can never be fixed this way. Per
+  scan, the share of error voxels outside the region is median 13 % on test (17 % dev), mean 21 % (28 %); pooled over
+  all voxels 48 % (37 %), because a few scans with large misses dominate. Share of the Dice gap that cannot be closed
+  inside the region: median 12 % (16 %), mean 20 % (26 %). Best reachable mean Dice when the whole region is
+  corrected: 0.949 on test (0.927 dev). `results/kits100/voxel_correction_cases.csv`.
+- `[decision]` "Oracle" = all wrong voxels first, as asked. It fixes the most wrong voxels, but is not a strict upper
+  bound on Dice (fixing a missed voxel and a false voxel change Dice by slightly different amounts).
+- `[idea]` The model-disagreement score mixes the grid effect (most of the disagreement) with real tumor
+  differences. A score built only from disagreement farther than 6 mm from the edge might separate the two; this
+  would be a new, post-lock question and has not been tried.
+- `[idea]` The |p_3mm − p_6mm| heatmap points at fixable voxels worse than plain distance to the edge, which supports
+  the locked choice of entropy for the interface; entropy's advantage over the edge reference is small, which matches
+  the known risk that it mostly lights up the edge.
+
 ---
 
 ## Open questions (update when answered, with the date)

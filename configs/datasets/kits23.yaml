@@ -19,6 +19,9 @@ image_glob: images/*.nii.gz
 label_path: segmentations/{stem}.nii.gz
 case_id: stem
 
+# Readable names of the ground-truth label values (used in analyses that break results down by label).
+label_names: {0: background, 1: kidney, 2: tumor, 3: cyst}
+
 # Ground-truth labels: 1 = kidney, 2 = tumor, 3 = cyst. Which of them count as "the kidney"?
 # TotalSegmentator has classes for kidney and kidney cyst, but not for kidney tumor, so it is not
 # obvious which definition matches what the model was trained to do. See the label check

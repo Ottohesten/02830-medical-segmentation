@@ -1,0 +1,11 @@
+status,split,method,auc_0_10_median,auc_0_10_mean,auc_0_50_median,auc_0_50_mean,auc_0_10_share_of_oracle_mean,auc_0_50_share_of_oracle_mean
+exploratory (after the G1 lock),dev,boundary,0.015623,0.016091,0.048806,0.04758,0.460599,0.689994
+exploratory (after the G1 lock),dev,entropy,0.017973,0.017989,0.051225,0.050971,0.514916,0.739174
+exploratory (after the G1 lock),dev,m2_diff,0.00864,0.009505,0.036103,0.03593,0.272085,0.521045
+exploratory (after the G1 lock),dev,oracle,0.034943,0.034936,0.069463,0.068957,1.0,1.0
+exploratory (after the G1 lock),dev,random,0.004145,0.004233,0.020352,0.020726,0.121165,0.300572
+exploratory (after the G1 lock),test,boundary,0.016427,0.016215,0.046855,0.04771,0.455375,0.693089
+exploratory (after the G1 lock),test,entropy,0.01823,0.018117,0.050252,0.050655,0.508793,0.735866
+exploratory (after the G1 lock),test,m2_diff,0.008827,0.008991,0.032788,0.03385,0.252501,0.491743
+exploratory (after the G1 lock),test,oracle,0.036163,0.035608,0.068382,0.068837,1.0,1.0
+exploratory (after the G1 lock),test,random,0.004086,0.004211,0.020041,0.020584,0.118262,0.299025

@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-19T21:51:01",
+  "model_name": "MacBook Air",
+  "model_id": "Mac17,3",
+  "chip": "Apple M5",
+  "memory": "16 GB",
+  "os": "macOS 27.0.1 (26A434)",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "cpu": "arm",
+  "cpu_count": 10,
+  "python": "3.12.15",
+  "torch": "2.2.2",
+  "numpy": "1.26.4",
+  "cuda": null,
+  "gpu": null,
+  "mps_available": true,
+  "git_commit": "de179282342bd93d905b3ac359d9564a8b2599cf",
+  "git_uncommitted_changes": true,
+  "config": "configs/kits100.yaml",
+  "script": "scripts/compare_models.py",
+  "status": "exploratory (after the G1 lock)",
+  "seconds": 402.2
+}

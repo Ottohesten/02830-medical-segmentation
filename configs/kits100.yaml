@@ -84,3 +84,19 @@ report:                         # figures and tables for the paper (scripts/make
   primary: model_diff_mean_region   # LOCKED primary measure (used to pick the heatmap example scans)
   heatmap: entropy              # LOCKED G2 heatmap
   example_bad_rule: worst10     # "bad" rule used to pick the failure examples
+
+# EXPLORATORY follow-up analyses (meeting with the supervisor, 2026-10-07). Run AFTER the G1 choices were locked,
+# so nothing here may change the locked G1 result. They only read saved predictions (no new inference) and report
+# the dev and test sets separately. Scripts: scripts/compare_models.py, scripts/simulate_voxel_correction.py.
+exploratory:
+  model_comparison:             # how good is the 6 mm model alone, and where do the 3 mm and 6 mm masks differ?
+    bad_rule: dice_below_083    # name of the evaluation.bad_rules entry whose threshold marks a "bad" scan
+    queue_top_n: 20             # rows in the table of the top of the locked queue (report.primary)
+    grid_band_mm: 6             # disagreement within this distance of the 3 mm mask's edge counts as the grid
+                                # effect (about one 6 mm voxel); farther away = a real difference in shape or content
+    distance_bins_mm: [3, 6, 12]  # finer distance bins for the breakdown (must contain grid_band_mm)
+  voxel_correction:             # simulated correction inside a scan: fix the k % most uncertain region voxels
+    k_percent: [1, 2, 5, 10, 20, 50]   # share of the region's voxels corrected to ground truth
+    methods: [entropy, m2_diff, boundary, random, oracle]   # voxel orders compared (see voxel_correction.py)
+    random_seeds: [42, 43, 44, 45, 46] # the random order is averaged over these seeds
+    auc_up_to_percent: [10, 50]        # area under the gain-vs-k curve from 0 up to these k (in %)

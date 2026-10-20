@@ -1,0 +1,17 @@
+status,split,group,n_scans,how,n_disagree,near_share,dist_0-3 mm_share,dist_3-6 mm_share,dist_6-12 mm_share,dist_>12 mm_share,label_background_share,far_label_background_share,label_kidney_share,far_label_kidney_share,label_tumor_share,far_label_tumor_share,label_cyst_share,far_label_cyst_share,right_3mm_share,near_right_3mm_share,far_right_3mm_share
+exploratory (after the G1 lock),dev,bad,4,pooled,152975,0.7632,0.5265,0.2367,0.1499,0.0868,0.0405,0.0102,0.3658,0.0841,0.3029,0.331,0.2908,0.5747,0.5342,0.6288,0.2295
+exploratory (after the G1 lock),dev,bad,4,median_per_scan,38897,0.8117,0.5463,0.2572,0.123,0.0653,0.0478,0.0039,0.3803,0.0546,0.3216,0.8215,0.0,0.0,0.5095,0.6434,0.2987
+exploratory (after the G1 lock),dev,false_alarm,3,pooled,514369,0.9035,0.6949,0.2087,0.0763,0.0202,0.1063,0.2519,0.7908,0.6105,0.0794,0.1037,0.0235,0.0339,0.8692,0.8553,0.9996
+exploratory (after the G1 lock),dev,false_alarm,3,median_per_scan,38594,0.7796,0.5418,0.2131,0.1223,0.0266,0.0892,0.0001,0.5117,0.3176,0.057,0.0,0.0167,0.0,0.8428,0.7984,0.9997
+exploratory (after the G1 lock),dev,good,13,pooled,1283846,0.9059,0.7882,0.1177,0.0766,0.0175,0.1239,0.0082,0.5277,0.3706,0.3458,0.6209,0.0026,0.0003,0.4641,0.5094,0.028
+exploratory (after the G1 lock),dev,good,13,median_per_scan,48141,0.9992,0.9781,0.0209,0.0008,0.0,0.1189,0.0,0.8159,0.0742,0.0613,0.7216,0.0,0.0,0.6158,0.6226,0.0339
+exploratory (after the G1 lock),dev,all,20,pooled,1951190,0.8941,0.7431,0.151,0.0822,0.0236,0.1127,0.0671,0.5844,0.378,0.2722,0.4459,0.0307,0.1091,0.5764,0.6095,0.2966
+exploratory (after the G1 lock),dev,all,20,median_per_scan,40909,0.9919,0.9276,0.0645,0.0081,0.0,0.0827,0.0001,0.6149,0.0862,0.082,0.6823,0.0,0.0,0.6274,0.6434,0.234
+exploratory (after the G1 lock),test,bad,11,pooled,659212,0.6754,0.4485,0.2268,0.1983,0.1263,0.0399,0.0448,0.3147,0.0786,0.6373,0.8663,0.0082,0.0103,0.5591,0.59,0.4947
+exploratory (after the G1 lock),test,bad,11,median_per_scan,50898,0.7319,0.4821,0.225,0.1746,0.0876,0.0211,0.0022,0.3428,0.0424,0.5787,0.9289,0.0,0.0,0.4743,0.546,0.2224
+exploratory (after the G1 lock),test,false_alarm,6,pooled,484077,0.7388,0.5154,0.2233,0.1659,0.0953,0.0665,0.0637,0.4373,0.1458,0.478,0.7889,0.0182,0.0016,0.8956,0.8606,0.9947
+exploratory (after the G1 lock),test,false_alarm,6,median_per_scan,93811,0.7949,0.5771,0.2095,0.1346,0.0705,0.0214,0.0082,0.381,0.1108,0.3937,0.6796,0.0,0.0,0.8837,0.8384,0.9912
+exploratory (after the G1 lock),test,good,63,pooled,2725018,0.9729,0.9053,0.0676,0.0238,0.0032,0.1623,0.1233,0.701,0.1229,0.1235,0.5756,0.0132,0.1782,0.6484,0.6516,0.5338
+exploratory (after the G1 lock),test,good,63,median_per_scan,23362,0.9986,0.9679,0.0313,0.0008,0.0,0.1204,0.0113,0.7994,0.1471,0.0604,0.0,0.0,0.0,0.6529,0.6506,0.8113
+exploratory (after the G1 lock),test,all,80,pooled,3868307,0.8929,0.7787,0.1142,0.0713,0.0357,0.1294,0.0645,0.6022,0.107,0.2554,0.7909,0.013,0.0375,0.6641,0.6653,0.6543
+exploratory (after the G1 lock),test,all,80,median_per_scan,27008,0.994,0.9411,0.0504,0.006,0.0,0.1081,0.0053,0.777,0.0857,0.0698,0.4086,0.0,0.0,0.647,0.6533,0.7291

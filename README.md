@@ -150,6 +150,29 @@ the bad scans), and the G1 and heatmap tables as CSV and LaTeX (booktabs). Every
 results and model output (no new analysis); the script checks that the curve areas equal the evaluated AUCs.
 Sizes follow the ACM two-column template (3.33 in / 7 in), PDF with embedded fonts plus a PNG preview.
 
+### Exploratory follow-up analyses (after the G1 lock)
+
+Questions from the supervisor meeting of 2026-10-07, asked after the G1 choices were locked, so they are
+**exploratory** and report the dev and test sets separately. Both scripts only read saved predictions (no inference)
+and never change the locked G1 files. Settings: `exploratory:` in `configs/kits100.yaml`.
+
+```bash
+uv run python scripts/compare_models.py            --config configs/kits100.yaml   # ~10 min on a MacBook Air M5
+uv run python scripts/simulate_voxel_correction.py --config configs/kits100.yaml   # ~10 min
+```
+
+- `compare_models.py` (`src/segreview/model_comparison.py`): **the 6 mm model alone** (Dice of both models per
+  scan; stops if the 3 mm Dice differs from `dice.csv`; real finds and false alarms at the top of the locked queue),
+  and **where the 3 mm and 6 mm masks disagree**: by ground-truth label, by distance to the 3 mm mask's edge
+  (within `grid_band_mm` = the coarser grid; farther = a real difference), and which model is right.
+  Outputs: `model_dice_3mm_vs_6mm*.csv`, `queue_top_3mm_vs_6mm.csv`, `model_disagreement_*.csv`,
+  `figures/model_disagreement_where.png`.
+- `simulate_voxel_correction.py` (`src/segreview/voxel_correction.py`): **does fixing the most uncertain voxels
+  help?** In each scan the k % most uncertain voxels of the region (organ + border) are set to ground truth and the
+  Dice gain is measured, for entropy, |p_3mm - p_6mm|, distance to the edge, random order and an oracle. Outputs:
+  `voxel_correction_*.csv`, `figures/voxel_correction_gain.png`.
+- Each script writes the machine, library versions and git commit to `<name>_machine.json` next to its results.
+
 ## Running on the DTU HPC (not tested on the cluster yet)
 
 > **Untested.** The job scripts in `jobs/` follow the DTU HPC (LSF) documentation, and their commands have been run
@@ -289,7 +312,8 @@ uv run python scripts/g3_smoke_test.py --config configs/g3_smoke.yaml   # -> res
 
 ```
 configs/        one YAML config per environment; configs/datasets/ describes each dataset
-src/segreview/  shared code (config, data, weights, inference, augment, uncertainty, evaluation, figures, pipeline)
+src/segreview/  shared code (config, data, weights, inference, augment, uncertainty, evaluation, figures, pipeline,
+                model_comparison, voxel_correction, machine)
 scripts/        runnable pipeline steps
 jobs/           LSF job scripts for the DTU HPC (not tested on the cluster)
 ui/             review interface (G2): index.html, app.js (flow), viewer.js (slice viewer), style.css, vendor/niivue

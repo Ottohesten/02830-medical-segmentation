@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-19.*
+*Last updated: 2026-10-19 (follow-up analyses added).*
 
 | | |
 |---|---|
@@ -52,14 +52,22 @@ The usual trick (ask several copies of the same model) is impossible because onl
   as a secondary finding.
 - Limitation: errors the model is *confident* about (e.g. a kidney in the pelvis it never finds) cannot be caught by
   any uncertainty score.
-- Exploratory (2026-10-06, not yet in the repo): the 6 mm model is a bit worse than the 3 mm model on its own, and
-  4 of the top 10 in the queue are false alarms caused by the 6 mm model being wrong. See the log.
+- Exploratory follow-up (2026-10-19, after the lock; `scripts/compare_models.py`): the 6 mm model alone is a bit
+  worse than the 3 mm model (test median Dice 0.894 vs. 0.910; below 0.83 in 16 vs. 11 of 80 scans), and 4 of the
+  top 10 in the queue are false alarms caused by the 6 mm model being wrong (6 are real finds).
+- Where the two models disagree: about 89 % of the disagreeing voxels lie within 6 mm of the 3 mm outline, i.e. the
+  coarser grid. The remaining ~11 % are real differences, mostly tumor (79 % on test), and they concentrate in the
+  bad scans and the false alarms. So the score mixes a large grid effect with a smaller signal about tumors.
 
 ### G2 — interface and user study
 
 - Browser interface (NiiVue + small Python server), Chrome on a MacBook trackpad, English UI. The heatmap shows voxel
   entropy (chosen on the development set because it points best at wrong voxels). Known risk: it mostly lights up the
   edge of the outline.
+- Exploratory simulation (2026-10-19, `scripts/simulate_voxel_correction.py`): correcting the 10 % most uncertain
+  voxels by entropy raises Dice by 0.034 on average (test), slightly more than correcting by distance to the edge
+  (0.032), twice as much as by |p_3mm − p_6mm| (0.017), four times random order (0.008); a perfect order gives 0.067.
+  About 12 % (median scan) of the Dice gap lies outside the region the heatmap covers and can never be fixed this way.
 - Study: each participant corrects 3 scans with and 3 without the heatmap (balanced order, 5 min per scan), then
   fills in NASA-TLX (workload) after each condition. Outcome: (Dice after − Dice before) / minutes, compared with a
   paired Wilcoxon test. At least 16 participants (power simulation); group members only as pilots.
@@ -83,6 +91,7 @@ trained, so there is no result yet.
 | Review interface | `ui/` (`app.js` flow, `viewer.js` slice viewer) |
 | Tests | `tests/` (`uv run pytest`) |
 | G1 results (locked) | `results/kits100/` — `g1_metrics_clean_test.csv` is the final G1 result; `report/` has figures and LaTeX tables |
+| Exploratory follow-up (3 mm vs. 6 mm, simulated voxel correction) | `results/kits100/model_dice_3mm_vs_6mm*.csv`, `queue_top_3mm_vs_6mm.csv`, `model_disagreement_*.csv`, `voxel_correction_*.csv`, `figures/model_disagreement_where.png`, `figures/voxel_correction_gain.png` |
 | Heatmap evaluation | `results/kits100/heatmap_eval_*.csv` |
 | Power simulation | `results/study_kits/` |
 | User-study documents | `docs/study/` — session guide, consent form, pilot plan, analysis plan (locked after the pilot) |
@@ -119,11 +128,11 @@ The full working rules (git, branches, locked results, new experiments, what to 
 
 ## 6. Next steps (2026-10-19)
 
-1. Follow up on the 2026-10-07 meeting with Kristine (see the log): 6 mm alone, where 3 mm and 6 mm differ, simulated correction of the most uncertain voxels.
+1. Send Kristine the three follow-up results (6 mm alone, where 3 mm and 6 mm differ, simulated voxel correction;
+   see the log of 2026-10-19) and decide with the group what goes into the report (as exploratory results).
 2. Everyone installs the project and tries the demo (`README.md` → Quick start).
 3. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
-4. Add the 6 mm-alone analysis to the repo (answers part of Kristine's question about 3 mm vs. 6 mm).
-5. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.
-6. Create the mandatory Trello board; divide the report sections.
+4. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.
+5. Create the mandatory Trello board; divide the report sections.
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).
