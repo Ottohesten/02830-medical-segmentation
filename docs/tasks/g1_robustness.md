@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/robustness` |
 | **Created** | 2026-10-20 |
-| **Status** | Step 1 complete; step 2 next |
+| **Status** | Step 1 complete locally; push blocked by GitHub authentication |
 | **Target** | Steps 1–4 by 2026-10-30, all steps by 2026-11-13 |
 
 This document is the task description **and** the working notes. Whoever works on the task (with or without an
@@ -75,6 +75,12 @@ Tick each box when done and write the date and a short note (numbers + file path
     Verification took 85.78 s. File paths, byte counts, SHA-256 hashes, config hash, source commit, and machine
     details are in `results/robustness_setup/download_verification.json` (setup evidence only).
     No inference or evaluation was run, and no locked G1 files were changed. Data and weights remain outside git.
+  - 2026-10-20: Committed setup as `b2269e9` (`Complete Otto robustness setup`). Configured repository-local
+    Git identity from Otto's existing commits and authenticated GitHub profile because Git had no identity.
+    Push could not authenticate over HTTPS; the connected GitHub integration also rejected write access
+    (HTTP 403, "Resource not accessible by integration"). No remote branch or pull request was created.
+    After GitHub authentication is configured, run `git push -u origin otto/robustness`, then open a pull request
+    into `main` for group review. A follow-up local commit records this publication blocker.
   - G1 in two sentences: We run the 3 mm and 6 mm TotalSegmentator models on each CT scan and measure their
     disagreement about the kidneys. Scans with more disagreement go earlier in the review queue so a person
     can check likely segmentation errors first, without ground truth being used to rank them.
@@ -131,7 +137,10 @@ A new chat starts by reading this section.)*
 - 2026-10-20: **Step 1 complete** on `otto/robustness`: installation verified; tests 72 passed, 36 skipped,
   no failures; 100 KiTS image/label pairs and both model checkpoints downloaded and verified.
   Evidence: `results/robustness_setup/download_verification.json`. No inference or evaluation has been run.
-  Next action: explain step 2, check compute availability (PyTorch reports no CUDA and `nvidia-smi` cannot
+  **Publication pending:** local commit `b2269e9` exists, but HTTPS Git lacks credentials and the connected
+  GitHub integration lacks write access (403). First configure GitHub authentication, push `otto/robustness`,
+  and open a pull request into `main` for group review. Then explain step 2 and check compute availability
+  (PyTorch reports no CUDA and `nvidia-smi` cannot
   communicate with the driver in this environment), then prepare a separate `configs/kits_perturbed.yaml`
   with its own output name for a timing run on 2 development scans with 1 perturbation. Do not start a run
   expected to exceed 30 minutes without Otto's approval. Steps 2–7 are untouched.

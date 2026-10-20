@@ -430,6 +430,13 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   Next: explain step 2, check compute availability (`nvidia-smi` also cannot communicate with the driver in
   this environment), and prepare a separate timing config for 2 dev scans and 1 perturbation. Steps 2–7
   have not started; ask Otto before any run expected to exceed 30 minutes.
+- `[admin]` Committed setup on `otto/robustness` as `b2269e9` (`Complete Otto robustness setup`). Git initially
+  lacked an author identity; set repository-local identity to Otto's identity from existing commits, with
+  the email verified against his authenticated GitHub profile. HTTPS push then failed because command-line
+  Git has no credentials; publishing via the connected GitHub integration failed with HTTP 403
+  ("Resource not accessible by integration"). No remote branch or PR was created. A follow-up local commit
+  records this blocker. Next action: configure GitHub authentication, run `git push -u origin otto/robustness`,
+  and open a PR into `main` for group review before proceeding to step 2.
 
 ## Open questions (update when answered, with the date)
 
