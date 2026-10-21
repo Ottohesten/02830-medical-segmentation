@@ -1,0 +1,312 @@
+[scores] 1 / 200: case_00000 clean
+[scores] 2 / 200: case_00000 lowres_8mm
+[scores] 3 / 200: case_00020 clean
+[scores] 4 / 200: case_00020 lowres_8mm
+[scores] 5 / 200: case_00026 clean
+[scores] 6 / 200: case_00026 lowres_8mm
+[scores] 7 / 200: case_00033 clean
+[scores] 8 / 200: case_00033 lowres_8mm
+[scores] 9 / 200: case_00040 clean
+[scores] 10 / 200: case_00040 lowres_8mm
+[scores] 11 / 200: case_00044 clean
+[scores] 12 / 200: case_00044 lowres_8mm
+[scores] 13 / 200: case_00045 clean
+[scores] 14 / 200: case_00045 lowres_8mm
+[scores] 15 / 200: case_00046 clean
+[scores] 16 / 200: case_00046 lowres_8mm
+[scores] 17 / 200: case_00051 clean
+[scores] 18 / 200: case_00051 lowres_8mm
+[scores] 19 / 200: case_00053 clean
+[scores] 20 / 200: case_00053 lowres_8mm
+[scores] 21 / 200: case_00055 clean
+[scores] 22 / 200: case_00055 lowres_8mm
+[scores] 23 / 200: case_00061 clean
+[scores] 24 / 200: case_00061 lowres_8mm
+[scores] 25 / 200: case_00077 clean
+[scores] 26 / 200: case_00077 lowres_8mm
+[scores] 27 / 200: case_00079 clean
+[scores] 28 / 200: case_00079 lowres_8mm
+[scores] 29 / 200: case_00080 clean
+[scores] 30 / 200: case_00080 lowres_8mm
+[scores] 31 / 200: case_00083 clean
+[scores] 32 / 200: case_00083 lowres_8mm
+[scores] 33 / 200: case_00091 clean
+[scores] 34 / 200: case_00091 lowres_8mm
+[scores] 35 / 200: case_00096 clean
+[scores] 36 / 200: case_00096 lowres_8mm
+[scores] 37 / 200: case_00100 clean
+[scores] 38 / 200: case_00100 lowres_8mm
+[scores] 39 / 200: case_00107 clean
+[scores] 40 / 200: case_00107 lowres_8mm
+[scores] 41 / 200: case_00115 clean
+[scores] 42 / 200: case_00115 lowres_8mm
+[scores] 43 / 200: case_00120 clean
+[scores] 44 / 200: case_00120 lowres_8mm
+[scores] 45 / 200: case_00124 clean
+[scores] 46 / 200: case_00124 lowres_8mm
+[scores] 47 / 200: case_00131 clean
+[scores] 48 / 200: case_00131 lowres_8mm
+[scores] 49 / 200: case_00132 clean
+[scores] 50 / 200: case_00132 lowres_8mm
+[scores] 51 / 200: case_00135 clean
+[scores] 52 / 200: case_00135 lowres_8mm
+[scores] 53 / 200: case_00138 clean
+[scores] 54 / 200: case_00138 lowres_8mm
+[scores] 55 / 200: case_00140 clean
+[scores] 56 / 200: case_00140 lowres_8mm
+[scores] 57 / 200: case_00145 clean
+[scores] 58 / 200: case_00145 lowres_8mm
+[scores] 59 / 200: case_00152 clean
+[scores] 60 / 200: case_00152 lowres_8mm
+[scores] 61 / 200: case_00154 clean
+[scores] 62 / 200: case_00154 lowres_8mm
+[scores] 63 / 200: case_00159 clean
+[scores] 64 / 200: case_00159 lowres_8mm
+[scores] 65 / 200: case_00164 clean
+[scores] 66 / 200: case_00164 lowres_8mm
+[scores] 67 / 200: case_00168 clean
+[scores] 68 / 200: case_00168 lowres_8mm
+[scores] 69 / 200: case_00178 clean
+[scores] 70 / 200: case_00178 lowres_8mm
+[scores] 71 / 200: case_00180 clean
+[scores] 72 / 200: case_00180 lowres_8mm
+[scores] 73 / 200: case_00184 clean
+[scores] 74 / 200: case_00184 lowres_8mm
+[scores] 75 / 200: case_00185 clean
+[scores] 76 / 200: case_00185 lowres_8mm
+[scores] 77 / 200: case_00192 clean
+[scores] 78 / 200: case_00192 lowres_8mm
+[scores] 79 / 200: case_00198 clean
+[scores] 80 / 200: case_00198 lowres_8mm
+[scores] 81 / 200: case_00203 clean
+[scores] 82 / 200: case_00203 lowres_8mm
+[scores] 83 / 200: case_00211 clean
+[scores] 84 / 200: case_00211 lowres_8mm
+[scores] 85 / 200: case_00217 clean
+[scores] 86 / 200: case_00217 lowres_8mm
+[scores] 87 / 200: case_00222 clean
+[scores] 88 / 200: case_00222 lowres_8mm
+[scores] 89 / 200: case_00228 clean
+[scores] 90 / 200: case_00228 lowres_8mm
+[scores] 91 / 200: case_00231 clean
+[scores] 92 / 200: case_00231 lowres_8mm
+[scores] 93 / 200: case_00236 clean
+[scores] 94 / 200: case_00236 lowres_8mm
+[scores] 95 / 200: case_00246 clean
+[scores] 96 / 200: case_00246 lowres_8mm
+[scores] 97 / 200: case_00247 clean
+[scores] 98 / 200: case_00247 lowres_8mm
+[scores] 99 / 200: case_00249 clean
+[scores] 100 / 200: case_00249 lowres_8mm
+[scores] 101 / 200: case_00258 clean
+[scores] 102 / 200: case_00258 lowres_8mm
+[scores] 103 / 200: case_00259 clean
+[scores] 104 / 200: case_00259 lowres_8mm
+[scores] 105 / 200: case_00260 clean
+[scores] 106 / 200: case_00260 lowres_8mm
+[scores] 107 / 200: case_00261 clean
+[scores] 108 / 200: case_00261 lowres_8mm
+[scores] 109 / 200: case_00271 clean
+[scores] 110 / 200: case_00271 lowres_8mm
+[scores] 111 / 200: case_00280 clean
+[scores] 112 / 200: case_00280 lowres_8mm
+[scores] 113 / 200: case_00283 clean
+[scores] 114 / 200: case_00283 lowres_8mm
+[scores] 115 / 200: case_00284 clean
+[scores] 116 / 200: case_00284 lowres_8mm
+[scores] 117 / 200: case_00291 clean
+[scores] 118 / 200: case_00291 lowres_8mm
+[scores] 119 / 200: case_00292 clean
+[scores] 120 / 200: case_00292 lowres_8mm
+[scores] 121 / 200: case_00293 clean
+[scores] 122 / 200: case_00293 lowres_8mm
+[scores] 123 / 200: case_00295 clean
+[scores] 124 / 200: case_00295 lowres_8mm
+[scores] 125 / 200: case_00298 clean
+[scores] 126 / 200: case_00298 lowres_8mm
+[scores] 127 / 200: case_00406 clean
+[scores] 128 / 200: case_00406 lowres_8mm
+[scores] 129 / 200: case_00407 clean
+[scores] 130 / 200: case_00407 lowres_8mm
+[scores] 131 / 200: case_00426 clean
+[scores] 132 / 200: case_00426 lowres_8mm
+[scores] 133 / 200: case_00436 clean
+[scores] 134 / 200: case_00436 lowres_8mm
+[scores] 135 / 200: case_00438 clean
+[scores] 136 / 200: case_00438 lowres_8mm
+[scores] 137 / 200: case_00443 clean
+[scores] 138 / 200: case_00443 lowres_8mm
+[scores] 139 / 200: case_00453 clean
+[scores] 140 / 200: case_00453 lowres_8mm
+[scores] 141 / 200: case_00456 clean
+[scores] 142 / 200: case_00456 lowres_8mm
+[scores] 143 / 200: case_00457 clean
+[scores] 144 / 200: case_00457 lowres_8mm
+[scores] 145 / 200: case_00460 clean
+[scores] 146 / 200: case_00460 lowres_8mm
+[scores] 147 / 200: case_00465 clean
+[scores] 148 / 200: case_00465 lowres_8mm
+[scores] 149 / 200: case_00467 clean
+[scores] 150 / 200: case_00467 lowres_8mm
+[scores] 151 / 200: case_00470 clean
+[scores] 152 / 200: case_00470 lowres_8mm
+[scores] 153 / 200: case_00481 clean
+[scores] 154 / 200: case_00481 lowres_8mm
+[scores] 155 / 200: case_00482 clean
+[scores] 156 / 200: case_00482 lowres_8mm
+[scores] 157 / 200: case_00487 clean
+[scores] 158 / 200: case_00487 lowres_8mm
+[scores] 159 / 200: case_00511 clean
+[scores] 160 / 200: case_00511 lowres_8mm
+[scores] 161 / 200: case_00516 clean
+[scores] 162 / 200: case_00516 lowres_8mm
+[scores] 163 / 200: case_00525 clean
+[scores] 164 / 200: case_00525 lowres_8mm
+[scores] 165 / 200: case_00526 clean
+[scores] 166 / 200: case_00526 lowres_8mm
+[scores] 167 / 200: case_00528 clean
+[scores] 168 / 200: case_00528 lowres_8mm
+[scores] 169 / 200: case_00536 clean
+[scores] 170 / 200: case_00536 lowres_8mm
+[scores] 171 / 200: case_00544 clean
+[scores] 172 / 200: case_00544 lowres_8mm
+[scores] 173 / 200: case_00546 clean
+[scores] 174 / 200: case_00546 lowres_8mm
+[scores] 175 / 200: case_00550 clean
+[scores] 176 / 200: case_00550 lowres_8mm
+[scores] 177 / 200: case_00554 clean
+[scores] 178 / 200: case_00554 lowres_8mm
+[scores] 179 / 200: case_00559 clean
+[scores] 180 / 200: case_00559 lowres_8mm
+[scores] 181 / 200: case_00562 clean
+[scores] 182 / 200: case_00562 lowres_8mm
+[scores] 183 / 200: case_00563 clean
+[scores] 184 / 200: case_00563 lowres_8mm
+[scores] 185 / 200: case_00566 clean
+[scores] 186 / 200: case_00566 lowres_8mm
+[scores] 187 / 200: case_00574 clean
+[scores] 188 / 200: case_00574 lowres_8mm
+[scores] 189 / 200: case_00575 clean
+[scores] 190 / 200: case_00575 lowres_8mm
+[scores] 191 / 200: case_00579 clean
+[scores] 192 / 200: case_00579 lowres_8mm
+[scores] 193 / 200: case_00580 clean
+[scores] 194 / 200: case_00580 lowres_8mm
+[scores] 195 / 200: case_00582 clean
+[scores] 196 / 200: case_00582 lowres_8mm
+[scores] 197 / 200: case_00585 clean
+[scores] 198 / 200: case_00585 lowres_8mm
+[scores] 199 / 200: case_00587 clean
+[scores] 200 / 200: case_00587 lowres_8mm
+[dice] 2 / 200
+[dice] 4 / 200
+[dice] 6 / 200
+[dice] 8 / 200
+[dice] 10 / 200
+[dice] 12 / 200
+[dice] 14 / 200
+[dice] 16 / 200
+[dice] 18 / 200
+[dice] 20 / 200
+[dice] 22 / 200
+[dice] 24 / 200
+[dice] 26 / 200
+[dice] 28 / 200
+[dice] 30 / 200
+[dice] 32 / 200
+[dice] 34 / 200
+[dice] 36 / 200
+[dice] 38 / 200
+[dice] 40 / 200
+[dice] 42 / 200
+[dice] 44 / 200
+[dice] 46 / 200
+[dice] 48 / 200
+[dice] 50 / 200
+[dice] 52 / 200
+[dice] 54 / 200
+[dice] 56 / 200
+[dice] 58 / 200
+[dice] 60 / 200
+[dice] 62 / 200
+[dice] 64 / 200
+[dice] 66 / 200
+[dice] 68 / 200
+[dice] 70 / 200
+[dice] 72 / 200
+[dice] 74 / 200
+[dice] 76 / 200
+[dice] 78 / 200
+[dice] 80 / 200
+[dice] 82 / 200
+[dice] 84 / 200
+[dice] 86 / 200
+[dice] 88 / 200
+[dice] 90 / 200
+[dice] 92 / 200
+[dice] 94 / 200
+[dice] 96 / 200
+[dice] 98 / 200
+[dice] 100 / 200
+[dice] 102 / 200
+[dice] 104 / 200
+[dice] 106 / 200
+[dice] 108 / 200
+[dice] 110 / 200
+[dice] 112 / 200
+[dice] 114 / 200
+[dice] 116 / 200
+[dice] 118 / 200
+[dice] 120 / 200
+[dice] 122 / 200
+[dice] 124 / 200
+[dice] 126 / 200
+[dice] 128 / 200
+[dice] 130 / 200
+[dice] 132 / 200
+[dice] 134 / 200
+[dice] 136 / 200
+[dice] 138 / 200
+[dice] 140 / 200
+[dice] 142 / 200
+[dice] 144 / 200
+[dice] 146 / 200
+[dice] 148 / 200
+[dice] 150 / 200
+[dice] 152 / 200
+[dice] 154 / 200
+[dice] 156 / 200
+[dice] 158 / 200
+[dice] 160 / 200
+[dice] 162 / 200
+[dice] 164 / 200
+[dice] 166 / 200
+[dice] 168 / 200
+[dice] 170 / 200
+[dice] 172 / 200
+[dice] 174 / 200
+[dice] 176 / 200
+[dice] 178 / 200
+[dice] 180 / 200
+[dice] 182 / 200
+[dice] 184 / 200
+[dice] 186 / 200
+[dice] 188 / 200
+[dice] 190 / 200
+[dice] 192 / 200
+[dice] 194 / 200
+[dice] 196 / 200
+[dice] 198 / 200
+[dice] 200 / 200
+[evaluate] clean_dev / worst10: 20 rows, 20 patients
+[evaluate] clean_dev / dice_below_083: 20 rows, 20 patients
+[evaluate] lowres_8mm_dev / worst10: 20 rows, 20 patients
+[evaluate] lowres_8mm_dev / dice_below_083: 20 rows, 20 patients
+[evaluate] mixed_dev / worst10: 40 rows, 20 patients
+[evaluate] mixed_dev / dice_below_083: 40 rows, 20 patients
+[evaluate] clean_test / worst10: 80 rows, 80 patients
+[evaluate] clean_test / dice_below_083: 80 rows, 80 patients
+[evaluate] lowres_8mm_test / worst10: 80 rows, 80 patients
+[evaluate] lowres_8mm_test / dice_below_083: 80 rows, 80 patients
+[evaluate] mixed_test / worst10: 160 rows, 80 patients
+[evaluate] mixed_test / dice_below_083: 160 rows, 80 patients

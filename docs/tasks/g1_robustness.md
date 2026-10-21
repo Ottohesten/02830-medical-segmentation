@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/robustness` |
 | **Created** | 2026-10-20 |
-| **Status** | Step 4 complete; 320 test predictions verified; Dice and scoring await step 5 |
+| **Status** | Step 5 complete; resolution degradation evaluated; report figure/summary next |
 | **Target** | Steps 1–4 by 2026-10-30, all steps by 2026-11-13 |
 
 This document is the task description **and** the working notes. Whoever works on the task (with or without an
@@ -282,7 +282,7 @@ Tick each box when done and write the date and a short note (numbers + file path
     Next: publish this step on `otto/robustness` to update PR #1, then explain step 5.
     Use Otto's authenticated terminal for the push if noninteractive HTTPS authentication is still unavailable.
 
-- [ ] **5. Evaluate.** With the existing G1 evaluation (`scripts/evaluate_g1.py`), report clean and perturbed
+- [x] **5. Evaluate.** With the existing G1 evaluation (`scripts/evaluate_g1.py`), report clean and perturbed
   separately, for development and test:
   - How much does Dice drop per perturbation (median, and how many scans become "bad", Dice < 0.83)?
   - Does the score rise when Dice falls? Per scan: change in score vs. change in Dice from clean to perturbed
@@ -290,6 +290,115 @@ Tick each box when done and write the date and a short note (numbers + file path
   - Mixed queue: clean and perturbed scans together. Do the damaged scans move to the top? Review-AUC vs. the
     volume baseline, random and oracle, as in G1.
   *Notes:*
+  - 2026-10-21: Otto requested step 5. Prepared `configs/kits_robustness_eval.yaml`,
+    `scripts/evaluate_robustness.py`, and `src/segreview/robustness_evaluation.py`; own output folders
+    `results/kits_robustness_eval/` and `data/predictions/kits_robustness_eval/`.
+    Fixed analysis saved before outcomes in `analysis_plan.json` / `run_config.yaml` in that result folder.
+    Use only `lowres_8mm`, primary `model_diff_mean_region`, secondary `entropy_mean_region`, and volume,
+    random, oracle baselines. Keep both original G1 bad rules; Dice < 0.83 is the task's fixed bad threshold.
+  - 2026-10-21: Sign convention fixed: `dice_drop = clean - perturbed`,
+    `score_change = perturbed - clean`; a positive Spearman rho supports sensitivity to deterioration.
+    Report median paired drop and clean/perturbed medians separately, bad/new-bad/recovered counts,
+    for both models and both splits. Report paired score-change correlations with patient bootstrap CIs.
+  - 2026-10-21: Reuse the existing G1 `evaluate_methods` engine (also called by `scripts/evaluate_g1.py`)
+    for clean, lowres, and mixed queues, separately for dev/test. Use existing 2,000 bootstrap samples,
+    1,000 random orders, 95% intervals, seed 42. Extended the engine with optional patient grouping;
+    default G1 behavior is unchanged. In mixed queues, resample case IDs with both views together;
+    omit independent-row rho p-values. Bad flags follow the existing full-queue G1 definition through
+    bootstrap. Queue top 10% and average-rank shifts use fair ties, fixed before outcomes.
+  - 2026-10-21: Preparation copies/hash-checks 720 selected maps (80 test × 2 variants × 4 maps;
+    20 dev × 2 variants × 2 main-model maps), then predicts only the missing **40 dev second-model pairs**.
+    Their rough size-scaled estimate is **6.61 min**, from step 4's measured second-model wall time and
+    recorded dev/test voxel totals. Each stage has a **30-minute cap**; ask Otto before longer runs/extensions.
+    Then time GT-free scoring on the two configured dev cases plus a synthetic G1 queue to project the CPU
+    stage before reading test scores or labels. No new downloads or test inference are needed.
+  - 2026-10-21: Added 10 synthetic tests for paired signs/counts, incomplete/mismatched pairs,
+    patient bootstrap, split-specific queues, unchanged G1 point AUCs, GT-free score equivalence, and locked
+    score validation. Shared suite: **123 passed, 36 skipped**, 8 expected constant-input warnings from tiny
+    synthetic correlations, 2.63 s. `results/kits_robustness_eval/preflight_tests_main.txt`.
+    Step remains open pending preparation, timing, evaluation, final verification, and publication.
+  - 2026-10-21: Preparation completed in **404.57 s / 6.74 min**: 720 archived input maps copied and
+    checksum-verified, 40 missing dev second-model pairs inferred, **800 maps** in the new experiment.
+    `results/kits_robustness_eval/{prepare_machine.json,prepare_log.txt,imported_predictions.csv,
+    second_model_times.csv,prediction_manifest.csv}`. Peak allocated GPU **496.21 MiB**, RSS **7,241.65 MiB**.
+  - 2026-10-21: CPU benchmark completed before test scoring/labels: projected evaluation **15.34 min**
+    including a 1.5 runtime safety factor. Size-scaled score proxy 315.49 s; synthetic largest-queue evaluation
+    8.16 s × 12 analyses; Dice allowance 2 s × 100 cases. This is a timing estimate, not an accuracy result.
+    Evidence: `results/kits_robustness_eval/{benchmark_times.csv,benchmark_machine.json,runtime_projection.json}`.
+    Proceed with the fixed evaluation under its existing **30-minute cap**; no longer-run approval is needed
+    for this estimate. No choices changed after benchmarking.
+  - 2026-10-21: **Evaluation completed in 722.97 s / 12.05 min**, within the 30-minute cap;
+    the benchmark took 12.13 s. Scored all model maps without labels first, then read labels for Dice.
+    CPU: AMD Ryzen 5 7500F, Linux, Python 3.12.15, torch 2.7.1+cu128 / CUDA build 12.8, 6 threads, seed 42.
+    CPU evaluation used no GPU; peak RSS **6,413.74 MiB**. GPU preparation used RTX 5060 Ti /
+    driver 615.78.08. Separate stage metadata records baseline commit `6fde679`, dirty run-code state,
+    exact config/source hashes, machine/library versions, time, and memory in
+    `results/kits_robustness_eval/{prepare,benchmark,evaluate}_machine.json`.
+  - 2026-10-21: Dice results (paired drop is the median of each scan's clean minus perturbed Dice,
+    not the difference between the two medians):
+
+    | Split | Model | Clean median | Lowres median | Median paired drop | Bad clean → lowres | Newly bad |
+    |---|---|---:|---:|---:|---:|---:|
+    | Dev (20) | 3 mm | 0.90330 | 0.86700 | 0.02795 | 4 → 6 | 2 |
+    | Dev (20) | 6 mm | 0.89510 | 0.89415 | 0.00745 | 7 → 7 | 0 |
+    | Test (80) | 3 mm | 0.90955 | 0.87865 | 0.03010 | 11 → 21 | 10 |
+    | Test (80) | 6 mm | 0.89430 | 0.88685 | 0.00855 | 16 → 16 | 0 |
+
+    No bad segmentations recovered in these groups. Test main-model Dice fell in **77/80** cases.
+    Sources: `results/kits_robustness_eval/{dice.csv,dice_per_model.csv,dice_degradation.csv,paired_changes.csv}`.
+  - 2026-10-21: Paired change results, primary first; positive rho means score rises with Dice loss:
+
+    | Split | Score | Change rho [95% bootstrap CI] | Score rises | Median score change |
+    |---|---|---|---:|---:|
+    | Dev | Model disagreement | -0.074 [-0.529, 0.415] | 9/20 | -0.000463 |
+    | Dev | Entropy (secondary) | 0.575 [0.104, 0.894] | 20/20 | 0.037025 |
+    | Dev | Negative volume | 0.849 [0.532, 0.980] | 16/20 | 11.296365 |
+    | Test | Model disagreement | 0.215 [-0.036, 0.459] | 41/80 | 0.000611 |
+    | Test | Entropy (secondary) | 0.243 [0.004, 0.473] | 79/80 | 0.046093 |
+    | Test | Negative volume | 0.743 [0.597, 0.845] | 70/80 | 13.950788 |
+
+    Source: `results/kits_robustness_eval/change_correlations.csv`; all CIs use 2,000 finite patient resamples.
+    The primary change-correlation interval includes zero: this does not establish a clear response to
+    degradation severity. Entropy has a modest positive secondary association; it remains secondary.
+    No superiority test between primary and entropy or adjustment for multiple comparisons was added.
+  - 2026-10-21: G1 review-AUC under the task's **Dice < 0.83** rule:
+
+    | Queue | Bad views | Primary | Entropy | Volume | Random | Oracle |
+    |---|---:|---:|---:|---:|---:|---:|
+    | Clean dev | 4/20 | 0.7625 | 0.6875 | 0.5500 | 0.4978 | 0.9000 |
+    | Lowres dev | 6/20 | 0.7917 | 0.7167 | 0.5917 | 0.4969 | 0.8500 |
+    | Mixed dev | 10/40 | 0.7800 | 0.7250 | 0.5725 | 0.4964 | 0.8750 |
+    | Clean test | 11/80 | 0.8313 | 0.8949 | 0.3903 | 0.5045 | 0.9313 |
+    | Lowres test | 21/80 | 0.7967 | 0.7455 | 0.4926 | 0.5018 | 0.8688 |
+    | Mixed test | 32/160 | 0.8086 | 0.8068 | 0.4648 | 0.5030 | 0.9000 |
+
+    Primary minus volume on lowres test: **0.3042 [0.1490, 0.4709]**; mixed test:
+    **0.3438 [0.1795, 0.5052]**. Mixed primary AUC CI **[0.7374, 0.8830]**.
+    These support failure ranking beyond volume under the fixed threshold rule.
+    Raw AUC ceilings change with bad prevalence; compare random/oracle references as well as raw AUC.
+    Under **worst10**, primary test AUC is **0.8547 clean / 0.8047 lowres / 0.8520 mixed**;
+    lowres minus volume CI **[-0.1090, 0.6876]** includes zero. Do not claim superiority for every bad rule.
+    Source: `results/kits_robustness_eval/g1_metrics.csv`. The original locked G1 headline uses worst10,
+    so its 0.855 must not be confused with the Dice-threshold clean AUC here.
+  - 2026-10-21: Mixed test queue has **160 views from 80 cases**, not 160 independent patients.
+    In the top 16 (10%), **7/16** are lowres for the primary score, **13/16** for entropy, **8/16** for volume.
+    Median paired rank gain: **2.0 / 55.5 / 6.0**, respectively. At that point the primary finds **12/32** bad
+    segmentations, entropy **13/32**, volume **4/32**. Finding failures and promoting all degraded views
+    are different outcomes: the primary still ranks failures usefully but does not consistently increase
+    for degradation. Entropy responds more consistently to the image change without a higher mixed AUC
+    point estimate. Sources: `results/kits_robustness_eval/{queue_top_summary.csv,queue_rank_changes.csv,g1_curves.csv}`.
+  - 2026-10-21: Verification passed: **100 cases, 200 score rows, 400 model Dice rows, 100 paired rows,
+    60 metric rows, 800 prediction files / 424,973,659 bytes**; all **720 imported originals unchanged**;
+    exact cohort/key coverage and config/source/stage hashes match the pre-outcome plan.
+    `results/kits_robustness_eval/{verification.json,post_run_checks.json,prediction_manifest.csv,key_results.json}`.
+    Run `PYTHONPATH=src:. .venv-gpu/bin/python results/kits_robustness_eval/report_source.py --config configs/kits_robustness_eval.yaml`
+    to reproduce the artifact audit and key-result extraction without rescoring/rebootstrapping.
+    Logs have normalized terminal progress line endings/trailing spaces. Prediction maps stay outside Git.
+    Completed inference configs/results, development strength evidence, and locked G1 outputs are unchanged.
+  - 2026-10-21: Final suites in both environments: **123 passed, 36 skipped**, 8 expected constant-input
+    warnings from the tiny synthetic tests (3.03 s shared, 3.04 s GPU).
+    `results/kits_robustness_eval/tests_{main,gpu}.txt`. Step 5 complete; publish its commit on
+    `otto/robustness` to update PR #1, then explain step 6. No report figure or step 6 summary written yet.
 
 - [ ] **6. One figure and a short summary.** One figure that answers the question at a glance, and a summary of
   5–10 lines in this document (section 4) and in the log. Bjørn uses it for the report.
@@ -338,6 +447,10 @@ Tick each box when done and write the date and a short note (numbers + file path
   No answer from Bjørn is recorded. Any later expansion must be logged with its timing relative to test use.
   Follow-up after step 4, 2026-10-21: 320 test predictions are now saved for the locked resolution-only
   experiment. No Dice, score results, or ranking evaluation has been inspected; section 6 remains unanswered.
+  Follow-up after step 5, 2026-10-21: the fixed resolution-only test evaluation is complete. Primary ranking
+  remains useful under Dice < 0.83, but paired score response is inconclusive; entropy is a secondary result.
+  Test outcomes have now been inspected. Any expansion must be logged with that timing and must not be
+  presented as part of the original untouched test. No answer from Bjørn is recorded.
 
 ## 7. Where we are
 
@@ -404,11 +517,31 @@ A new chat starts by reading this section.)*
   provenance, memory, file hashes, and passing tests are under `results/kits_robustness_test/`;
   predictions are outside Git in `data/predictions/kits_robustness_test/`.
   No test ground truth, Dice, uncertainty scores, or ranking evaluation was read/computed.
-  **Next action:** commit/push this completed step on `otto/robustness` (Otto's terminal if HTTPS credentials
-  remain unavailable), then explain step 5: compare clean/lowres Dice and the locked scores using saved maps.
+  **Next action:** explain step 5: compare clean/lowres Dice and the locked scores using saved maps.
   For development comparisons, reuse the chosen 3 mm maps and obtain the 6 mm clean/lowres maps for all 20 dev
   scans before scoring. Keep the locked strength and primary/secondary scores. Steps 5–7 have not started.
   Bjørn's report-scope question in section 6 remains unanswered; no message was sent.
-  **Git:** the completed step is committed locally. The assistant's push failed because noninteractive
-  HTTPS Git cannot read a GitHub username. Otto must run `git push origin otto/robustness` from his
-  authenticated terminal to publish the commit and update PR #1. The worktree is clean after committing.
+  **Push confirmed, 2026-10-21:** GitHub's `otto/robustness` points to `6fde679`, matching local HEAD and
+  publishing the completed step 4 to PR #1. This status confirmation will accompany the next work commit.
+- 2026-10-21: **Step 5 in progress.** Pre-outcome analysis config/plan, paired summaries, patient-grouped
+  G1 bootstrap, and 10 synthetic tests are ready; no new scores or Dice inspected yet.
+  Next: copy the selected dev/test maps into `kits_robustness_eval`, infer the missing 40 dev second-model
+  pairs (estimate 6.61 min, cap 30 min), then benchmark CPU scoring/evaluation before starting the full
+  evaluation. Ask Otto if a stage is projected over 30 min. Fixed choices and analysis details are in step 5
+  and `results/kits_robustness_eval/analysis_plan.json`. Steps 6–7 have not started.
+- 2026-10-21: **Step 5 evaluation starting.** Preparation complete (800 maps; 6.74 min). CPU benchmark
+  projects 15.34 min, within the 30-minute stage cap. Next: compute the fixed scores from model maps first,
+  then Dice, paired changes, and split-specific G1 queues with patient bootstrap. No strengths or methods
+  will be selected from test outcomes. Evidence remains under `results/kits_robustness_eval/`.
+- 2026-10-21: **Steps 1–5 complete.** Evaluation took 12.05 min after 6.74 min dev-map preparation.
+  Test 3 mm median paired Dice drop **0.03010**, bad count **11 → 21/80**. Primary change rho **0.215
+  [-0.036, 0.459]** is inconclusive; primary mixed threshold review-AUC **0.8086** versus volume **0.4648**,
+  random **0.5030**, oracle **0.9000**. Entropy rises in 79/80 cases and promotes more lowres views, but
+  mixed AUC is similar (0.8068). Full dev/test results, both bad rules, CIs, hashes, and 123-pass test logs:
+  `results/kits_robustness_eval/`. Inputs and locked results remain intact; test outcomes are now inspected.
+  **Next action:** commit/push step 5 on `otto/robustness` (Otto's authenticated terminal if needed), then
+  explain step 6 and build one report figure plus the requested 5–10-line summary. Keep the fixed methods
+  and resolution-only scope; section 6's report-scope question is still unanswered. Steps 6–7 have not started.
+  **Git:** step 5 is committed locally. The assistant's push failed because noninteractive HTTPS Git
+  cannot read a GitHub username. Otto must run `git push origin otto/robustness` from his authenticated
+  terminal to publish the completed step. This status is included in the same unpublished work commit.

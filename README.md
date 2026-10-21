@@ -295,6 +295,67 @@ Step 5 has not started: no test labels, Dice, uncertainty scores, or ranking eva
 The copied `strength_lock` metadata describes the development-lock moment; actual test-inference status is
 recorded in `machine.json`. Development comparisons still require second-model clean/lowres maps for all 20 dev scans.
 
+## Robustness Dice, score changes, and queues (step 5)
+
+`configs/kits_robustness_eval.yaml` fixes the analysis before outcomes: original 20 dev / 80 test patients,
+clean + lowres_8mm, locked primary model disagreement and secondary entropy, volume/random/oracle baselines.
+The runner copies selected saved maps into its own prediction folder and predicts only the 40 missing
+development second-model pairs. Neither completed inference experiment nor locked G1 output is overwritten.
+
+Run the stages separately from the repository root, using `.venv-gpu/` (host GPU access for `--prepare`):
+
+```bash
+PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python scripts/evaluate_robustness.py --config configs/kits_robustness_eval.yaml --plan
+PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python -u scripts/evaluate_robustness.py --config configs/kits_robustness_eval.yaml --prepare
+PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python -u scripts/evaluate_robustness.py --config configs/kits_robustness_eval.yaml --benchmark
+# Read runtime_projection.json; ask Otto before any stage expected to exceed 30 minutes.
+PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python -u scripts/evaluate_robustness.py --config configs/kits_robustness_eval.yaml --evaluate
+```
+
+`--plan` seals the config, source hashes, case IDs, analysis signs, and bootstrap policy before outcomes.
+Each stage has a 30-minute cap. Stage metadata refuses accidental repeated execution; inspect status before
+any deliberate recovery. `--benchmark` times scoring on two dev cases without retaining their scores and
+times G1 on a synthetic largest queue. It writes a conservative runtime proxy, not a measured full-run result.
+
+`--evaluate` computes scores with the existing G1 `scan_scores` from saved model maps only, before reading
+labels. It then saves Dice per view and per model, paired Dice/score changes, degradation and correlation
+summaries, and G1 queue metrics/curves. `dice_drop = clean - perturbed`; `score_change = perturbed - clean`,
+so positive Spearman change correlation supports detection. Ordinary score-vs-Dice G1 rho retains its
+negative-is-good convention. An undefined constant-input correlation is reported as NaN.
+
+Clean, lowres, and mixed queues are reported separately for dev and test. Queue metrics use the same
+`evaluate_methods` engine as `scripts/evaluate_g1.py`, the original two bad rules, 2,000 bootstrap samples,
+1,000 random orders, 95% intervals, and seed 42. Mixed queues resample patient IDs with both views retained;
+their asymptotic independent-row rho p-values are omitted. Default ungrouped G1 behavior is unchanged.
+Bad flags are defined in the full queue and retained in bootstrap, as in the original G1 engine. Random
+baseline intervals show spread across random orders. Top-10% shares and rank shifts handle ties fairly.
+
+Outputs are under `results/kits_robustness_eval/`: `analysis_plan.json`, `*_machine.json`,
+`imported_predictions.csv`, `prediction_manifest.csv`, `scores.csv`, `dice.csv`, `dice_per_model.csv`,
+`paired_changes.csv`, `dice_degradation.csv`, `change_correlations.csv`, `g1_metrics.csv`, `g1_curves.csv`,
+`queue_rank_changes.csv`, `queue_top_summary.csv`, and `verification.json`. Prediction maps stay outside Git
+in `data/predictions/kits_robustness_eval/`. Step 6 will create the single report figure and short summary.
+
+The completed step 5 preparation took **6.74 min** on GPU, followed by a **12.05 min** CPU evaluation
+(30-minute caps; no extension). Final suites: **123 passed, 36 skipped** in both environments; eight
+expected constant-input warnings come from the tiny synthetic tests. The artifact audit verifies 100 cases,
+200 scores, 400 model Dice rows, 100 paired rows, 60 metrics, 800 saved maps, and 720 unchanged archived inputs.
+
+On the 80 test cases, main-model median paired Dice loss is 0.03010 and Dice < 0.83 rises from 11 to 21.
+Primary change rho is 0.215 [-0.036, 0.459]; mixed threshold review-AUC is 0.8086 versus volume 0.4648,
+random 0.5030, oracle 0.9000. Entropy rises in 79/80 cases, but mixed AUC is similar (0.8068).
+Under worst10 the primary lowres-vs-volume interval includes zero; the full results retain both bad rules.
+Failure ranking and promoting degraded views are distinct outcomes. No method was changed after test results.
+
+Reproduce the post-run audit and `key_results.json` extraction from saved artifacts:
+
+```bash
+PYTHONPATH=src:. MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python results/kits_robustness_eval/report_source.py --config configs/kits_robustness_eval.yaml
+```
+
+`post_run_checks.json` checks exact cohort/variant/model coverage, source/config/stage hashes, prediction
+hashes, and mixed patient grouping. It does not rerun model inference or bootstrap analysis.
+
 ## Running on the DTU HPC (not tested on the cluster yet)
 
 > **Untested.** The job scripts in `jobs/` follow the DTU HPC (LSF) documentation, and their commands have been run

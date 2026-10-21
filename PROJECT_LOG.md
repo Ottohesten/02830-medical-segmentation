@@ -662,6 +662,102 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   from his authenticated terminal to update PR #1. Included this publication status in the same unpublished
   step commit; no extra status-only push is needed. The worktree is clean after committing.
 
+- `[admin]` Otto reported pushing step 4. Verified with `git ls-remote --heads origin otto/robustness`
+  that GitHub has `6fde679b767edb196503c33c4f9119c2664a001d`, matching local HEAD and publishing step 4
+  to PR #1. Updated "Where we are"; this administrative confirmation will accompany the next work commit.
+  Next: explain step 5. No additional inference, Dice, or uncertainty evaluation was started.
+
+- `[decision]` Otto requested robustness step 5. Before inspecting new scores or test Dice, saved the fixed
+  analysis in `configs/kits_robustness_eval.yaml` and `results/kits_robustness_eval/{analysis_plan.json,run_config.yaml}`.
+  Keep lowres_8mm, primary model_diff_mean_region, secondary entropy_mean_region; compare with volume/random/oracle.
+  Dice drop = clean minus perturbed; score rise = perturbed minus clean; positive change-correlation rho supports
+  deterioration sensitivity. Clean/lowres/mixed queues and paired summaries stay separate for dev and test.
+- `[decision]` Reuse G1's `evaluate_methods` engine with 2,000 bootstrap samples, 1,000 random orders, 95% CIs,
+  seed 42, and both original bad rules (task threshold Dice < 0.83). Mixed queues bootstrap case IDs with both
+  views retained; no independent-row rho p-value. Full-queue bad flags stay fixed through bootstrap, as in G1.
+  Top-10% perturbed share and average-rank shift use fair ties. No new score selection or combinations.
+  Files: `src/segreview/{evaluation,robustness_evaluation}.py`, `scripts/evaluate_robustness.py`.
+- `[experiment]` Step 5 preparation will copy/hash-check 720 archived maps into the new experiment and predict
+  only 40 missing dev second-model pairs. Rough runtime **6.61 min**, derived from step 4's 1,088.27 s
+  second-model wall interval × dev/test voxel ratio **0.3641671**. Sources:
+  `results/kits_robustness_test/{machine.json,planning_image_sizes.csv}`. Each stage is capped at 30 min;
+  ask before any longer run/extension. Benchmark CPU scoring on two dev cases and a synthetic G1 queue before
+  starting full evaluation. Original inference configs/results and locked G1 outputs remain unchanged.
+- `[result]` Added 10 synthetic tests for the step 5 math and safeguards. Shared suite: **123 passed,
+  36 skipped**, 8 expected constant-input warnings from tiny synthetic correlations, **2.63 s**.
+  `results/kits_robustness_eval/preflight_tests_main.txt`. Step 5 is in progress; steps 6–7 are untouched.
+
+- `[experiment]` Step 5 preparation completed: **404.57 s / 6.74 min**, 720 copied/hash-verified maps,
+  40 missing dev second-model predictions, **800 maps** ready. `results/kits_robustness_eval/{prepare_machine.json,
+  prepare_log.txt,imported_predictions.csv,second_model_times.csv,prediction_manifest.csv}`. Peak allocated
+  GPU **496.21 MiB**, process peak RSS **7,241.65 MiB**. No scores or labels read in preparation.
+- `[experiment]` CPU benchmark on two dev cases and a synthetic largest G1 queue projects **15.34 min**
+  for evaluation, including a 1.5 safety factor: voxel-scaled score proxy **315.49 s**, synthetic queue
+  **8.16 s × 12**, and Dice allowance **2 s × 100 cases**. `results/kits_robustness_eval/{benchmark_times.csv,
+  benchmark_machine.json,runtime_projection.json}`. This is approximate runtime planning, not an accuracy
+  result. Starting the fixed evaluation within the existing 30-minute cap; no test-based choices changed.
+
+- `[experiment]` Completed the fixed step 5 CPU evaluation in **722.97 s / 12.05 min**, within its 30-minute
+  cap, after 404.57 s GPU preparation and a 12.13 s timing benchmark. Scored all 200 views from model maps
+  before loading labels for 400 per-model Dice evaluations. CPU AMD Ryzen 5 7500F, Linux, Python 3.12.15,
+  torch 2.7.1+cu128 / CUDA build 12.8, 6 threads, seed 42; CPU peak RSS **6,413.74 MiB**, no GPU used for
+  evaluation. GPU preparation used RTX 5060 Ti / driver 615.78.08. Separate metadata records baseline
+  `6fde679`, dirty state, exact config/source hashes, machine/library versions, time and memory:
+  `results/kits_robustness_eval/{prepare,benchmark,evaluate}_machine.json`. Run code is committed with results.
+- `[result]` Main-model clean/lowres medians and median paired drops: dev **0.90330 / 0.86700 / 0.02795**,
+  test **0.90955 / 0.87865 / 0.03010**. Dice < 0.83 counts dev **4 → 6/20**, test **11 → 21/80**, with
+  **2 / 10** newly bad and no recoveries. Test Dice falls on **77/80** cases.
+  Second-model clean/lowres medians and paired drops: dev **0.89510 / 0.89415 / 0.00745**, test
+  **0.89430 / 0.88685 / 0.00855**; bad counts **7 → 7/20** and **16 → 16/80**, no newly bad/recovered.
+  `results/kits_robustness_eval/{dice.csv,dice_per_model.csv,dice_degradation.csv,paired_changes.csv}`.
+- `[result]` Spearman(Dice drop, score rise), dev then test, 95% patient bootstrap CI:
+  primary **-0.074 [-0.529, 0.415] / 0.215 [-0.036, 0.459]**;
+  secondary entropy **0.575 [0.104, 0.894] / 0.243 [0.004, 0.473]**;
+  negative volume **0.849 [0.532, 0.980] / 0.743 [0.597, 0.845]**. All six have 2,000 finite bootstrap samples.
+  Primary rises on **9/20 dev, 41/80 test** (median change **-0.000463 / 0.000611**), entropy on
+  **20/20 dev, 79/80 test** (**0.037025 / 0.046093**). Primary response to degradation severity is inconclusive;
+  entropy's modest positive association remains secondary. No new score selection or head-to-head superiority
+  test, and no multiplicity adjustment, was added. `results/kits_robustness_eval/change_correlations.csv`.
+- `[result]` Dice < 0.83 review-AUC (primary / entropy / volume / random / oracle):
+  clean dev **0.7625 / 0.6875 / 0.5500 / 0.4978 / 0.9000**;
+  lowres dev **0.7917 / 0.7167 / 0.5917 / 0.4969 / 0.8500**;
+  mixed dev **0.7800 / 0.7250 / 0.5725 / 0.4964 / 0.8750**;
+  clean test **0.8313 / 0.8949 / 0.3903 / 0.5045 / 0.9313**;
+  lowres test **0.7967 / 0.7455 / 0.4926 / 0.5018 / 0.8688**;
+  mixed test **0.8086 / 0.8068 / 0.4648 / 0.5030 / 0.9000**.
+  Primary lowres minus volume **0.3042 [0.1490, 0.4709]**; mixed minus volume **0.3438 [0.1795, 0.5052]**.
+  Mixed primary AUC CI **[0.7374, 0.8830]**. Raw ceilings vary with bad prevalence; keep oracle/random references.
+  `results/kits_robustness_eval/g1_metrics.csv`, with all G1 rho/quality/CI columns retained.
+- `[result]` Under worst10, primary test AUC is **0.8547 clean / 0.8047 lowres / 0.8520 mixed**.
+  Lowres-vs-volume CI **[-0.1090, 0.6876]** includes zero; superiority is not established under every bad rule.
+  Do not compare the task's threshold clean AUC directly with the original G1 worst10 headline 0.855.
+  Source: `results/kits_robustness_eval/g1_metrics.csv` (both original bad rules saved).
+- `[result]` Mixed test queue: **160 views / 80 case IDs**, **32 bad views**, patient-grouped bootstrap.
+  Top 16 lowres views: primary **7**, entropy **13**, volume **8**. Median paired rank gains
+  **2.0 / 55.5 / 6.0**, respectively. At top 10%, primary finds **12/32** bad segmentations, entropy
+  **13/32**, volume **4/32**. Failure ranking remains useful under the threshold rule while the primary does
+  not consistently promote degraded views. Entropy responds more consistently without a higher mixed AUC
+  point estimate. `results/kits_robustness_eval/{queue_top_summary.csv,queue_rank_changes.csv,g1_curves.csv}`.
+- `[result]` Post-run verification passed: **100 cases, 200 score rows, 400 model Dice rows, 100 paired rows,
+  60 metric rows, 800 prediction files / 424,973,659 bytes**, **720 imported inputs unchanged**.
+  Exact cohort/key coverage and config/source/stage hashes match the fixed pre-outcome plan; mixed CIs group
+  case IDs and independent-row rho p-values are omitted. `results/kits_robustness_eval/{verification.json,
+  post_run_checks.json,prediction_manifest.csv,key_results.json}`. `report_source.py` reproduces this audit and
+  result extraction without rescoring or bootstrapping. Prediction maps remain outside Git in
+  `data/predictions/kits_robustness_eval/`. Completed inference configs/results and locked G1 files unchanged.
+- `[result]` Final suites in both environments: **123 passed, 36 skipped**, 8 expected constant-input
+  warnings from tiny synthetic tests; **3.03 s shared / 3.04 s GPU**.
+  `results/kits_robustness_eval/tests_{main,gpu}.txt`. Normalized progress line endings/trailing spaces in logs.
+- `[admin]` Checked step 5 and updated task notes/"Where we are", overview, and README. Test outcomes have
+  now been inspected; retain the locked resolution-only scope, primary score, and secondary entropy.
+  Next: commit/push step 5 on `otto/robustness` to update PR #1, then explain step 6 (one figure plus the
+  requested short report summary). Use Otto's authenticated terminal if noninteractive HTTPS Git still
+  lacks credentials. Steps 6–7 have not started; Bjørn's report-scope question remains unanswered.
+
+- `[admin]` Saved completed step 5 in a local commit. `git push origin otto/robustness` failed because
+  noninteractive HTTPS Git cannot read a GitHub username. Otto must push from his authenticated terminal.
+  Included the publication status in the same unpublished step commit; no extra status-only push is needed.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the
