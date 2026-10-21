@@ -2,12 +2,12 @@
 
 | | |
 |---|---|
-| **Owner** | Rasmus |
+| **Owner** | Otto |
 | **Contact / lead** | Bjørn |
-| **Branch** | `rasmus/missed-errors` |
+| **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
 | **Status** | Not started |
-| **Way of working** | Independent. Explore, try ideas, keep what works. Keep the group posted; coordinate only where section 3 says so. |
+| **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
 This document is the task description **and** the working notes. Update it after every step and at the end of every
@@ -43,8 +43,8 @@ A few starting ideas (try them, drop them, or find better ones):
 
 - How the code works: [README.md](../../README.md). General rules: [CONTRIBUTING.md](../../CONTRIBUTING.md).
 - **Data you need:** the KiTS scans (`scripts/download_data.py --config configs/kits100.yaml`) and the saved model
-  output for kits100, `data/predictions/kits100/` (about 340 MB). Get the model output from Bjørn via the group's
-  OneDrive and put it in the same place. **Do not run inference for kits100 yourself.**
+  output for kits100, `data/predictions/kits100/` (about 340 MB). Get the model output from the group's OneDrive
+  (folder "delte store filer", `kits100.zip`) and unzip it so it lands in `data/predictions/kits100/`. **Do not run inference for kits100 yourself.**
 - Per-scan Dice, scores and the locked queue: `results/kits100/` (`dice.csv`, `scores.csv`, `g1_scores_clean_*.csv`).
 - Earlier related analyses: `results/kits100/model_disagreement_*`, `exploratory_disagreement_*`,
   `voxel_correction_*`, and the robustness task ([g1_robustness.md](g1_robustness.md)).

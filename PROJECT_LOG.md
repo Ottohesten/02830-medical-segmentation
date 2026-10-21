@@ -812,11 +812,16 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 - `[admin]` Otto's GPU (RTX 5060 Ti) is not supported by the project's torch 2.2.2; the robustness runs used a separate
   environment (`.venv-gpu`, torch 2.7.1 + CUDA 12.8, `requirements/robustness-gpu.txt`). The shared lock file is
   unchanged. To be mentioned in the report together with the other machines.
-- `[decision]` Rasmus gets an independent task: catching confident errors that uncertainty misses
-  ([docs/tasks/g1_missed_errors.md](docs/tasks/g1_missed_errors.md)). The final check uses the untouched G3 pool once,
-  coordinated with Frederik.
-- `[admin]` Large shared data (`data/predictions/kits100/`, `data/study/study_kits/`) are shared via the group's
-  OneDrive, not git.
+- `[decision]` Rasmus owns the user study (G2) and runs it independently
+  ([docs/tasks/g2_user_study.md](docs/tasks/g2_user_study.md)); he asks the group for help when useful.
+- `[decision]` Otto owns a new task: catching confident errors that uncertainty misses
+  ([docs/tasks/g1_missed_errors.md](docs/tasks/g1_missed_errors.md)). The final check uses the
+  untouched G3 pool once, coordinated with Frederik.
+- `[decision]` Working principle for everyone: tasks are large enough to work on independently; owners decide within
+  their task and propose the next improvement themselves; questions are welcome; coordinate only where work touches
+  shared code, shared data or another task (CONTRIBUTING.md, section 5).
+- `[admin]` Large shared data are shared via the group's OneDrive (folder "delte store filer"), not git:
+  `kits100.zip` → `data/predictions/kits100/`, `study_kits.zip` → `data/study/study_kits/`.
 
 ---
 
