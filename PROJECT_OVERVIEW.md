@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-21 (robustness step 5 complete; resolution-only evaluation saved; report figure next).*
+*Last updated: 2026-10-21 (robustness step 6 complete; report figure/summary ready; group presentation next).*
 
 | | |
 |---|---|
@@ -72,7 +72,8 @@ The usual trick (ask several copies of the same model) is impossible because onl
   mixed-queue review-AUC under that threshold is 0.8086 versus volume 0.4648 and random 0.5030.
   Entropy rises in 79/80 cases but remains secondary. This supports failure ranking under resolution loss,
   with a limitation in detecting the degradation itself; it does not establish general domain-shift robustness.
-  Full dev/test, both-model, both-rule results: `results/kits_robustness_eval/`; step 6 report figure is next.
+  Full dev/test, both-model, both-rule results: `results/kits_robustness_eval/`. The report figure (PDF/PNG),
+  caption, and eight-line summary are ready in `results/kits_robustness_eval/report/`; group presentation is next.
 
 ### G2 — interface and user study
 
@@ -111,7 +112,8 @@ trained, so there is no result yet.
 | Power simulation | `results/study_kits/` |
 | User-study documents | `docs/study/` — session guide, consent form, pilot plan, analysis plan (locked after the pilot) |
 | G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` |
-| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Otto; steps 1–5 complete; resolution-only evaluation saved; report figure/summary next) |
+| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Otto; steps 1–6 complete; report figure/summary ready; group presentation next) |
+| Robustness report material | [Figure PDF](results/kits_robustness_eval/report/fig_robustness_summary_test.pdf), [PNG](results/kits_robustness_eval/report/fig_robustness_summary_test.png), [caption](results/kits_robustness_eval/report/caption.md), [eight-line summary](results/kits_robustness_eval/report/summary.md) |
 | HPC job scripts (never run on the cluster) | `jobs/` |
 | Scans, model output, weights (not in git) | `data/`, `models/` — download with `scripts/download_data.py` and `download_model.py` |
 

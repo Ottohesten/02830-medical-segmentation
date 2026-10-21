@@ -758,6 +758,47 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   noninteractive HTTPS Git cannot read a GitHub username. Otto must push from his authenticated terminal.
   Included the publication status in the same unpublished step commit; no extra status-only push is needed.
 
+## 2026-10-21: robustness step 6, report figure and short summary
+
+- `[admin]` Read task status, overview and contributing rules. `git pull --ff-only` was already up to date;
+  offline `uv sync --locked` checked 133 packages. Verified GitHub's `otto/robustness` points to `4a0d89c`,
+  matching local HEAD and publishing step 5. No extra status-only commit is needed.
+- `[result]` Created one **3-panel** figure using `scripts/plot_robustness_summary.py` and the unchanged
+  saved step 5 CSVs: paired main-model Dice, primary/secondary change correlations with saved 95% CIs,
+  and mixed test review curves with volume/random/oracle references. This is a presentation after test
+  evaluation; no scientific choice, score, model, bootstrap, or source result changed.
+  Exports: `results/kits_robustness_eval/report/fig_robustness_summary_test.{pdf,png}`.
+- `[result]` PDF: **1 page**, **30,465 bytes**, vector output with embedded text. PNG: **2160 × 1620 pixels,
+  300 dpi**, **354,912 bytes**; figure size **7.2 × 5.4 inches**. Saved `caption.md` and `summary.md`
+  (**8 numbered lines**) in the same report folder. PNG visually inspected; PDF page count/text extraction,
+  PNG dimensions, input/output/config/script hashes, and summary length pass `report/verification.json`.
+  Rendering used CPU only (AMD Ryzen 5 7500F, Linux, Python 3.12.15, torch 2.7.1+cu128 / CUDA build 12.8,
+  Matplotlib 3.11.2). `report/figure_provenance.json` records baseline `4a0d89c`, dirty state and exact hashes.
+- `[result]` Eight-line report summary (identical to task section 4 and `report/summary.md`):
+
+  1. An 8 mm resolution perturbation was selected on 20 development scans before test scoring.
+  2. On 80 test scans, median 3 mm Dice fell from 0.910 to 0.879; median paired loss was 0.0301.
+  3. Segmentations below Dice 0.83 increased from 11/80 to 21/80.
+  4. Primary score rise versus Dice loss was inconclusive: ρ = 0.215, 95% CI [-0.036, 0.459].
+  5. Entropy rose on 79/80 scans and remains a secondary finding.
+  6. Mixed-queue review-AUC was 0.809 for the primary score and 0.807 for entropy, versus volume 0.465, random 0.503, and oracle 0.900.
+  7. The primary found 12/32 bad segmentations in the first 16 views; only 7/16 of those views were degraded copies.
+  8. Failure ranking remains useful in this resolution stress test, with limited evidence for a response to degradation severity; other domain shifts are outside the tested scope.
+
+- `[admin]` Checked step 6 and updated task notes/"Where we are", overview and README. Original configs,
+  strength lock, saved analysis tables and locked G1 outputs remain unchanged; no scans, labels or prediction
+  arrays were read. Next: commit/push report material on `otto/robustness` to update PR #1, then guide Otto's
+  five-minute presentation in step 7. No presentation or external message to Bjørn has happened.
+
+- `[result]` Final step 6 suites: **123 passed, 36 skipped**, 8 expected constant-input warnings from existing
+  synthetic tests; **2.99 s shared / 3.12 s GPU**. `results/kits_robustness_eval/report/tests_{main,gpu}.txt`.
+  Verified the eight summary lines match the report source, task section 4 and this log exactly;
+  `results/kits_robustness_eval/report/verification.json`. Scientific inputs/configs remain unchanged.
+
+- `[admin]` Saved completed step 6 in a local commit. The assistant's `git push origin otto/robustness`
+  failed because noninteractive HTTPS Git cannot read a GitHub username. Otto must push from his authenticated
+  terminal. Included publication status in the same unpublished work commit; no extra status-only push is needed.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

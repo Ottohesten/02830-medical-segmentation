@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/robustness` |
 | **Created** | 2026-10-20 |
-| **Status** | Step 5 complete; resolution degradation evaluated; report figure/summary next |
+| **Status** | Step 6 complete; report figure, caption, and eight-line summary ready; group presentation next |
 | **Target** | Steps 1–4 by 2026-10-30, all steps by 2026-11-13 |
 
 This document is the task description **and** the working notes. Whoever works on the task (with or without an
@@ -400,16 +400,56 @@ Tick each box when done and write the date and a short note (numbers + file path
     `results/kits_robustness_eval/tests_{main,gpu}.txt`. Step 5 complete; publish its commit on
     `otto/robustness` to update PR #1, then explain step 6. No report figure or step 6 summary written yet.
 
-- [ ] **6. One figure and a short summary.** One figure that answers the question at a glance, and a summary of
+- [x] **6. One figure and a short summary.** One figure that answers the question at a glance, and a summary of
   5–10 lines in this document (section 4) and in the log. Bjørn uses it for the report.
   *Notes:*
+  - 2026-10-21: Read "Where we are", overview, and contributing rules; `git pull --ff-only` was already up
+    to date; offline `uv sync --locked` checked 133 packages. Confirmed GitHub's `otto/robustness` has
+    `4a0d89c`, matching local HEAD and publishing step 5. No new run or analysis approval was needed.
+  - 2026-10-21: Added `scripts/plot_robustness_summary.py`, reading only the saved step 5 CSV tables.
+    Made one composite test figure with **3 panels**: A, paired 3 mm Dice and the 0.83 threshold;
+    B, primary/secondary score-change correlations with saved 95% CIs; C, mixed-queue review curves with
+    primary, secondary, volume, random, and oracle references. The presentation was created after test
+    evaluation; no scientific choices, scores, bootstrap samples, or source results changed.
+  - 2026-10-21: Report files under `results/kits_robustness_eval/report/`:
+    [PDF](../../results/kits_robustness_eval/report/fig_robustness_summary_test.pdf) (**1 page**, 30,465 bytes),
+    [PNG](../../results/kits_robustness_eval/report/fig_robustness_summary_test.png) (**2160 × 1620 pixels,
+    300 dpi**, 354,912 bytes), `caption.md`, and `summary.md` (**8 numbered lines**).
+    Figure size: **7.2 × 5.4 inches**, with vector PDF output and embedded text.
+    The identical summary is in section 4 below and `PROJECT_LOG.md` for Bjørn's report work.
+  - 2026-10-21: Ran the plotting script successfully and inspected the PNG visually; all panels, labels,
+    intervals, and legend are readable. Checked PDF page count/text extraction, PNG dimensions, all
+    input/output/config/script SHA-256 hashes, and summary line count; `report/verification.json` passed.
+    `report/figure_provenance.json` records baseline `4a0d89c`, dirty state, source/output hashes,
+    CPU AMD Ryzen 5 7500F, Linux, Python 3.12.15, torch 2.7.1+cu128 / CUDA build 12.8, Matplotlib 3.11.2.
+    Rendering used CPU only. Original configs, strength lock, all evaluation tables, and locked G1 outputs
+    remain unchanged. This step reads no scans, labels, or prediction arrays.
+  - 2026-10-21: Updated README, overview, task notes/"Where we are", and log. Step 7 remains open:
+    Otto still needs to present the work to the group (5 minutes); no presentation or message to Bjørn
+    was sent. Commit/push this completed report step on `otto/robustness` to update PR #1.
+  - 2026-10-21: Both complete test suites pass: **123 passed, 36 skipped**, 8 expected constant-input
+    warnings from the existing synthetic tests (**2.99 s shared / 3.12 s GPU**).
+    `results/kits_robustness_eval/report/tests_{main,gpu}.txt`. Also verified that all eight summary lines
+    match the report source, task section 4, and project log exactly; `report/verification.json`.
 
 - [ ] **7. Present it to the group** (5 minutes): what you did, what came out, what it means.
   *Notes:*
 
 ## 4. Results summary
 
-*(Filled in at step 6.)*
+Figure: [PDF](../../results/kits_robustness_eval/report/fig_robustness_summary_test.pdf) /
+[PNG](../../results/kits_robustness_eval/report/fig_robustness_summary_test.png).
+[Caption](../../results/kits_robustness_eval/report/caption.md) and
+[summary source](../../results/kits_robustness_eval/report/summary.md).
+
+1. An 8 mm resolution perturbation was selected on 20 development scans before test scoring.
+2. On 80 test scans, median 3 mm Dice fell from 0.910 to 0.879; median paired loss was 0.0301.
+3. Segmentations below Dice 0.83 increased from 11/80 to 21/80.
+4. Primary score rise versus Dice loss was inconclusive: ρ = 0.215, 95% CI [-0.036, 0.459].
+5. Entropy rose on 79/80 scans and remains a secondary finding.
+6. Mixed-queue review-AUC was 0.809 for the primary score and 0.807 for entropy, versus volume 0.465, random 0.503, and oracle 0.900.
+7. The primary found 12/32 bad segmentations in the first 16 views; only 7/16 of those views were degraded copies.
+8. Failure ranking remains useful in this resolution stress test, with limited evidence for a response to degradation severity; other domain shifts are outside the tested scope.
 
 ## 5. Decisions made in this task
 
@@ -545,3 +585,14 @@ A new chat starts by reading this section.)*
   **Git:** step 5 is committed locally. The assistant's push failed because noninteractive HTTPS Git
   cannot read a GitHub username. Otto must run `git push origin otto/robustness` from his authenticated
   terminal to publish the completed step. This status is included in the same unpublished work commit.
+- 2026-10-21: **Steps 1–6 complete.** Step 5 push confirmed at `4a0d89c`. One report figure (3 panels,
+  PDF + 300 dpi PNG), caption, and an eight-line summary are ready under `results/kits_robustness_eval/report/`.
+  Section 4 and `PROJECT_LOG.md` contain the same summary. The figure makes both findings visible:
+  useful failure ranking under resolution loss and an inconclusive primary response to degradation severity.
+  Only saved tables were read; no new inference, scores, statistics, or scientific choices.
+  **Next action:** commit/push this completed report step on `otto/robustness`, then guide Otto through
+  step 7's five-minute group presentation. Step 7 is not complete until the presentation actually happens.
+  Bjørn's report-scope question remains unanswered; no external message was sent.
+  **Git:** the completed step 6 is committed locally. The assistant's push failed because noninteractive
+  HTTPS Git cannot read a GitHub username. Otto must run `git push origin otto/robustness` from his
+  authenticated terminal. Publication status is included in the same unpublished step commit.

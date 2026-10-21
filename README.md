@@ -356,6 +356,31 @@ PYTHONPATH=src:. MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python resu
 `post_run_checks.json` checks exact cohort/variant/model coverage, source/config/stage hashes, prediction
 hashes, and mixed patient grouping. It does not rerun model inference or bootstrap analysis.
 
+## Robustness report figure and summary (step 6)
+
+The report uses one composite figure: paired 3 mm Dice, primary/secondary score-change correlations with
+saved CIs, and mixed-queue review curves under Dice < 0.83. It reads saved evaluation tables only;
+no CTs, labels, prediction maps, model inference, scoring, or bootstrap analysis is rerun.
+
+```bash
+PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python scripts/plot_robustness_summary.py --config configs/kits_robustness_eval.yaml
+# For a deliberate replacement of the generated figure and text only, add --overwrite.
+```
+
+Exports under `results/kits_robustness_eval/report/`:
+
+- [Vector PDF](results/kits_robustness_eval/report/fig_robustness_summary_test.pdf) for the report.
+- [PNG](results/kits_robustness_eval/report/fig_robustness_summary_test.png): 2160 × 1620 pixels, 300 dpi.
+- [Caption](results/kits_robustness_eval/report/caption.md) and [eight-line summary](results/kits_robustness_eval/report/summary.md).
+- `figure_provenance.json`: machine/versions, source/config/input/output hashes, display settings, and
+  explicit post-evaluation presentation status. `verification.json` records the export/line-count checks.
+
+The figure is 7.2 × 5.4 inches. Primary and secondary methods retain their G1 colors and have distinct
+markers/line styles. The caption explains the change-sign convention, threshold, oracle, and paired
+bootstrap; source results and locked choices are unchanged. The same summary is in task section 4 and the log.
+
+![Resolution robustness summary](results/kits_robustness_eval/report/fig_robustness_summary_test.png)
+
 ## Running on the DTU HPC (not tested on the cluster yet)
 
 > **Untested.** The job scripts in `jobs/` follow the DTU HPC (LSF) documentation, and their commands have been run

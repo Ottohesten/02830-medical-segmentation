@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-21T11:28:09",
+  "platform": "Linux-7.2.10-1-cachyos-x86_64-with-glibc2.44",
+  "cpu": "x86_64",
+  "cpu_count": 12,
+  "python": "3.12.15",
+  "torch": "2.7.1+cu128",
+  "numpy": "1.26.4",
+  "cuda": "12.8",
+  "gpu": null,
+  "mps_available": false,
+  "git_commit": "4a0d89c3a464cc4794511c7e64e03241e22f56eb",
+  "git_uncommitted_changes": true,
+  "os": "Linux-7.2.10-1-cachyos-x86_64-with-glibc2.44",
+  "device_used": "cpu (CSV-to-figure only)",
+  "config_sha256": "e9d68623d4d7498c686be6b36b42ad5204414afde4ea7be1ecff179ee682e5b3",
+  "script_sha256": "7997695c6a72bd8b3b6dd39f8fa643c6e181e394343d266716a4fc5fb4f68da2",
+  "matplotlib": "3.11.2",
+  "dpi": 300,
+  "figure_size_inches": [
+    7.2,
+    5.4
+  ],
+  "test_cases": 80,
+  "summary_lines": 8,
+  "new_inference_scoring_or_bootstrap": false,
+  "elapsed_seconds": 0.5337623149998763,
+  "presentation_created_after_test_evaluation": true,
+  "inputs_sha256": {
+    "paired_changes.csv": "e96eebbf51a8e3e5e5744cf75ccb73f46ce40cba6f2b459de1152183e12d1b86",
+    "dice_degradation.csv": "91e3098700943889044d51053d6c85fc270306338323c8f34b7c26d2b053d094",
+    "change_correlations.csv": "96925051f43ed056b2bc17ce34a3e621247884ab3ee0339d1cf08fa37b556f4e",
+    "g1_metrics.csv": "32fb6ad501c12b39df625f405af8e7a04b7efd4c0f16e40c35d800f8eaa1e3cb",
+    "g1_curves.csv": "094d22881e34fcaccfad57a92a09dd669a6a0c06951406d0dbb2e26bd4eadc83",
+    "queue_top_summary.csv": "0b6d6c7aaf366ff5a904abd6ce0107af7997b6eb553ca80b6ff1ead89bf1b7c2",
+    "analysis_plan.json": "3db60ab142c5554a6d24d74ace4747e54f63b4c08c12c4690198dab27c8ef6f5"
+  },
+  "outputs_sha256": {
+    "fig_robustness_summary_test.pdf": "a768b06a9f14fd8c924d22b2ef59ffd7856299b17bedf1d178c3b48c72455f0a",
+    "fig_robustness_summary_test.png": "29a14c32e22c3b0bf9d4bfe41d6643249db741bc7af3d19833164ec74577f0bc",
+    "summary.md": "0db7d4db400b870418443bf418faa8cc2f1a8119d7736b1521fa21664fe010bd",
+    "caption.md": "74fbf57b7b4a98a583aa42a059008a9352d71dbc4b1142f98127a5330d19ad61"
+  },
+  "cpu_model": "AMD Ryzen 5 7500F 6-Core Processor"
+}
