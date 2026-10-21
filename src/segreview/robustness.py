@@ -1,13 +1,50 @@
-"""Development-only Dice comparisons and strength suggestions for the G1 robustness task.
+"""Dice-only development selection and locked test-scope validation for the G1 robustness task.
 
 The selection rule uses paired Dice degradation only. No uncertainty score is accepted or read.
 """
+
+from copy import deepcopy
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 from segreview.config import REPO_ROOT
 from segreview.data import case_split
+
+
+def validate_test_run(cfg: dict, cases: list, reference: dict, reference_cases: list,
+                      locked: dict, lock: dict) -> list:
+    """Return only held-out cases; reject changed scientific settings, case selection, or reused output folders."""
+    name = cfg['name']
+    if name in {reference['name'], locked['name']} or Path(name).name != name or name in {'.', '..'}:
+        raise ValueError('Test inference requires its own output name.')
+    for key in ['results_dir', 'predictions_dir']:
+        target = (cfg['paths'][key] / name).resolve()
+        for prior in [reference, locked]:
+            protected = (prior['paths'][key] / prior['name']).resolve()
+            if target.is_relative_to(protected) or protected.is_relative_to(target):
+                raise ValueError('Test output must be separate from locked and development folders.')
+    comparison = deepcopy(cfg)
+    comparison.pop('robustness_test')
+    comparison['name'] = locked['name']
+    comparison['dataset']['n_cases'] = locked['dataset']['n_cases']
+    comparison['evaluation']['splits'] = locked['evaluation']['splits']
+    if 'report' in locked:
+        comparison['report']['set'] = locked['report']['set']
+    if comparison != locked or [p['name'] for p in cfg['perturbations']] != lock['selected_variants']:
+        raise ValueError('Scientific settings must match the locked development choice.')
+    if cfg['robustness_test']['splits'] != ['test'] or cfg['evaluation']['splits'] != ['test']:
+        raise ValueError('Step 4 must select only test scans.')
+    ids = [c.case_id for c in cases]
+    expected = [c.case_id for c in reference_cases]
+    if (len(ids) != len(set(ids)) or ids != expected or cfg['seed'] != reference['seed']
+            or cfg['dataset']['split'] != reference['dataset']['split']):
+        raise ValueError('The full ordered case selection and split must match the reference study.')
+    selected = [c for c in cases if case_split(cfg, c.case_id) == 'test']
+    if len(selected) != cfg['robustness_test']['expected_test_cases']:
+        raise ValueError('Unexpected number of held-out cases.')
+    return selected
 
 
 def validate_development_run(cfg: dict, cases: list) -> None:

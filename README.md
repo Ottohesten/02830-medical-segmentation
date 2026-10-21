@@ -201,7 +201,8 @@ The cu128 flag is required when installing from this requirements file.
 
 The benchmark runs the first two development IDs in sorted order with both models, each clean and with
 `noise_60`. This is a timing example, not the strength selection for step 3. No ground truth or scores are
-read. Unlike `run_second_model.py` (clean scans only), the benchmark also runs the 6 mm model on the noisy copies.
+read. The benchmark measures both models on the noisy copies; the shared `run_second_model.py` now also handles
+every configured perturbation, saving `m2_mask` and `m2_prob` under its variant folder.
 Results go to `results/kits_robustness_timing/`: per-prediction `timings.csv`, `timing_summary.csv`, separate
 model-load times, the config snapshot, machine metadata, and `runtime_projections.csv`.
 Predictions go to `data/predictions/kits_robustness_timing/` and remain outside Git.
@@ -237,15 +238,62 @@ requires a new output name. The runtime estimate is a rough size-scaled proxy fr
 other perturbations and Dice analysis add uncertainty.
 
 Strength suggestions must be reviewed and written into the task, log, and final config before running uncertainty
-analysis. The test set remains untouched. This is a development selection rule, not a change to locked G1 metrics.
+analysis. Test scans remain outside strength selection. This is a development selection rule, not a change to locked G1 metrics.
 
 The completed 2026-10-21 run took 44.39 minutes. The predeclared rule selects **lowres_8mm only**; tested noise
 and contrast strengths have too few clear Dice drops. Lowres_12mm is also eligible, but 8 mm is milder.
 `configs/kits_perturbed.yaml` records the locked choice and retains development-only scope (20 scans).
 The candidate results remain intact. Per-scan Dice, candidate summary, evidence hashes, prediction manifest,
 and the development plot are under `results/kits_robustness_dev/`; `report_source.py` there reproduces the
-verification and figure from the repository root. Discuss the single-perturbation scope (task section 6) before
-planning test inference. The shared second-model step still needs support for perturbed variants.
+verification and figure from the repository root. Otto requested step 4 with the locked choice; the question
+for Bjørn in task section 6 remains open for report scope. The current test question concerns resolution degradation.
+
+## Robustness inference on the 80 test scans
+
+`configs/kits_robustness_test.yaml` keeps the locked scientific settings and selects the original study's
+100 IDs so scan indices remain stable. The runner filters to the 80 test IDs before inference. It runs
+both models on clean and `lowres_8mm` images: **320 predictions / 640 mask and probability files**.
+The archived `configs/kits_perturbed.yaml` and its strength-lock hash remain unchanged.
+
+```bash
+PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python scripts/run_robustness_test.py --config configs/kits_robustness_test.yaml --plan
+# The original run was approved by Otto with an 8-hour cap; do not rerun completed inference.
+PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python -u scripts/run_robustness_test.py --config configs/kits_robustness_test.yaml --run
+# Check saved outputs without new inference:
+PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python scripts/run_robustness_test.py --config configs/kits_robustness_test.yaml --verify
+```
+
+`--plan` reads image headers and existing development timings only. The main-model projection uses all 20 dev
+scans for clean/lowres; second-model and I/O estimates use the earlier two-scan benchmark, with noise as the
+lowres overhead proxy. Raw-voxel scaling is approximate and final verification is excluded from the estimate.
+The plan and exact test IDs are in `results/kits_robustness_test/{run_plan.json,planned_cases.csv}`.
+
+`--run` checks the original strength-lock/config/evidence hashes and the original case split before loading
+the models. Both models receive identically seeded perturbations. It writes per-scan/per-variant times,
+machine/driver/version/git/source provenance, wall time and peak memory; it resumes completed predictions
+only with an identical config and source snapshot. Historical clean-only second-model timing files are
+preserved with an explicit `clean` variant. No labels, Dice, uncertainty scores, or G1 evaluation are read or
+computed by this runner; those belong to step 5.
+
+Small artifacts go to `results/kits_robustness_test/`; predictions stay outside Git in
+`data/predictions/kits_robustness_test/`. Final verification requires every timing pair and all 640 maps,
+checks input/output shapes and affines, and records file SHA-256 hashes. It checks headers and compressed
+file hashes; it does not re-evaluate segmentation contents. Locked `kits100` outputs remain protected.
+
+The completed 2026-10-21 run took **41.54 minutes including verification** under the approved 8-hour cap.
+All **320 predictions / 640 files** passed verification; prediction files total 303,793,357 bytes outside Git.
+Peak allocated GPU memory was 3,649.76 MiB; peak process RSS was 8,051.12 MiB. Both final test suites passed:
+113 passed, 36 skipped. Machine/config/source/input provenance, per-scan timings, `timing_summary.csv`,
+`verification.json`, `post_run_checks.json`, and `prediction_manifest.csv` are in `results/kits_robustness_test/`.
+`report_source.py` there regenerates the timing summary and provenance checks (from the repository root):
+
+```bash
+PYTHONPATH=src:. MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python results/kits_robustness_test/report_source.py --config configs/kits_robustness_test.yaml
+```
+
+Step 5 has not started: no test labels, Dice, uncertainty scores, or ranking evaluation were read/computed.
+The copied `strength_lock` metadata describes the development-lock moment; actual test-inference status is
+recorded in `machine.json`. Development comparisons still require second-model clean/lowres maps for all 20 dev scans.
 
 ## Running on the DTU HPC (not tested on the cluster yet)
 

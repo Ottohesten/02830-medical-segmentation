@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/robustness` |
 | **Created** | 2026-10-20 |
-| **Status** | Step 3 complete; lowres_8mm locked on development Dice; test not started |
+| **Status** | Step 4 complete; 320 test predictions verified; Dice and scoring await step 5 |
 | **Target** | Steps 1–4 by 2026-10-30, all steps by 2026-11-13 |
 
 This document is the task description **and** the working notes. Whoever works on the task (with or without an
@@ -218,8 +218,69 @@ Tick each box when done and write the date and a short note (numbers + file path
     a GitHub username; Otto must run `git push origin otto/robustness` in his authenticated terminal to
     publish the completed step and update PR #1.
 
-- [ ] **4. Run the test set (80 scans)** with the chosen perturbations (overnight or on the GPU).
+- [x] **4. Run the test set (80 scans)** with the chosen perturbations (overnight or on the GPU).
   *Notes:*
+  - 2026-10-21: Otto requested step 4. Proceed with the existing locked `lowres_8mm` choice; no further
+    strength search or score selection. The experiment concerns resolution degradation only. No answer
+    from Bjørn is recorded for the report-scope question in section 6.
+  - 2026-10-21: Prepared `configs/kits_robustness_test.yaml` and `scripts/run_robustness_test.py`.
+    The config selects the original 100 study IDs to preserve scan indices; the runner restricts inference
+    to the original **80 test IDs**, clean and `lowres_8mm`, with both models: **320 predictions / 640 files**.
+    Outputs: `results/kits_robustness_test/` and `data/predictions/kits_robustness_test/` (predictions outside Git).
+    `configs/kits_perturbed.yaml`, its archived strength lock, and locked G1 files remain unchanged.
+  - 2026-10-21: Extended `src/segreview/pipeline.py` so the second model predicts every configured variant,
+    with the same full-list perturbation index as the main model. Both steps accept optional split filtering.
+    Second-model completion requires both mask and probability; timings use case + variant keys and preserve
+    historical clean-only rows. `src/segreview/robustness.py` and the runner reject altered scientific
+    settings, case selection/split, archived evidence hashes, or protected output paths before inference.
+  - 2026-10-21: Ran `--plan` only (image headers and existing dev timings; no labels or model inference).
+    **Planning estimate: 39.66 min**, excluding final verification; **proposed reserve cap: 480 min**.
+    The main-model estimate uses all 20 dev scans for the selected variants; the second model and I/O use
+    a two-scan clean/noise proxy scaled by raw voxel counts. This is an approximate runtime plan, not a result.
+    Exact IDs, sizes, estimate components, config and source/input hashes:
+    `results/kits_robustness_test/{run_plan.json,planned_cases.csv,planning_image_sizes.csv,run_config.yaml}`.
+  - 2026-10-21: Added **21 synthetic tests** for isolation, locked choices, identical model inputs,
+    original seed indices, resuming partial second-model output, legacy timing migration, runtime arithmetic,
+    and incomplete/misaligned output rejection. Complete suites: **113 passed, 36 skipped, 0 failed**
+    (2.95 s shared, 3.06 s GPU). Evidence: `results/kits_robustness_test/preflight_tests_{main,gpu}.txt`.
+    A separate tiny Conv3d smoke test passed on RTX 5060 Ti / driver 615.78.08 / torch 2.7.1+cu128 /
+    CUDA 12.8; `results/kits_robustness_test/preflight_gpu.json`. No test images were used by the smoke test.
+  - 2026-10-21: Otto explicitly approved the prepared run: "Ja, start med loft på 8 timer".
+    Kept the existing **480-minute cap**, strengths, scores, and case split unchanged.
+    Approval evidence: `results/kits_robustness_test/run_approval.json`. Executed
+    `PYTHONPATH=src MPLCONFIGDIR=/tmp/otto-robustness-mpl .venv-gpu/bin/python -u scripts/run_robustness_test.py --config configs/kits_robustness_test.yaml --run`
+    with host GPU access; exit 0. Console output: `results/kits_robustness_test/run_log.txt`.
+    Normalized terminal progress line endings and trailing spaces for the text log committed to Git.
+  - 2026-10-21: **Completed 320 predictions and verification in 2,492.40 s / 41.54 min** (cap not approached).
+    Main-model wall interval: **1,340.81 s**; second-model interval: **1,088.27 s**;
+    remaining verification interval: **63.32 s**. Each model predicted all 80 clean and 80 lowres_8mm scans.
+    Per-scan prediction-time medians (exclude model setup and load/perturb/save):
+
+    | Model | Clean | Lowres 8 mm | Predictions |
+    |---|---:|---:|---:|
+    | 3 mm (`fast`) | 4.420 s | 4.565 s | 160 |
+    | 6 mm (`fastest`) | 2.890 s | 2.745 s | 160 |
+
+    Exact rows/summary: `results/kits_robustness_test/{inference_times.csv,second_model_times.csv,timing_summary.csv}`.
+    Machine: AMD Ryzen 5 7500F, RTX 5060 Ti, driver 615.78.08, Linux 7.2.10-1-cachyos,
+    Python 3.12.15, torch 2.7.1+cu128 / CUDA 12.8, 6 CPU threads, seed 42.
+    Peak allocated GPU memory **3,649.76 MiB**, process peak RSS **8,051.12 MiB**.
+    `results/kits_robustness_test/{machine.json,run_attempts.json,run_config.yaml,run_plan.json}` records
+    baseline commit `e608d92`, uncommitted run-code state, and exact config/source/input hashes.
+    The run code is committed with these results.
+  - 2026-10-21: **Verification passed:** exact 80-case × 2-variant × 2-model timing coverage,
+    **640 prediction files / 303,793,357 bytes**, matching input/output shapes and affines, per-file SHA-256,
+    and config/source hashes matching the approved plan. Evidence:
+    `results/kits_robustness_test/{verification.json,prediction_manifest.csv,post_run_checks.json}`.
+    `report_source.py` in that folder reproduces the timing summary and provenance checks with
+    `PYTHONPATH=src:. .venv-gpu/bin/python results/kits_robustness_test/report_source.py --config configs/kits_robustness_test.yaml`.
+    Predictions remain outside Git in `data/predictions/kits_robustness_test/`.
+    No ground truth, Dice, uncertainty scores, or ranking evaluation was read/computed in this step.
+    Archived development evidence, shared environment, and locked G1 config/results remain unchanged.
+  - 2026-10-21: Final suites: **113 passed, 36 skipped, 0 failed** in both environments
+    (2.76 s shared, 2.47 s GPU). Evidence: `results/kits_robustness_test/tests_{main,gpu}.txt`.
+    Next: publish this step on `otto/robustness` to update PR #1, then explain step 5.
+    Use Otto's authenticated terminal for the push if noninteractive HTTPS authentication is still unavailable.
 
 - [ ] **5. Evaluate.** With the existing G1 evaluation (`scripts/evaluate_g1.py`), report clean and perturbed
   separately, for development and test:
@@ -258,6 +319,12 @@ Tick each box when done and write the date and a short note (numbers + file path
   catastrophic failures. Exclude tested noise and contrast because none meets the clear-drop requirement;
   do not select lowres_12mm because a milder eligible choice exists. Source: `configs/kits_perturbed.yaml`
   and `results/kits_robustness_dev/strength_lock.json`. Any later scope/strength change must be logged before test.
+- 2026-10-21 — Following Otto's request to continue to step 4, retain the locked resolution-only question.
+  Use a new test config/output name, both models, clean plus `lowres_8mm`, and the original 80 held-out cases.
+  Separate inference (step 4) from Dice/scoring/evaluation (step 5). Ask before the new long run.
+- 2026-10-21 — Step 4 test inference is complete. Preserve its maps and provenance; use saved predictions
+  for step 5. The test set has now been used for inference, with no quality or score results inspected.
+  Development comparisons still need second-model clean/lowres maps for the original 20 dev cases.
 
 ## 6. Questions for Bjørn
 
@@ -265,7 +332,12 @@ Tick each box when done and write the date and a short note (numbers + file path
   gives ≥ 0.02 Dice loss on five dev scans. Is this single resolution perturbation sufficient for the report,
   or should we plan an additional dev-only strength search / a stronger secondary resolution before test?
   Lowres_12mm is also eligible but was excluded by the mildest-per-type rule. The initial timing plan assumed
-  3–4 perturbations; only one is currently locked. No test inference or uncertainty scoring has started.
+  3–4 perturbations; only one is currently locked. At strength lock, no test inference or uncertainty scoring
+  had started.
+  Follow-up, 2026-10-21: Otto requested step 4; preparation retains the locked resolution-only scope.
+  No answer from Bjørn is recorded. Any later expansion must be logged with its timing relative to test use.
+  Follow-up after step 4, 2026-10-21: 320 test predictions are now saved for the locked resolution-only
+  experiment. No Dice, score results, or ranking evaluation has been inspected; section 6 remains unanswered.
 
 ## 7. Where we are
 
@@ -311,7 +383,32 @@ A new chat starts by reading this section.)*
   No uncertainty-score computation or test inference has occurred. Next: explain this single-perturbation
   outcome to Otto and discuss section 6 with Bjørn before deciding the test scope. Then plan step 4, including
   second-model support for perturbed scans and fresh runtime estimates; ask Otto before a new long run.
-  The final config still selects 20 dev scans. Publish this step on `otto/robustness` to update PR #1; use Otto's
-  terminal if the assistant lacks HTTPS credentials. Steps 4–7 are untouched.
-  **Git:** step 3's commit is currently local; the assistant's push failed for missing HTTPS credentials.
-  Otto should push `otto/robustness` from his terminal before the next step.
+  The final config still selects 20 dev scans. Steps 4–7 are untouched.
+  **Push confirmed, 2026-10-21:** GitHub's `otto/robustness` points to `e608d92`, matching local HEAD and
+  publishing step 3 to PR #1. This status confirmation will accompany the next work commit.
+- 2026-10-21: **Step 4 prepared, not complete.** Otto requested proceeding with the locked choice;
+  `configs/kits_robustness_test.yaml` and `scripts/run_robustness_test.py` are ready for the original 80 test
+  scans, clean + `lowres_8mm`, both models (**320 predictions**). Second-model perturbation support and
+  split filtering are implemented. Both suites pass (**113 passed, 36 skipped**); GPU smoke test passes.
+  Plan/evidence: `results/kits_robustness_test/`; approximate estimate **39.66 min**, proposed cap **480 min**.
+  **Next action: ask Otto to approve this new long run**, then execute `--run` with GPU access and save the log.
+  No test inference, label reading, or score computation has started. After complete verification, check step 4,
+  update the notes/log/overview, and commit/push on `otto/robustness`. Preparation is currently uncommitted.
+  Steps 5–7 are untouched; Bjørn's report-scope question remains open, with no answer recorded.
+- 2026-10-21: **Step 4 approved and starting.** Otto approved the prepared 320-prediction test run with
+  the existing 480-minute cap. Next: finish both models' clean/lowres_8mm predictions, verify all 640 maps
+  and timing coverage, then document measured time/memory and commit/push the completed step. Save console
+  output to `results/kits_robustness_test/run_log.txt`. No Dice or uncertainty evaluation in this step.
+- 2026-10-21: **Steps 1–4 complete.** Both models predicted all 80 test scans, clean + `lowres_8mm`:
+  **320 predictions / 640 files**, **41.54 min**, verification passed. Timing, machine/config/source/input
+  provenance, memory, file hashes, and passing tests are under `results/kits_robustness_test/`;
+  predictions are outside Git in `data/predictions/kits_robustness_test/`.
+  No test ground truth, Dice, uncertainty scores, or ranking evaluation was read/computed.
+  **Next action:** commit/push this completed step on `otto/robustness` (Otto's terminal if HTTPS credentials
+  remain unavailable), then explain step 5: compare clean/lowres Dice and the locked scores using saved maps.
+  For development comparisons, reuse the chosen 3 mm maps and obtain the 6 mm clean/lowres maps for all 20 dev
+  scans before scoring. Keep the locked strength and primary/secondary scores. Steps 5–7 have not started.
+  Bjørn's report-scope question in section 6 remains unanswered; no message was sent.
+  **Git:** the completed step is committed locally. The assistant's push failed because noninteractive
+  HTTPS Git cannot read a GitHub username. Otto must run `git push origin otto/robustness` from his
+  authenticated terminal to publish the commit and update PR #1. The worktree is clean after committing.

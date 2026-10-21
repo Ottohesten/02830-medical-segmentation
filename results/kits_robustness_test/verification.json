@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "n_cases": 80,
+  "n_predictions": 320,
+  "n_files": 640,
+  "prediction_bytes": 303793357,
+  "checks": "Exact case/variant/model timing coverage; matching input/output shapes and affines; file SHA-256",
+  "ground_truth_read": false,
+  "dice_or_uncertainty_computed": false
+}

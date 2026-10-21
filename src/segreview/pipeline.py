@@ -3,7 +3,7 @@
 Steps (all read the same config):
 1. inference    predict the organ in every scan: clean scans and every configured perturbation.
 2. tta          extra test-time augmentation passes on the clean scans (if uncertainty.tta.n_passes > 0).
-3. second model predict the clean scans with a second network (uncertainty.second_model_resolution,
+3. second model predict every configured variant with a second network (uncertainty.second_model_resolution,
                 e.g. the 6 mm model), to measure how much two models disagree.
 4. dice         true Dice of every prediction against ground truth       (uses ground truth)
 5. label check  if the dataset has several organ definitions: Dice under each, and how much of each
@@ -60,14 +60,16 @@ def _update_csv(path, new: pd.DataFrame, keys: list[str]) -> None:
     new.sort_values(keys).to_csv(path, index=False)
 
 
-def step_inference(cfg: dict, device: torch.device, overwrite: bool = False) -> None:
-    """Predict mask + organ probability for every scan and variant that has no saved prediction yet."""
+def step_inference(cfg: dict, device: torch.device, overwrite: bool = False,
+                   splits: list[str] | None = None) -> None:
+    """Save missing main-model predictions; optionally restrict splits, retaining original indices for seeds."""
     from segreview.inference import OrganSegmenter
 
     cases = list_cases(cfg)
     specs = {p["name"]: p for p in (cfg.get("perturbations") or [])}
     todo = [(i, c, v) for v in variants(cfg) for i, c in enumerate(cases)
-            if overwrite or not has_prediction(cfg, v, c.case_id)]
+            if (splits is None or case_split(cfg, c.case_id) in splits)
+            and (overwrite or not has_prediction(cfg, v, c.case_id))]
     print(f"[inference] device={device}, {len(cases)} scans x {len(variants(cfg))} variants, {len(todo)} to predict")
     if not todo:
         return
@@ -134,8 +136,9 @@ def step_tta(cfg: dict, device: torch.device, overwrite: bool = False) -> None:
                                    "device": str(device)}]), ["case_id"])
 
 
-def step_second_model(cfg: dict, device: torch.device, overwrite: bool = False) -> None:
-    """Predict the clean scans with the second model and save its mask and probability (m2_mask, m2_prob).
+def step_second_model(cfg: dict, device: torch.device, overwrite: bool = False,
+                      splits: list[str] | None = None) -> None:
+    """Save the second model's mask/probability for every variant, optionally restricted to named splits.
 
     The public TotalSegmentator weights have only one fold, so fold disagreement is impossible. The 6 mm
     network is a separately trained model of the same structures, so the disagreement between it and the
@@ -148,22 +151,36 @@ def step_second_model(cfg: dict, device: torch.device, overwrite: bool = False) 
     from segreview.inference import OrganSegmenter
 
     cases = list_cases(cfg)
-    todo = [c for c in cases if overwrite or not map_path(cfg, CLEAN, c.case_id, "m2_prob").exists()]
-    print(f"[second model] resolution={resolution}, {len(todo)} scans to predict")
+    specs = {p["name"]: p for p in (cfg.get("perturbations") or [])}
+    # Keep full-list indices: both models must receive exactly the same seeded perturbation.
+    todo = [(i, c, v) for v in variants(cfg) for i, c in enumerate(cases)
+            if (splits is None or case_split(cfg, c.case_id) in splits)
+            and (overwrite or not all(map_path(cfg, v, c.case_id, k).exists()
+                                     for k in ("m2_mask", "m2_prob")))]
+    print(f"[second model] resolution={resolution}, {len(todo)} case/variant pairs to predict")
     if not todo:
         return
+    timing_path = results_dir(cfg) / "second_model_times.csv"
+    if timing_path.exists():
+        previous = pd.read_csv(timing_path)
+        if "variant" not in previous:
+            # Historical rows were all clean; preserve them when adding variant-aware timings.
+            previous["variant"] = CLEAN
+            previous.to_csv(timing_path, index=False)
     segmenter = OrganSegmenter(cfg, device, resolution=resolution)
-    for case in todo:
+    for i, case, variant in todo:
         image = load_canonical(case.image_path)
+        if variant != CLEAN:
+            image = perturb(image, specs[variant], cfg, i)
         start = time.perf_counter()
         pred = segmenter.predict(image)
         seconds = time.perf_counter() - start
-        save_map(cfg, CLEAN, case.case_id, "m2_mask", pred.mask, pred.affine)
-        save_map(cfg, CLEAN, case.case_id, "m2_prob", pred.prob, pred.affine)
-        print(f"  {case.case_id}: {seconds:.1f} s")
-        _update_csv(results_dir(cfg) / "second_model_times.csv",
-                    pd.DataFrame([{"case_id": case.case_id, "resolution": resolution, "seconds": round(seconds, 2),
-                                   "device": str(device)}]), ["case_id"])
+        save_map(cfg, variant, case.case_id, "m2_mask", pred.mask, pred.affine)
+        save_map(cfg, variant, case.case_id, "m2_prob", pred.prob, pred.affine)
+        print(f"  {case.case_id} [{variant}]: {seconds:.1f} s")
+        _update_csv(timing_path,
+                    pd.DataFrame([{"case_id": case.case_id, "variant": variant, "resolution": resolution,
+                                   "seconds": round(seconds, 2), "device": str(device)}]), ["case_id", "variant"])
 
 
 def step_label_check(cfg: dict) -> pd.DataFrame | None:

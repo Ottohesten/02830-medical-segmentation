@@ -1,0 +1,5 @@
+resolution,variant,count,sum,median,min,max
+fast,clean,80,483.11,4.42,1.24,22.35
+fast,lowres_8mm,80,483.32,4.5649999999999995,1.18,18.31
+fastest,clean,80,356.21999999999997,2.8899999999999997,0.81,17.79
+fastest,lowres_8mm,80,346.27,2.745,0.78,15.23
