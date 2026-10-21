@@ -817,6 +817,19 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 - `[decision]` Otto owns a new task: catching confident errors that uncertainty misses
   ([docs/tasks/g1_missed_errors.md](docs/tasks/g1_missed_errors.md)). The final check uses the
   untouched G3 pool once, coordinated with Frederik.
+- `[decision]` **Locked test of a new ranking score on fresh scans** (written down before anyone has evaluated the ranking
+  on these scans):
+  - Fresh scans: the G3 pool (the next 100 KiTS scans of the same seed-42 draw after kits100). Frederik runs the 3 mm and
+    6 mm models on them for G3.
+  - Score tested: `far_disagree_per_volume` (3 mm vs. 6 mm disagreement more than 6 mm from the 3 mm edge, divided by
+    the 3 mm volume; found on kits100, see 2026-10-20). Compared with the locked G1 score `model_diff_mean_region`;
+    entropy (`entropy_mean_region`) and the volume baseline are reported as secondary.
+  - Primary measure: review-AUC with "bad" = Dice < 0.83. The new score counts as better if the lower end of the 95 %
+    paired bootstrap interval for (new − locked) is above 0 (2,000 resamples, seed 42). Worst-10 % review-AUC and
+    quality-AUC are secondary.
+  - Run once, after Frederik's model output for the pool exists, together with any check Otto locks in the
+    missed-errors task, so the pool is only opened once; latest 2026-11-18. Until then nobody computes ranking
+    metrics on the pool. Simulated corrections for G3 are fine.
 - `[decision]` Working principle for everyone: tasks are large enough to work on independently; owners decide within
   their task and propose the next improvement themselves; questions are welcome; coordinate only where work touches
   shared code, shared data or another task (CONTRIBUTING.md, section 5).

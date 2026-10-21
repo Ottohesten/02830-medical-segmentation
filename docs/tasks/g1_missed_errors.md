@@ -59,7 +59,8 @@ A few starting ideas (try them, drop them, or find better ones):
   everything you find on kits100 is exploratory). Explore freely there.
 - **The final check is on fresh scans, once.** The G3 pool (the next 100 KiTS scans in the same seeded draw) has not
   been looked at. Before using it: write down the one or two checks you want to test and how you will judge them, in
-  this document and in the log, and tell Bjørn. Frederik runs the models on the pool for G3; coordinate with him to
+  this document and in the log, and tell Bjørn. A test of another score on the pool is already locked (PROJECT_LOG.md,
+  2026-10-21); both are run together once, so the pool is opened only once (latest 2026-11-18). Frederik runs the models on the pool for G3; coordinate with him to
   reuse his model output instead of running it again.
 - **Coordinate** when you want to change shared code (anything in `src/segreview/` that others use) or when you need
   someone else's data. Everything else you decide yourself.
