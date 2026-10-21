@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-21",
+  "source_config": "configs/kits_robustness_dev.yaml",
+  "source_config_sha256": "a8f16016ad585940a3a6b7f1e9542451609339d3617830ea464968dcefb899c4",
+  "summary_file": "results/kits_robustness_dev/dev_degradation_summary.csv",
+  "summary_sha256": "2e2a26d161cbcf22ae85be92e8f3dd3cafb65b7635c13eebcc6fa9fc445cf52d",
+  "selected_variants": [
+    "lowres_8mm"
+  ],
+  "excluded_types": [
+    "noise",
+    "contrast"
+  ],
+  "reason": "Mildest eligible strength per type under the predeclared Dice-only rule; noise and contrast had fewer than five clear drops.",
+  "primary_score": "model_diff_mean_region",
+  "secondary_score": "entropy_mean_region",
+  "uncertainty_scores_seen": false,
+  "test_set_used": false,
+  "dataset_scope": "Retains only the 20 development scans. Test inference is a separate step requiring its own plan.",
+  "candidate_predictions": "data/predictions/kits_robustness_dev",
+  "final_config": "configs/kits_perturbed.yaml",
+  "final_config_sha256": "8db0218351d301a7864bc9834e94e64d947717aaaea280ca952f0203907e2f66",
+  "selection_rule": {
+    "expected_dev_cases": 20,
+    "min_dice_drop": 0.02,
+    "min_affected_cases": 5,
+    "min_remaining_good_cases": 5,
+    "catastrophic_dice": 0.5,
+    "max_new_catastrophic_cases": 2,
+    "bad_rule": "dice_below_083",
+    "rule": "mildest_eligible_per_type",
+    "status": "candidates_only",
+    "max_run_minutes": 480,
+    "timing_csv": "results/kits_robustness_timing/timings.csv",
+    "timing_variant": "noise_60"
+  }
+}

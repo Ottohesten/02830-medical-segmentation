@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "config_and_source_hashes_match_plan": true,
+  "exact_case_variant_model_timing_coverage": true,
+  "n_cases": 80,
+  "n_predictions": 320,
+  "n_prediction_files": 640,
+  "prediction_bytes": 303793357,
+  "dice_or_scores_present": false,
+  "elapsed_minutes": 41.54001313288333,
+  "verification_wall_seconds": 63.31916750000164,
+  "timing_scope": "Prediction intervals exclude loading, perturbing, saving, and model setup; model wall intervals include them. Total wall time also includes verification."
+}

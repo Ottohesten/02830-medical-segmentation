@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-20 (exploratory scores from the real 3 mm vs. 6 mm differences).*
+*Last updated: 2026-10-21 (robustness step 6 complete; report figure/summary ready; group presentation next).*
 
 | | |
 |---|---|
@@ -66,6 +66,15 @@ The usual trick (ask several copies of the same model) is impossible because onl
   (0.895). The rule fixed in advance picked a different score on the 20 dev scans (the control direction, 0.747 on
   test), so nothing here is a result yet: a chosen score must be tested once on new scans (the G3 pool).
 
+- Robustness (Otto, 2026-10-21; own experiment, locked G1 unchanged): dev-selected lowres_8mm reduces test
+  median 3 mm Dice from 0.90955 to 0.87865 (median paired loss 0.03010); Dice < 0.83 rises from 11 to 21/80.
+  Primary score change versus Dice loss is inconclusive (rho 0.215, 95% CI [-0.036, 0.459]), while the
+  mixed-queue review-AUC under that threshold is 0.8086 versus volume 0.4648 and random 0.5030.
+  Entropy rises in 79/80 cases but remains secondary. This supports failure ranking under resolution loss,
+  with a limitation in detecting the degradation itself; it does not establish general domain-shift robustness.
+  Full dev/test, both-model, both-rule results: `results/kits_robustness_eval/`. The report figure (PDF/PNG),
+  caption, and eight-line summary are ready in `results/kits_robustness_eval/report/`; group presentation is next.
+
 ### G2 — interface and user study
 
 - Browser interface (NiiVue + small Python server), Chrome on a MacBook trackpad, English UI. The heatmap shows voxel
@@ -103,7 +112,8 @@ trained, so there is no result yet.
 | Power simulation | `results/study_kits/` |
 | User-study documents | `docs/study/` — session guide, consent form, pilot plan, analysis plan (locked after the pilot) |
 | G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` |
-| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Rasmus) |
+| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Otto; steps 1–6 complete; report figure/summary ready; group presentation next) |
+| Robustness report material | [Figure PDF](results/kits_robustness_eval/report/fig_robustness_summary_test.pdf), [PNG](results/kits_robustness_eval/report/fig_robustness_summary_test.png), [caption](results/kits_robustness_eval/report/caption.md), [eight-line summary](results/kits_robustness_eval/report/summary.md) |
 | HPC job scripts (never run on the cluster) | `jobs/` |
 | Scans, model output, weights (not in git) | `data/`, `models/` — download with `scripts/download_data.py` and `download_model.py` |
 

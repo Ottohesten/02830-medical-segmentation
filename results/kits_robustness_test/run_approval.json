@@ -1,0 +1,18 @@
+{
+  "recorded_at_utc": "2026-10-21T00:11:01.796363+00:00",
+  "user_reply": "Ja, start med loft på 8 timer",
+  "max_run_minutes": 480,
+  "n_test_cases": 80,
+  "n_predictions": 320,
+  "variants": [
+    "clean",
+    "lowres_8mm"
+  ],
+  "resolutions": [
+    "fast",
+    "fastest"
+  ],
+  "ground_truth_or_score_evaluation_authorized_in_this_run": false,
+  "approved_plan_sha256": "4a6ab746a78c9a70a9c0e2c82438dad33cdaf08ca7ae6d3ff8b9d06bed8774bb",
+  "approved_config_sha256": "65ee277670aa5687f51500f733658a3bb31c4e914c42996ee7bb94a2fb402a8b"
+}

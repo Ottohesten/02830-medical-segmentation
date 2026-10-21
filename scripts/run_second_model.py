@@ -1,4 +1,4 @@
-"""Predict the clean scans with the second model (uncertainty.second_model_resolution, e.g. 6 mm).
+"""Predict clean and configured perturbed scans with the second model (e.g. the 6 mm network).
 
 The disagreement between the main and the second model is used as an uncertainty score and heatmap.
 
@@ -10,6 +10,7 @@ from segreview.pipeline import step_second_model
 
 
 def main():
+    """Read the config and run missing second-model predictions for every configured variant."""
     parser = config_arg_parser(__doc__)
     parser.add_argument("--overwrite", action="store_true", help="run again even if output exists")
     args = parser.parse_args()

@@ -1,0 +1,68 @@
+{
+  "scope": "3 mm model only; dev Dice only; no uncertainty scores or test inference",
+  "n_cases": 20,
+  "n_variants_including_clean": 9,
+  "n_predictions": 180,
+  "reference_timing_csv": "results/kits_robustness_timing/timings.csv",
+  "unscaled_minutes": 18.267425317499146,
+  "mean_voxel_ratio_dev_to_reference": 2.177454545454545,
+  "voxel_scaled_minutes": 39.776488291339966,
+  "estimate_limitations": "Two measured scans, one noise type; raw-voxel scaling is a rough planning proxy; excludes Dice analysis",
+  "max_run_minutes": 480,
+  "candidate_specs": [
+    {
+      "name": "noise_30",
+      "type": "noise",
+      "strength": 30
+    },
+    {
+      "name": "noise_60",
+      "type": "noise",
+      "strength": 60
+    },
+    {
+      "name": "noise_120",
+      "type": "noise",
+      "strength": 120
+    },
+    {
+      "name": "lowres_6mm",
+      "type": "lowres",
+      "strength": 6
+    },
+    {
+      "name": "lowres_8mm",
+      "type": "lowres",
+      "strength": 8
+    },
+    {
+      "name": "lowres_12mm",
+      "type": "lowres",
+      "strength": 12
+    },
+    {
+      "name": "contrast_80",
+      "type": "contrast",
+      "strength": 0.8
+    },
+    {
+      "name": "contrast_90",
+      "type": "contrast",
+      "strength": 0.9
+    }
+  ],
+  "selection_rule": {
+    "expected_dev_cases": 20,
+    "min_dice_drop": 0.02,
+    "min_affected_cases": 5,
+    "min_remaining_good_cases": 5,
+    "catastrophic_dice": 0.5,
+    "max_new_catastrophic_cases": 2,
+    "bad_rule": "dice_below_083",
+    "rule": "mildest_eligible_per_type",
+    "status": "candidates_only",
+    "max_run_minutes": 480,
+    "timing_csv": "results/kits_robustness_timing/timings.csv",
+    "timing_variant": "noise_60"
+  }
+}

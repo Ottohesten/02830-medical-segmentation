@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "config_source_and_stage_hashes_match_pre_outcome_plan": true,
+  "n_cases": 100,
+  "n_score_rows": 200,
+  "n_model_dice_rows": 400,
+  "n_paired_rows": 100,
+  "n_metric_rows": 60,
+  "n_prediction_files": 800,
+  "prediction_bytes": 424973659,
+  "n_archived_inputs_unchanged": 720,
+  "mixed_bootstrap_unit": "case_id",
+  "mixed_independent_row_rho_p_values_omitted": true
+}

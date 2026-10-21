@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "n_patients": 100,
+  "n_score_rows": 200,
+  "n_dice_rows": 200,
+  "n_model_dice_rows": 400,
+  "n_paired_rows": 100,
+  "queue_sets": [
+    "clean_dev",
+    "clean_test",
+    "lowres_8mm_dev",
+    "lowres_8mm_test",
+    "mixed_dev",
+    "mixed_test"
+  ],
+  "mixed_queue_bootstrap_unit": "case_id",
+  "no_additional_strength_or_score_selection": true
+}

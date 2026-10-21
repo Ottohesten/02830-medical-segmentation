@@ -1,0 +1,145 @@
+# Step 4: both models on 80 held-out scans, clean and locked lowres_8mm.
+# The runner performs inference only; Dice and scores belong to step 5.
+# The original configs/kits_perturbed.yaml and strength lock remain unchanged.
+name: kits_robustness_test
+seed: 42
+compute:
+  device: cuda
+  num_threads: 6
+  reduce_chunk_slices: 16
+paths:
+  raw_dir: data/raw
+  models_dir: models
+  predictions_dir: data/predictions
+  results_dir: results
+dataset:
+  file: configs/datasets/kits23.yaml
+  n_cases: 100
+  selection: random
+  split:
+    dev:
+    - case_00040
+    - case_00051
+    - case_00135
+    - case_00178
+    - case_00236
+    - case_00249
+    - case_00261
+    - case_00271
+    - case_00291
+    - case_00295
+    - case_00298
+    - case_00456
+    - case_00465
+    - case_00467
+    - case_00528
+    - case_00544
+    - case_00559
+    - case_00563
+    - case_00574
+    - case_00582
+model:
+  task: total
+  resolution: fast
+  folds:
+  - 0
+  tile_step_size: 0.8
+uncertainty:
+  border_mm: 5
+  second_model_resolution: fastest
+  tta:
+    n_passes: 0
+    max_shift_voxels: 2
+    intensity_scale: 0.05
+    intensity_shift_hu: 20
+    noise_std_hu: 10
+heatmap_eval:
+  candidates:
+  - entropy
+  - m2_diff
+  top_fraction: 0.1
+plausibility:
+  body_threshold_hu: -500
+  min_component_ml: 20
+perturbations:
+- name: lowres_8mm
+  type: lowres
+  strength: 8
+perturbation_settings:
+  contrast_level_hu: 40
+evaluation:
+  splits:
+  - test
+  bad_rules:
+  - name: worst10
+    rule: worst_fraction
+    value: 0.1
+  - name: dice_below_083
+    rule: threshold
+    value: 0.83
+  n_bootstrap: 2000
+  ci_level: 0.95
+  n_random_orders: 1000
+  combinations:
+  - name: combo_mean_missing
+    rule: mean_rank
+    scores:
+    - model_diff_mean_region
+    - plaus_missing_side
+visualization:
+  ct_window_level: 40
+  ct_window_width: 400
+  dice_bin_width: 0.01
+  share_bin_width: 0.05
+  label_worst_n: 3
+  dpi: 120
+report:
+  set: clean_test
+  primary: model_diff_mean_region
+  heatmap: entropy
+  example_bad_rule: worst10
+robustness_selection:
+  expected_dev_cases: 20
+  min_dice_drop: 0.02
+  min_affected_cases: 5
+  min_remaining_good_cases: 5
+  catastrophic_dice: 0.5
+  max_new_catastrophic_cases: 2
+  bad_rule: dice_below_083
+  rule: mildest_eligible_per_type
+  status: locked_on_development_dice
+  max_run_minutes: 480
+  timing_csv: results/kits_robustness_timing/timings.csv
+  timing_variant: noise_60
+strength_lock:
+  date: '2026-10-21'
+  source_config: configs/kits_robustness_dev.yaml
+  source_config_sha256: a8f16016ad585940a3a6b7f1e9542451609339d3617830ea464968dcefb899c4
+  summary_file: results/kits_robustness_dev/dev_degradation_summary.csv
+  summary_sha256: 2e2a26d161cbcf22ae85be92e8f3dd3cafb65b7635c13eebcc6fa9fc445cf52d
+  selected_variants:
+  - lowres_8mm
+  excluded_types:
+  - noise
+  - contrast
+  reason: Mildest eligible strength per type under the predeclared Dice-only rule;
+    noise and contrast had fewer than five clear drops.
+  primary_score: model_diff_mean_region
+  secondary_score: entropy_mean_region
+  uncertainty_scores_seen: false
+  test_set_used: false
+  dataset_scope: Retains only the 20 development scans. Test inference is a separate
+    step requiring its own plan.
+  candidate_predictions: data/predictions/kits_robustness_dev
+robustness_test:
+  splits:
+  - test
+  expected_test_cases: 80
+  reference_config: configs/kits100.yaml
+  locked_config: configs/kits_perturbed.yaml
+  strength_lock_file: results/kits_robustness_dev/strength_lock.json
+  development_timing_csv: results/kits_robustness_dev/inference_times.csv
+  benchmark_timing_csv: results/kits_robustness_timing/timings.csv
+  benchmark_model_load_csv: results/kits_robustness_timing/model_load_times.csv
+  benchmark_perturbation: noise_60
+  max_run_minutes: 480
