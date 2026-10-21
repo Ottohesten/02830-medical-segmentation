@@ -1,0 +1,4 @@
+weights,loss,forward_s,batch_size
+random (no pretraining),4.861593246459961,0.9717431999742985,2
+nnU-Net default fine-tuning start (last layer re-initialized),7.146092891693115,0.013680899981409311,2
+all pretrained weights,-0.8274330496788025,0.01458830013871193,2

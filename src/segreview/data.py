@@ -47,6 +47,17 @@ def _stem(path: Path) -> str:
     return path.name.removesuffix(".gz").removesuffix(".nii")
 
 
+def random_draw(cfg: dict, all_ids: list[str]) -> list[str]:
+    """All scan ids in the order of the config's seeded random draw (dataset.selection: random).
+
+    The first n are the config's selection (dataset.n_cases); the ones after them are the scans a larger
+    selection would add, in order. For example, the G3 pool is the next scans after the 100 of kits100.
+    Input: config (seed), all scan ids of the dataset. Output: all ids, in the order they are drawn.
+    """
+    ids = sorted(all_ids)
+    return [ids[i] for i in np.random.default_rng(cfg["seed"]).permutation(len(ids))]
+
+
 def select_case_ids(cfg: dict, all_ids: list[str]) -> list[str]:
     """Pick the scans to use from the full list of scan ids (see module docstring).
 
@@ -60,8 +71,7 @@ def select_case_ids(cfg: dict, all_ids: list[str]) -> list[str]:
     if selection == "first":
         return ids[:n]
     if selection == "random":
-        order = np.random.default_rng(cfg["seed"]).permutation(len(ids))
-        return sorted(ids[i] for i in order[:n])
+        return sorted(random_draw(cfg, ids)[:n])
     raise ValueError(f"Unknown selection '{selection}'")
 
 
@@ -180,14 +190,10 @@ def _local_cases(cfg: dict) -> dict[str, Case]:
     return local
 
 
-def selected_case_ids(cfg: dict, local: dict[str, Case] | None = None) -> list[str]:
-    """The ids of the scans the config selects. The scans themselves need not be downloaded.
-
-    If the dataset has a case_list.txt (written at download time), the selection is drawn from that full
-    list; otherwise from the scans on disk. So only the case list is needed to know, for example, which
-    100 scans kits100 uses on a machine where they are not downloaded.
+def all_case_ids(cfg: dict, local: dict[str, Case] | None = None) -> list[str]:
+    """All scan ids of the dataset: from case_list.txt (written at download time) if it exists, else the scans on
+    disk. The scans themselves need not be downloaded.
     Input: the loaded config, and optionally the scans on disk (from _local_cases, to avoid a second search).
-    Output: the selected ids, sorted.
     """
     case_list = dataset_dir(cfg) / CASE_LIST_FILE
     if case_list.exists():
@@ -197,7 +203,15 @@ def selected_case_ids(cfg: dict, local: dict[str, Case] | None = None) -> list[s
     if not all_ids:
         raise FileNotFoundError(f"No scans matching {dataset_dir(cfg) / cfg['dataset']['image_glob']}. "
                                 "Run scripts/download_data.py first.")
-    return select_case_ids(cfg, all_ids)
+    return all_ids
+
+
+def selected_case_ids(cfg: dict, local: dict[str, Case] | None = None) -> list[str]:
+    """The ids of the scans the config selects, drawn from all_case_ids. The scans need not be downloaded, so only
+    the case list is needed to know, for example, which 100 scans kits100 uses on a machine without them.
+    Output: the selected ids, sorted.
+    """
+    return select_case_ids(cfg, all_case_ids(cfg, local))
 
 
 def list_cases(cfg: dict, splits: list[str] | None = None) -> list[Case]:

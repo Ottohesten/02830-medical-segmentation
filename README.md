@@ -335,7 +335,13 @@ powershell -ExecutionPolicy Bypass -File frederik\windows_setup.ps1             
 .venv\Scripts\python.exe -m pytest
 .venv\Scripts\python.exe scripts\g3_smoke_test.py --config configs\g3_smoke_gpu.yaml       # 6 mm, batch 2 and 13
 .venv\Scripts\python.exe scripts\g3_smoke_test.py --config configs\g3_smoke_gpu_3mm.yaml   # 3 mm, batch 2
+.venv\Scripts\python.exe scripts\g3_smoke_estimate.py --config configs\g3_smoke_gpu.yaml   # planning estimates
 ```
+
+`g3_smoke_estimate.py` turns the two smoke tests into planning estimates (time of one fine-tuning run and of the
+whole G3 plan, disk space): it reads their `summary.csv`, measures the time to predict a scan with G1's inference
+code on the 2 smoke-test scans, and asks the dataset's server for the file sizes of kits100 and the G3 pool. Output:
+`results/g3_smoke_gpu/{estimates,disk,inference_times_gpu}.csv`. The numbers are estimates for planning, not results.
 
 ## Layout
 

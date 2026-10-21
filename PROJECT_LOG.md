@@ -458,6 +458,73 @@ Task document: [docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md) (Frede
 - `[admin]` Not run yet, on purpose (Frederik: set up, do not train yet): the GPU smoke test and therefore the
   estimates for one fine-tuning run, the whole plan and the disk space (phase 1, steps 4b–6).
 
+## 2026-10-21: G3 phase 1 — GPU smoke test on Frederik's PC (RTX 4090, Windows)
+
+Machine for every number below (`machine.json` in each result folder): Windows 11 (build 26200), Intel Core
+i9-14900K, 31.7 GiB RAM, NVIDIA GeForce RTX 4090 (24,564 MiB, driver 617.14), Python 3.12, torch 2.2.2+cu121, CUDA
+12.1, cuDNN 8.8.1 (`.venv` from `frederik/windows_setup.ps1`). Code: commit `9686315` plus the measurement changes
+listed at the end of this section (in the next commit). Before the runs, other programs used 18.7 of 34.1 GB RAM
+and 2.3 GB of the GPU's memory (games closed). Seed 42.
+
+- `[experiment]` GPU smoke test (`scripts/g3_smoke_test.py`) for the 6 mm model at batch 2 and 13
+  (`configs/g3_smoke_gpu.yaml`) and the 3 mm model at batch 2 (`configs/g3_smoke_gpu_3mm.yaml`), each with 0 and 16
+  augmentation workers; 30 training steps per run (10 warm-up, not counted) and 10 validation steps. About 2.5 min
+  per model. Results: `results/g3_smoke_gpu/`, `results/g3_smoke_gpu_3mm/` (`summary.csv`, `timing.csv`,
+  `cases.csv`, `sanity.csv`, `machine.json`). No model was saved.
+- `[result]` Fine-tuning runs on Windows: nnU-Net's trainer with spawned workers (16 for training, 8 for validation)
+  works, and with 16 workers the GPU never waited for data (0.000 s per step).
+- `[result]` Start from all weights confirmed (`sanity.csv`, loss on one batch at batch 2): random weights 4.86
+  (6 mm) / 5.07 (3 mm); nnU-Net's default start with the last layer re-initialized 7.15 / 8.85, worse than random;
+  all pretrained weights −0.83 / −0.91. Same pattern as on the Mac (6 mm: 5.38 / 7.86 / −0.77).
+- `[result]` The data line up (`cases.csv`): kidney Dice of the model against the ground truth on the network grid
+  6 mm 0.930 / 0.904, 3 mm 0.924 / 0.912 (case_00183 / case_00002). The correction changes 267 / 523 voxels (6 mm;
+  the Mac: 267 / 522, so GPU and CPU differ in one voxel) and 2,225 / 3,692 voxels (3 mm).
+- `[result]` Time per training step with 16 workers (mean of 20 steps; data wait + step): 6 mm batch 2 0.040 s,
+  6 mm batch 13 0.181 s, 3 mm batch 2 0.176 s; per validation step 0.021 / 0.165 / 0.208 s. The Mac (CPU, batch
+  2 / 13): 21 s / 586 s per step. Preparing one batch in a single process (0 workers, 1 thread): 6 mm 0.41 s
+  (batch 2) and 2.15 s (batch 13), i.e. 0.17–0.21 s per 64³ patch (Mac: 0.8–0.9 s); 3 mm 2.23 s (batch 2). So about
+  12–13 workers are needed for the GPU never to wait (2.15 / 0.181, 2.23 / 0.176). (`summary.csv`)
+- `[result]` GPU memory (torch's peak allocated / reserved): 6 mm batch 2 2.2 / 2.9 GB, batch 13 12.4 / 17.3 GB;
+  3 mm batch 2 11.7 / 16.3 GB. Fits in the 24 GB together with the ~2.3 GB Windows and other programs use.
+- `[result]` RAM (`summary.csv`): with 16 workers the run's processes used 11.4 GB (6 mm batch 2), 12.7 GB (batch
+  13) and 14.2 GB (3 mm) of RAM (private working sets; about 0.5 GB per worker); with 0 workers 2.3–2.4 GB. The PC's
+  RAM in use reached 31.6 / 32.3 / 34.0 GB of 34.1 GB. Windows' commit (memory reserved against RAM + page file)
+  reached 62 / 78 / 79 GB with 16 workers (2.3–2.5 GB per worker process, which loads CUDA torch) and 8–21 GB
+  with 0 workers.
+- `[result]` **On this PC the RAM, not the GPU, is the limit:** with 16 workers and the usual programs open, the
+  RAM was full for the 3 mm model (34.0 of 34.1 GB). For long runs: close other programs (18.7 GB in use before the
+  test), or use 12–14 workers (each about 0.5 GB RAM and 2.3–2.5 GB commit; at 12 the GPU may wait a little). If the
+  commit passes RAM + page file, Windows stops the run ("the paging file is too small", WinError 1455).
+- `[result]` Prediction time per scan on this GPU with G1's inference code (resampling, network, reduction,
+  resampling back; `scripts/g3_smoke_estimate.py`, `results/g3_smoke_gpu/inference_times_gpu.csv`): 3 mm 6.4 / 8.5 s
+  (mean 7.45 s), 6 mm 3.8 / 5.7 s (mean 4.75 s), for the 2 smoke-test scans (195 and 261 slices; kits100: mean
+  224, median 132). The Mac (CPU, kits100 run): 138 s / 24 s.
+- `[result]` **Estimates for planning, not results** (`scripts/g3_smoke_estimate.py`,
+  `results/g3_smoke_gpu/estimates.csv`; one run = steps × training step + epochs × 50 validation steps, 16
+  workers): one fine-tuning run of 2,500 / 6,250 steps takes 2 / 5 min (6 mm, batch 2), 9 / 22 min (6 mm, batch
+  13) and 9 / 23 min (3 mm, batch 2). The whole plan: 11 fine-tuned 3 mm models × 6,250 steps 4.2 h + predicting
+  kits100 (100 scans) with the 11 models and the original 2.5 h + the queue on the pool 0.3 h = about 7 h of GPU
+  time (docs/g3_plan.md estimated one to two days on a V100). Not included: starting each run (seconds), the 6 mm
+  stage and the grid of settings in phase 2, extra seeds. The prediction time rests on 2 scans.
+- `[result]` Disk (`results/g3_smoke_gpu/disk.csv`): KiTS files of kits100 9.94 GB and of the G3 pool (positions
+  101–200 of the draw) 8.26 GB (sizes from the dataset's server, nothing downloaded); preprocessed training data
+  for 100 pool scans 0.07 GB (6 mm) / 0.43 GB (3 mm); checkpoints 0.33 GB per fine-tuned model (final + best),
+  3.6 GB for the plan's 11 models. Predictions are not included (phase 2 decides what is saved). C: has 1,035 GB free.
+- `[result]` The seed-42 draw order confirms the pool definition: its first 100 scans are exactly kits100, and
+  positions 101–102 are the 2 smoke-test scans (checked in `scripts/g3_smoke_estimate.py`).
+- `[experiment]` Two earlier runs the same night were replaced by the final run, because the RAM measurement was
+  wrong: (1) the first measured Windows' commit and called it RAM (62–78 GB, more than the PC has); its step times
+  matched the final run (6 mm batch 13: 0.177 s). (2) the second read the private working sets every 0.5 s, which
+  paused the run: every 3rd step was 0.25–0.3 s slower (6 mm batch 13: mean 0.255 s, median 0.179 s).
+- `[decision]` RAM measurement on Windows (`src/segreview/memory.py`): RAM = the private working sets of all the
+  run's processes, read once when the steps are done (the workers are still running); commit and the PC's RAM in
+  use are sampled every 0.5 s (cheap). In the final run the mean step time equals the median (0.181 / 0.181 s).
+- `[admin]` New since commit `9686315`: `scripts/g3_smoke_estimate.py` with `src/segreview/g3_estimates.py`
+  (settings in `configs/g3_smoke_gpu.yaml`, section `estimate`); `random_draw` and `all_case_ids` in
+  `src/segreview/data.py` (the draw order, also needed for the pool in phase 2); the smoke test takes the machine
+  info at its start, so its own new result files no longer count as uncommitted changes. Tests: 94 passed, 37
+  skipped.
+
 ---
 
 ## Open questions (update when answered, with the date)

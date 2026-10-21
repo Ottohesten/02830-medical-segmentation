@@ -133,11 +133,12 @@ def main():
     from segreview.config import load_config, pick_device, results_dir
     from segreview.data import CASE_LIST_FILE, Case, dataset_dir, load_canonical, load_label_map, selected_case_ids
     from segreview.inference import OrganSegmenter
-    from segreview.machine import write_machine_info
+    from segreview.machine import machine_info, write_machine_info
     from segreview.memory import PeakMemory
     from segreview.metrics import dice
     from segreview.weights import model_folder
 
+    machine_at_start = machine_info()           # before this run writes its result files (git status of the code)
     source = load_config(REPO_ROOT / cfg["source_config"])
     device = pick_device(cfg["compute"]["device"])
     if device.type == "cuda" and not torch.cuda.is_available():
@@ -357,7 +358,7 @@ def main():
     summary["step_s_per_sample"] = summary.step_s / summary.batch_size
     summary = summary.merge(pd.DataFrame(runs), on=keys[1:], how="left")
     summary.round(4).to_csv(out_dir / "summary.csv", index=False)
-    write_machine_info(out_dir / "machine.json", config=str(args.config),
+    write_machine_info(out_dir / "machine.json", info=machine_at_start, config=str(args.config),
                        run_seconds=round(time.perf_counter() - started), torch_threads=torch.get_num_threads(),
                        cudnn_benchmark=torch.backends.cudnn.benchmark, preparation_peak=preparation_memory.as_dict())
     print(summary.round(3).to_string(index=False))

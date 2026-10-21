@@ -83,7 +83,7 @@ def test_peak_ram_sees_an_allocation_in_this_process():
     with PeakMemory(interval=0.05) as peak:
         block = np.ones(SIZE // 8)
         time.sleep(0.3)
-        del block
+    del block                                         # after the block: Windows reads the RAM when the block ends
     assert peak.ram_method == memory_method()
     assert peak.ram_gb - before > 0.8 * SIZE / 1e9
 
@@ -102,11 +102,32 @@ def test_peak_ram_includes_child_processes():
     assert peak.ram_gb - before > 0.8 * SIZE / 1e9
 
 
+@pytest.mark.skipif(sys.platform != "win32" or memory._psutil() is None, reason="Windows with psutil only")
+def test_commit_is_measured_on_windows():
+    before = PeakMemory(interval=0.05)
+    with before:
+        pass
+    with PeakMemory(interval=0.05) as peak:
+        block = np.ones(SIZE // 8)
+        time.sleep(0.3)
+    del block
+    assert peak.commit_gb - before.commit_gb > 0.8 * SIZE / 1e9
+    assert peak.commit_gb >= peak.ram_gb > 0                 # what is in RAM is also committed
+
+
+def test_system_ram_is_plausible():
+    used = memory.system_ram_used_gb()
+    if used is None:
+        pytest.skip("the machine's RAM in use cannot be read here")
+    assert 0 < used < 10_000
+
+
 def test_no_gpu_numbers_without_cuda():
     with PeakMemory() as peak:
         pass
     assert peak.gpu_allocated_gb is None and peak.gpu_reserved_gb is None
-    assert set(peak.as_dict()) == {"peak_ram_gb", "peak_gpu_allocated_gb", "peak_gpu_reserved_gb", "peak_ram_method"}
+    assert set(peak.as_dict()) == {"peak_ram_gb", "peak_commit_gb", "peak_system_ram_gb", "peak_gpu_allocated_gb",
+                                   "peak_gpu_reserved_gb", "peak_ram_method"}
 
 
 @pytest.mark.skipif(sys.platform == "win32" and memory._psutil() is None, reason="Windows without psutil")

@@ -4,7 +4,7 @@ dataset in a temporary folder (no network: the download functions are replaced).
 import pytest
 
 from segreview import data
-from segreview.data import (CASE_LIST_FILE, dataset_dir, download_cases, list_cases, select_case_ids,
+from segreview.data import (CASE_LIST_FILE, dataset_dir, download_cases, list_cases, random_draw, select_case_ids,
                             selected_case_ids)
 
 IDS = [f"case_{i:05d}" for i in range(10)]
@@ -32,6 +32,15 @@ def put_scans(cfg, case_ids) -> None:
 def write_case_list(cfg) -> None:
     dataset_dir(cfg).mkdir(parents=True, exist_ok=True)
     (dataset_dir(cfg) / CASE_LIST_FILE).write_text("\n".join(IDS) + "\n")
+
+
+def test_random_draw_starts_with_the_selection_and_continues_it(tmp_path):
+    cfg = make_cfg(tmp_path)
+    draw = random_draw(cfg, IDS[::-1])                # the order of the input list does not matter
+    assert sorted(draw) == IDS
+    assert sorted(draw[:3]) == select_case_ids(cfg, IDS)
+    cfg["dataset"]["n_cases"] = 5                     # a larger selection adds the next scans of the same draw
+    assert sorted(draw[:5]) == select_case_ids(cfg, IDS)
 
 
 def test_selection_from_the_case_list_needs_no_downloaded_scans(tmp_path):

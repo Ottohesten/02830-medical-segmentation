@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-21T03:12:32",
+  "cpu_model": "Intel(R) Core(TM) i9-14900K",
+  "memory_total_gib": 31.7,
+  "os": "Windows 11 (version 10.0, build 26200)",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "cpu_count": 32,
+  "python": "3.12.14",
+  "torch": "2.2.2+cu121",
+  "numpy": "1.26.4",
+  "cuda": "12.1",
+  "cudnn": 8801,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "gpu_memory_mib": 24564,
+  "nvidia_driver": "617.14",
+  "gpu_compute_capability": "8.9",
+  "mps_available": false,
+  "git_commit": "9686315ac8171d0c472d77dc95c1412172232d65",
+  "git_uncommitted_changes": true,
+  "config": "configs\\g3_smoke_gpu_3mm.yaml",
+  "run_seconds": 126,
+  "torch_threads": 1,
+  "cudnn_benchmark": true,
+  "preparation_peak": {
+    "peak_ram_gb": 2.46,
+    "peak_commit_gb": 8.07,
+    "peak_system_ram_gb": 22.53,
+    "peak_gpu_allocated_gb": 2.2,
+    "peak_gpu_reserved_gb": 3.3,
+    "peak_ram_method": "uss_process_tree_at_end"
+  }
+}

@@ -39,3 +39,19 @@ training:
   warmup_iterations: 10               # not counted: cuDNN tries its algorithms and the workers fill their queue
   validation_iterations: 10           # validation steps (forward pass only) after the training steps of each run
   initial_lr: 0.001                   # fine-tuning: 10x lower than nnU-Net's default of 0.01
+
+estimate:                             # scripts/g3_smoke_estimate.py (phase 1, step 5): planning numbers computed from
+                                      # the measured times and sizes. ESTIMATES, not results
+  smoke_configs: [configs/g3_smoke_gpu.yaml, configs/g3_smoke_gpu_3mm.yaml]   # the smoke tests to read (6 mm, 3 mm)
+  workers: 16                         # use the runs with this many augmentation workers, as in a real fine-tuning run
+  steps: [2500, 6250]                 # one fine-tuning run: 10 or 25 epochs x 250 steps (docs/g3_plan.md)
+  steps_per_epoch: 250                # nnU-Net's training steps per epoch
+  validation_steps_per_epoch: 50      # nnU-Net's validation steps after each epoch
+  checkpoints_per_model: 2            # nnU-Net keeps checkpoint_final.pth and checkpoint_best.pth
+  plan:                               # the whole plan (docs/g3_plan.md, "Compute"), for the 3 mm model
+    model_resolution: fast            # the 3 mm model
+    batch_size: 2                     # its own batch size
+    models: 11                        # B and C at 3 budgets, 3 seeds at k = 20, and D
+    steps: 6250                       # 25 epochs
+    evaluation_scans: 100             # every fine-tuned model and the original model on kits100 (20 dev + 80 test)
+    pool_scans: 100                   # the G3 pool: the queue (3 mm + 6 mm model) and its disk space

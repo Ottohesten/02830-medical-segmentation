@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-20 (G3: Windows environment on Frederik's RTX 4090 ready).*
+*Last updated: 2026-10-21 (G3: GPU smoke test on Frederik's RTX 4090 done; whole plan ≈ 7 h of GPU time).*
 
 | | |
 |---|---|
@@ -35,7 +35,7 @@ opened, **show where in the scan the AI is unsure**. The goal is the most improv
 |---|---|---|
 | **G1** (core) | Rank scans by likely failure, without ground truth | **Done.** Locked and tested once on 80 test scans |
 | **G2** (core) | Review interface with an uncertainty heatmap + user study | Interface and analysis built and tested; **pilot and study not run yet** |
-| **G3** (stretch) | Fine-tune the model on corrections | Plan and Mac smoke test only. Frederik: Windows environment on the RTX 4090 ready, GPU smoke test next ([task](docs/tasks/g3_finetuning.md)) |
+| **G3** (stretch) | Fine-tune the model on corrections | Smoke test done on the RTX 4090 (2026-10-21): fine-tuning works there, ≈ 23 min per 3 mm run. Nothing trained for real yet; pipeline (phase 2) next ([task](docs/tasks/g3_finetuning.md)) |
 
 ### G1 — how the ranking works and how well it does
 
@@ -83,7 +83,9 @@ The usual trick (ask several copies of the same model) is impossible because onl
 
 Kristine's question (2026-10-06): are the scans with the biggest errors also the ones where correction helps future
 training most? G3 is how we would answer it. The plan and smoke test show fine-tuning can start, but nothing has been
-trained, so there is no result yet.
+trained, so there is no result yet. On Frederik's RTX 4090 (2026-10-21) a training step takes about 0.18 s for both
+models, so one 3 mm fine-tuning run of 6,250 steps takes about 23 min and the whole plan about 7 h of GPU time
+(estimates, `results/g3_smoke_gpu/estimates.csv`); the PC's RAM, not the GPU, is the limit.
 
 ## 3. Where things are
 
@@ -143,8 +145,8 @@ The full working rules (git, branches, locked results, new experiments, what to 
    (`far_6mm_drops_ml`) or a different one, logged with date and reason before the pool is opened (log 2026-10-20).
 3. Everyone installs the project and tries the demo (`README.md` → Quick start).
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
-5. G3 (Frederik): the GPU smoke test on the RTX 4090 (Windows environment and configs ready), then the pipeline
-   with the 6 mm model ([docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)).
+5. G3 (Frederik): the pipeline with the 6 mm model (phase 2; the GPU smoke test is done, 2026-10-21)
+   ([docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)).
 6. Divide the report sections (the Trello board exists).
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).

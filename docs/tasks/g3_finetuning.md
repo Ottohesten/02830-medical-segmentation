@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `frederik/g3` |
 | **Created** | 2026-10-20 |
-| **Status** | Phase 1 (setup and GPU smoke test): Windows environment ready; smoke test not run yet (waits for the go-ahead) |
+| **Status** | Phase 1 (setup and GPU smoke test) done 2026-10-21; phase 2 waits for the go-ahead |
 | **Machine** | Frederik's PC: NVIDIA RTX 4090 (24 GB), Intel i9-14900K (24 cores, 32 threads), 32 GB RAM, Windows 11 Home; the project runs natively on Windows (section 3) |
 
 This document is the task description **and** the working notes. Whoever works on the task (with or without an
@@ -104,21 +104,24 @@ Tick each box when done and write the date and a short note (numbers + file path
   (3 mm, batch 2): CUDA forced, torch threads 1, augmentation workers 0 and 16, 30 steps (10 warm-up), 10
   validation steps.
   *Notes:* 2026-10-20. The smoke test was extended for the GPU and for Windows (see section 6).
-- [ ] **4b. Run the smoke tests** (only after the go-ahead; close games and other GPU programs first):
+- [x] **4b. Run the smoke tests** (only after the go-ahead; close games and other GPU programs first):
 
   ```powershell
   .venv\Scripts\python.exe scripts\g3_smoke_test.py --config configs\g3_smoke_gpu.yaml       # -> results/g3_smoke_gpu/
   .venv\Scripts\python.exe scripts\g3_smoke_test.py --config configs\g3_smoke_gpu_3mm.yaml   # -> results/g3_smoke_gpu_3mm/
   ```
 
-  *Notes:*
-- [ ] **5. Report and estimates:** time per training step and per batch preparation, GPU memory and RAM, per model
+  *Notes:* 2026-10-21 (go-ahead from Frederik): both run, about 2.5 min each. Two earlier runs that night were
+  replaced because the RAM measurement was wrong (commit instead of RAM; then a measurement that slowed every 3rd
+  step); fixed in `src/segreview/memory.py` (log 2026-10-21).
+- [x] **5. Report and estimates:** time per training step and per batch preparation, GPU memory and RAM, per model
   and batch size (`summary.csv`); estimate one fine-tuning run of 2,500 and 6,250 steps (6 mm and 3 mm), the whole
   plan (about 11 fine-tuned 3 mm models + evaluation), and the disk space for the pool (100 scans) and kits100.
-  *Notes:*
-- [ ] **6. Results and log:** results in `results/g3_smoke_gpu/` and `results/g3_smoke_gpu_3mm/` (with
+  *Notes:* 2026-10-21: `scripts/g3_smoke_estimate.py` → `results/g3_smoke_gpu/{estimates,disk,inference_times_gpu}.csv`.
+  Numbers in section 5.
+- [x] **6. Results and log:** results in `results/g3_smoke_gpu/` and `results/g3_smoke_gpu_3mm/` (with
   `machine.json`), dated `[experiment]`/`[result]` entries in PROJECT_LOG.md. Stop and report.
-  *Notes:*
+  *Notes:* 2026-10-21: done (PROJECT_LOG.md, 2026-10-21). Phase 1 finished.
 
 ### Phase 2 — G3 pipeline with the 6 mm model (only after the go-ahead)
 
@@ -144,6 +147,28 @@ Tick each box when done and write the date and a short note (numbers + file path
 
 *(Filled in at the end of each phase.)*
 
+**Phase 1 (2026-10-21), RTX 4090 on Windows** (details and files: PROJECT_LOG.md, 2026-10-21):
+
+| | 6 mm, batch 2 | 6 mm, batch 13 | 3 mm, batch 2 |
+|---|---|---|---|
+| Training step, 16 workers (data wait + step) | 0.040 s | 0.181 s | 0.176 s |
+| Validation step | 0.021 s | 0.165 s | 0.208 s |
+| Preparing one batch in one process (0 workers) | 0.41 s | 2.15 s | 2.23 s |
+| GPU memory, torch peak allocated / reserved | 2.2 / 2.9 GB | 12.4 / 17.3 GB | 11.7 / 16.3 GB |
+| RAM of the run, 16 workers (0 workers) | 11.4 (2.3) GB | 12.7 (2.4) GB | 14.2 (2.4) GB |
+| PC's RAM in use, 16 workers (of 34.1 GB) | 31.6 GB | 32.3 GB | 34.0 GB |
+| Windows commit, 16 workers | 62 GB | 78 GB | 79 GB |
+| One fine-tuning run, 2,500 / 6,250 steps (estimate) | 2 / 5 min | 9 / 22 min | 9 / 23 min |
+
+- The start from all pretrained weights is confirmed (loss −0.83 / −0.91 vs. 7.15 / 8.85 with the last layer
+  re-initialized), and the corrected targets line up with the model (kidney Dice 0.90–0.93).
+- Whole plan (estimate): 11 fine-tuned 3 mm models 4.2 h + predicting kits100 with them and the original 2.5 h + the
+  queue 0.3 h ≈ **7 h of GPU time**. Prediction per scan: 3 mm 7.5 s, 6 mm 4.8 s (2 scans).
+- Disk: kits100 9.9 GB, the pool 8.3 GB, checkpoints 0.33 GB per fine-tuned model; no problem.
+- **RAM is the limit on this PC, not the GPU:** with 16 workers and other programs open (18.7 GB before the test),
+  the RAM was full for the 3 mm model. For the real runs: close other programs, or use 12–14 workers (about 12–13
+  are needed for the GPU never to wait).
+
 ## 6. Decisions made in this task
 
 *(Date — decision — why. Also add each one to PROJECT_LOG.md.)*
@@ -151,6 +176,8 @@ Tick each box when done and write the date and a short note (numbers + file path
 - 2026-10-20 — Run natively on Windows in a separate `.venv` with `uv.lock`'s versions (section 3), not in WSL2 —
   Frederik prefers to stay on Windows. WSL2 (Linux inside Windows) was planned first, because `uv.lock` has no
   Windows packages, and dropped the same day before anything was installed.
+- 2026-10-21 — RAM on Windows is measured as the private working sets of all processes, read once at the end of each
+  run; commit and the PC's RAM in use are sampled — reading the working sets during the run slowed every 3rd step.
 - 2026-10-20 — Tools that only this Windows PC needs live in `frederik/` (Frederik's request); the G3 code stays in
   `configs/`, `scripts/` and `src/segreview/` (docs/g3_plan.md), so the group can find and run it elsewhere too.
 - 2026-10-20 — Own configs for the GPU smoke test (`g3_smoke_gpu`, `g3_smoke_gpu_3mm`) instead of editing
@@ -182,3 +209,7 @@ A new chat starts by reading this section.)*
   yet. Nothing has been trained. **Next action:** Frederik commits the branch (GitHub Desktop) and gives the go-ahead
   for step 4b (the smoke tests). Close games and other GPU programs first: during the setup other programs used
   about 4.7 GB of the GPU's memory and 28–56 % of its time.
+- 2026-10-21: **Phase 1 finished** (steps 4b–6): smoke tests for the 6 mm and 3 mm model on the RTX 4090,
+  estimates and disk space (section 5, PROJECT_LOG.md 2026-10-21). Not committed yet. **Next action:** Frederik
+  commits and decides on phase 2 (the G3 pipeline with the 6 mm model). Before phase 2 reads ground truth of the
+  pool, the group logs which disagreement score is tested on the pool (section 7).

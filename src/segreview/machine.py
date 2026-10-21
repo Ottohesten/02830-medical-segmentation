@@ -171,8 +171,12 @@ def machine_info() -> dict:
     return info
 
 
-def write_machine_info(path: Path, **extra) -> dict:
-    """Save machine_info() (plus any extra fields, e.g. the config file and run time) as JSON at 'path'."""
-    info = {**machine_info(), **extra}
+def write_machine_info(path: Path, info: dict | None = None, **extra) -> dict:
+    """Save machine_info() (plus any extra fields, e.g. the config file and run time) as JSON at 'path'.
+
+    info: machine_info() taken earlier, e.g. at the start of a run, before the run writes its own result files
+    (otherwise git sees those new files and always reports uncommitted changes). Default: taken now.
+    """
+    info = {**(machine_info() if info is None else info), **extra}
     path.write_text(json.dumps(info, indent=2, default=str) + "\n")
     return info

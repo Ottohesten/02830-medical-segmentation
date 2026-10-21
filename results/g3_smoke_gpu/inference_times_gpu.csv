@@ -1,0 +1,5 @@
+model_resolution,case_id,shape,seconds
+fastest,case_00183,512x512x195,3.8
+fastest,case_00002,512x512x261,5.7
+fast,case_00183,512x512x195,6.4
+fast,case_00002,512x512x261,8.5
