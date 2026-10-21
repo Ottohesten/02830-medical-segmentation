@@ -112,7 +112,7 @@ trained, so there is no result yet.
 | Power simulation | `results/study_kits/` |
 | User-study documents | `docs/study/` — session guide, consent form, pilot plan, analysis plan (locked after the pilot) |
 | G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` |
-| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Otto; steps 1–6 complete; report figure/summary ready; group presentation next) |
+| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Otto; steps 1–6 complete; report figure/summary ready; group presentation next), [g1_missed_errors.md](docs/tasks/g1_missed_errors.md) (Rasmus) |
 | Robustness report material | [Figure PDF](results/kits_robustness_eval/report/fig_robustness_summary_test.pdf), [PNG](results/kits_robustness_eval/report/fig_robustness_summary_test.png), [caption](results/kits_robustness_eval/report/caption.md), [eight-line summary](results/kits_robustness_eval/report/summary.md) |
 | HPC job scripts (never run on the cluster) | `jobs/` |
 | Scans, model output, weights (not in git) | `data/`, `models/` — download with `scripts/download_data.py` and `download_model.py` |

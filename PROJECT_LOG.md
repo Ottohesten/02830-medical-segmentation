@@ -395,8 +395,6 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   2026-09-23, so far only tried on 3 spleen scans.
 - `[admin]` Trello board created by Rasmus (date not recorded).
 
----
-
 ## 2026-10-20: Otto starts the robustness task
 
 - `[decision]` Otto takes ownership of `docs/tasks/g1_robustness.md` on branch `otto/robustness`, replacing the
@@ -798,6 +796,29 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 - `[admin]` Saved completed step 6 in a local commit. The assistant's `git push origin otto/robustness`
   failed because noninteractive HTTPS Git cannot read a GitHub username. Otto must push from his authenticated
   terminal. Included publication status in the same unpublished work commit; no extra status-only push is needed.
+
+## 2026-10-21: supervisor advice on G3, task changes
+
+- `[supervisor]` Kristine (meeting): the comparison "most uncertain first" vs. random order is a good way to see whether
+  the most uncertain scans are just outliers. Evaluate the test set after each training step (adding 1 or e.g. 10
+  corrected scans at a time, whichever is practical). If ranking helps, test Dice should rise faster when training on
+  the most uncertain scans first than in random order.
+- `[decision]` G3 is run as a learning curve: k = 0, 10, 20, … corrected pool scans, queue order vs. random order
+  (several seeds), each point trained from the original model, test Dice after each point. Training settings are still
+  chosen on the development set first; the test set is only used to draw the curves.
+- `[result]` G3 GPU timing (Frederik, RTX 4090): about 0.04–0.18 s per training step with 16 data workers, so
+  2,500 steps take about 7–8 min for both the 6 mm and the 3 mm model; GPU memory at most 17.3 of 24 GB. The PC's RAM
+  (34 GB) was almost full with 16 workers.
+- `[admin]` Otto's GPU (RTX 5060 Ti) is not supported by the project's torch 2.2.2; the robustness runs used a separate
+  environment (`.venv-gpu`, torch 2.7.1 + CUDA 12.8, `requirements/robustness-gpu.txt`). The shared lock file is
+  unchanged. To be mentioned in the report together with the other machines.
+- `[decision]` Rasmus gets an independent task: catching confident errors that uncertainty misses
+  ([docs/tasks/g1_missed_errors.md](docs/tasks/g1_missed_errors.md)). The final check uses the untouched G3 pool once,
+  coordinated with Frederik.
+- `[admin]` Large shared data (`data/predictions/kits100/`, `data/study/study_kits/`) are shared via the group's
+  OneDrive, not git.
+
+---
 
 ## Open questions (update when answered, with the date)
 
