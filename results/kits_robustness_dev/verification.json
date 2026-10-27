@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "dev_cases": 20,
+  "variants_including_clean": 9,
+  "timing_rows": 180,
+  "dice_rows": 180,
+  "prediction_maps": 360,
+  "paired_prediction_grids_match": true,
+  "config_and_code_hashes_match": true,
+  "test_dice_rows": 0,
+  "score_files_present": [],
+  "prediction_bytes": 252949887
+}

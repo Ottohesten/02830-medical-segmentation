@@ -61,6 +61,11 @@ Larger tasks owned by one person have a document in `docs/tasks/` (goal, rules, 
 "Where we are"). Whoever works on the task updates it after every step and at the end of every work session, and
 pushes it, so the group can follow and a new session can continue from it.
 
+Tasks are sized so the owner can work independently for a longer stretch: the owner makes the decisions within the
+task, and when a step is done, decides on (or proposes) the next improvement instead of waiting for new instructions.
+Questions to Bjørn or the group are always welcome, and the group is kept posted through the task document, the log
+and pushes. Coordinate only where work touches shared code, shared data or someone else's task.
+
 ## 6. Code style
 
 - Code, comments, docs and the report in English (American spelling).

@@ -1,0 +1,323 @@
+{
+  "scope": "Locked lowres_8mm; 80 test cases; task threshold; secondary entropy remains secondary",
+  "test_dice": [
+    {
+      "split": "test",
+      "variant": "lowres_8mm",
+      "resolution": "fast",
+      "n_cases": 80,
+      "median_clean_dice": 0.90955,
+      "median_perturbed_dice": 0.8786499999999999,
+      "median_paired_drop": 0.0301,
+      "mean_paired_drop": 0.0406037499999999,
+      "n_clean_bad": 11,
+      "n_perturbed_bad": 21,
+      "n_new_bad": 10,
+      "n_recovered": 0
+    },
+    {
+      "split": "test",
+      "variant": "lowres_8mm",
+      "resolution": "fastest",
+      "n_cases": 80,
+      "median_clean_dice": 0.8943,
+      "median_perturbed_dice": 0.8868499999999999,
+      "median_paired_drop": 0.00855,
+      "mean_paired_drop": 0.0094375,
+      "n_clean_bad": 16,
+      "n_perturbed_bad": 16,
+      "n_new_bad": 0,
+      "n_recovered": 0
+    }
+  ],
+  "test_change_correlations": [
+    {
+      "split": "test",
+      "variant": "lowres_8mm",
+      "method": "model_diff_mean_region",
+      "n_cases": 80,
+      "rho_dice_drop_vs_score_rise": 0.2152300804642087,
+      "rho_ci_low": -0.0358759490306776,
+      "rho_ci_high": 0.4586296482198396,
+      "n_bootstrap_finite": 2000,
+      "median_score_change": 0.0006111189723014,
+      "n_score_rises": 41,
+      "n_dice_drops": 77,
+      "n_drop_and_score_rise": 39
+    },
+    {
+      "split": "test",
+      "variant": "lowres_8mm",
+      "method": "entropy_mean_region",
+      "n_cases": 80,
+      "rho_dice_drop_vs_score_rise": 0.2434304602276943,
+      "rho_ci_low": 0.0043285753465488,
+      "rho_ci_high": 0.4732805927111305,
+      "n_bootstrap_finite": 2000,
+      "median_score_change": 0.0460933148860931,
+      "n_score_rises": 79,
+      "n_dice_drops": 77,
+      "n_drop_and_score_rise": 76
+    },
+    {
+      "split": "test",
+      "variant": "lowres_8mm",
+      "method": "neg_volume_ml",
+      "n_cases": 80,
+      "rho_dice_drop_vs_score_rise": 0.7431843223870873,
+      "rho_ci_low": 0.5970502321009781,
+      "rho_ci_high": 0.8449725295384322,
+      "n_bootstrap_finite": 2000,
+      "median_score_change": 13.950787544250488,
+      "n_score_rises": 70,
+      "n_dice_drops": 77,
+      "n_drop_and_score_rise": 70
+    }
+  ],
+  "test_top_queue": [
+    {
+      "split": "test",
+      "method": "model_diff_mean_region",
+      "n_rows": 160,
+      "top_k": 16,
+      "expected_perturbed_in_top_k": 7.0,
+      "share_perturbed_top_k": 0.4375,
+      "median_rank_gain": 2.0,
+      "n_perturbed_moved_up": 41
+    },
+    {
+      "split": "test",
+      "method": "entropy_mean_region",
+      "n_rows": 160,
+      "top_k": 16,
+      "expected_perturbed_in_top_k": 13.0,
+      "share_perturbed_top_k": 0.8125,
+      "median_rank_gain": 55.5,
+      "n_perturbed_moved_up": 79
+    },
+    {
+      "split": "test",
+      "method": "neg_volume_ml",
+      "n_rows": 160,
+      "top_k": 16,
+      "expected_perturbed_in_top_k": 8.0,
+      "share_perturbed_top_k": 0.5,
+      "median_rank_gain": 6.0,
+      "n_perturbed_moved_up": 70
+    }
+  ],
+  "test_mixed_top_review": [
+    {
+      "set": "mixed_test",
+      "bad_rule": "dice_below_083",
+      "method": "random",
+      "reviewed_fraction": 0.1,
+      "review_recall": 0.102375,
+      "quality_mean_dice": 0.8648174587499996,
+      "expected_bad_found": 3.276
+    },
+    {
+      "set": "mixed_test",
+      "bad_rule": "dice_below_083",
+      "method": "model_diff_mean_region",
+      "reviewed_fraction": 0.1,
+      "review_recall": 0.375,
+      "quality_mean_dice": 0.8825050000000001,
+      "expected_bad_found": 12.0
+    },
+    {
+      "set": "mixed_test",
+      "bad_rule": "dice_below_083",
+      "method": "entropy_mean_region",
+      "reviewed_fraction": 0.1,
+      "review_recall": 0.40625,
+      "quality_mean_dice": 0.8880481250000001,
+      "expected_bad_found": 13.0
+    },
+    {
+      "set": "mixed_test",
+      "bad_rule": "dice_below_083",
+      "method": "neg_volume_ml",
+      "reviewed_fraction": 0.1,
+      "review_recall": 0.125,
+      "quality_mean_dice": 0.8738587499999999,
+      "expected_bad_found": 4.0
+    },
+    {
+      "set": "mixed_test",
+      "bad_rule": "dice_below_083",
+      "method": "oracle",
+      "reviewed_fraction": 0.1,
+      "review_recall": 0.5,
+      "quality_mean_dice": 0.9002762499999999,
+      "expected_bad_found": 16.0
+    }
+  ],
+  "test_queue_metrics": [
+    {
+      "set": "clean_test",
+      "method": "model_diff_mean_region",
+      "n_bad": 11,
+      "review_auc": 0.83125,
+      "review_auc_ci_low": 0.7239174107142857,
+      "review_auc_ci_high": 0.925,
+      "review_auc_minus_volume": 0.440909090909091,
+      "review_auc_minus_volume_ci_low": 0.2258928571428572,
+      "review_auc_minus_volume_ci_high": 0.66459375
+    },
+    {
+      "set": "clean_test",
+      "method": "entropy_mean_region",
+      "n_bad": 11,
+      "review_auc": 0.8948863636363638,
+      "review_auc_ci_low": 0.8360416666666667,
+      "review_auc_ci_high": 0.94875,
+      "review_auc_minus_volume": 0.5045454545454547,
+      "review_auc_minus_volume_ci_low": 0.2954479895104897,
+      "review_auc_minus_volume_ci_high": 0.7178794642857143
+    },
+    {
+      "set": "clean_test",
+      "method": "neg_volume_ml",
+      "n_bad": 11,
+      "review_auc": 0.390340909090909,
+      "review_auc_ci_low": 0.2062239583333333,
+      "review_auc_ci_high": 0.5843861607142856,
+      "review_auc_minus_volume": 0.0,
+      "review_auc_minus_volume_ci_low": 0.0,
+      "review_auc_minus_volume_ci_high": 0.0
+    },
+    {
+      "set": "clean_test",
+      "method": "oracle",
+      "n_bad": 11,
+      "review_auc": 0.93125,
+      "review_auc_ci_low": 0.89375,
+      "review_auc_ci_high": 0.96875,
+      "review_auc_minus_volume": 0.540909090909091,
+      "review_auc_minus_volume_ci_low": 0.3510156249999999,
+      "review_auc_minus_volume_ci_high": 0.7375
+    },
+    {
+      "set": "clean_test",
+      "method": "random",
+      "n_bad": 11,
+      "review_auc": 0.5045443181818199,
+      "review_auc_ci_low": 0.349403409090909,
+      "review_auc_ci_high": 0.6699431818181818,
+      "review_auc_minus_volume": null,
+      "review_auc_minus_volume_ci_low": null,
+      "review_auc_minus_volume_ci_high": null
+    },
+    {
+      "set": "lowres_8mm_test",
+      "method": "model_diff_mean_region",
+      "n_bad": 21,
+      "review_auc": 0.7967261904761904,
+      "review_auc_ci_low": 0.7127325892857143,
+      "review_auc_ci_high": 0.8758981092436975,
+      "review_auc_minus_volume": 0.3041666666666666,
+      "review_auc_minus_volume_ci_low": 0.1489902777777778,
+      "review_auc_minus_volume_ci_high": 0.4708552631578947
+    },
+    {
+      "set": "lowres_8mm_test",
+      "method": "entropy_mean_region",
+      "n_bad": 21,
+      "review_auc": 0.7455357142857143,
+      "review_auc_ci_low": 0.653125,
+      "review_auc_ci_high": 0.84375,
+      "review_auc_minus_volume": 0.2529761904761905,
+      "review_auc_minus_volume_ci_low": 0.0855769230769231,
+      "review_auc_minus_volume_ci_high": 0.4283159324942789
+    },
+    {
+      "set": "lowres_8mm_test",
+      "method": "neg_volume_ml",
+      "n_bad": 21,
+      "review_auc": 0.4925595238095238,
+      "review_auc_ci_low": 0.373344298245614,
+      "review_auc_ci_high": 0.6088671874999999,
+      "review_auc_minus_volume": 0.0,
+      "review_auc_minus_volume_ci_low": 0.0,
+      "review_auc_minus_volume_ci_high": 0.0
+    },
+    {
+      "set": "lowres_8mm_test",
+      "method": "oracle",
+      "n_bad": 21,
+      "review_auc": 0.8687499999999999,
+      "review_auc_ci_low": 0.8187499999999999,
+      "review_auc_ci_high": 0.91875,
+      "review_auc_minus_volume": 0.3761904761904761,
+      "review_auc_minus_volume_ci_low": 0.2596093750000001,
+      "review_auc_minus_volume_ci_high": 0.5136333120204601
+    },
+    {
+      "set": "lowres_8mm_test",
+      "method": "random",
+      "n_bad": 21,
+      "review_auc": 0.5018190476190489,
+      "review_auc_ci_low": 0.3961160714285713,
+      "review_auc_ci_high": 0.6050892857142857,
+      "review_auc_minus_volume": null,
+      "review_auc_minus_volume_ci_low": null,
+      "review_auc_minus_volume_ci_high": null
+    },
+    {
+      "set": "mixed_test",
+      "method": "model_diff_mean_region",
+      "n_bad": 32,
+      "review_auc": 0.8085937499999999,
+      "review_auc_ci_low": 0.7374135331978319,
+      "review_auc_ci_high": 0.8829698955278592,
+      "review_auc_minus_volume": 0.3437499999999999,
+      "review_auc_minus_volume_ci_low": 0.1794626322751323,
+      "review_auc_minus_volume_ci_high": 0.505174939385776
+    },
+    {
+      "set": "mixed_test",
+      "method": "entropy_mean_region",
+      "n_bad": 32,
+      "review_auc": 0.8068359374999999,
+      "review_auc_ci_low": 0.7441983393122217,
+      "review_auc_ci_high": 0.8761453186758894,
+      "review_auc_minus_volume": 0.3419921875,
+      "review_auc_minus_volume_ci_low": 0.181628509358289,
+      "review_auc_minus_volume_ci_high": 0.4952291864326376
+    },
+    {
+      "set": "mixed_test",
+      "method": "neg_volume_ml",
+      "n_bad": 32,
+      "review_auc": 0.4648437499999999,
+      "review_auc_ci_low": 0.341209329810901,
+      "review_auc_ci_high": 0.5977020060741687,
+      "review_auc_minus_volume": 0.0,
+      "review_auc_minus_volume_ci_low": 0.0,
+      "review_auc_minus_volume_ci_high": 0.0
+    },
+    {
+      "set": "mixed_test",
+      "method": "oracle",
+      "n_bad": 32,
+      "review_auc": 0.8999999999999999,
+      "review_auc_ci_low": 0.859375,
+      "review_auc_ci_high": 0.9375,
+      "review_auc_minus_volume": 0.4351562499999999,
+      "review_auc_minus_volume_ci_low": 0.3088808936403508,
+      "review_auc_minus_volume_ci_high": 0.5609525240384615
+    },
+    {
+      "set": "mixed_test",
+      "method": "random",
+      "n_bad": 32,
+      "review_auc": 0.502980859375,
+      "review_auc_ci_low": 0.4077929687499999,
+      "review_auc_ci_high": 0.5937548828124999,
+      "review_auc_minus_volume": null,
+      "review_auc_minus_volume_ci_low": null,
+      "review_auc_minus_volume_ci_high": null
+    }
+  ]
+}

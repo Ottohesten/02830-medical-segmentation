@@ -173,13 +173,27 @@ def _ci(values: np.ndarray, level: float) -> tuple[float, float]:
     return float(np.percentile(values, tail)), float(np.percentile(values, 100.0 - tail))
 
 
+def bootstrap_indices(n: int, n_bootstrap: int, rng: np.random.Generator,
+                      groups: np.ndarray | None = None) -> list[np.ndarray]:
+    """Resample independent cases; with group IDs keep every row of a sampled patient together."""
+    if groups is None:
+        return [rng.integers(0, n, size=n) for _ in range(n_bootstrap)]
+    groups = np.asarray(groups)
+    if groups.shape != (n,):
+        raise ValueError('Need one bootstrap group ID per row.')
+    members = [np.flatnonzero(groups == group) for group in np.unique(groups)]
+    return [np.concatenate([members[i] for i in rng.integers(0, len(members), size=len(members))])
+            for _ in range(n_bootstrap)]
+
+
 def evaluate_methods(scores: dict[str, np.ndarray], dice: np.ndarray, cfg: dict,
-                     bad_rule: dict) -> tuple[list[dict], dict]:
+                     bad_rule: dict, groups: np.ndarray | None = None) -> tuple[list[dict], dict]:
     """Evaluate every ranking method on one set of scans, for one definition of "bad".
 
     Input: {method name: score per scan} (GT-free scores; must include 'neg_volume_ml', whose
            negative is the predicted volume), true Dice per scan, the config (evaluation, seed) and one
-           entry of evaluation.bad_rules.
+           entry of evaluation.bad_rules. Optional group IDs keep paired variants together in bootstrap
+           samples; asymptotic rho p-values are omitted for dependent rows. Default behavior is unchanged.
     Output: (one row of metrics per method, {method: (review curve, quality curve)} for plotting).
             The rows include 'random' and 'oracle'.
     """
@@ -200,7 +214,7 @@ def evaluate_methods(scores: dict[str, np.ndarray], dice: np.ndarray, cfg: dict,
         curves[name] = curves_for(s, dice, bad)
 
     # Bootstrap: the same resampled scan sets are used for every method, so differences are paired.
-    boot_idx = [rng.integers(0, n, size=n) for _ in range(ev["n_bootstrap"])]
+    boot_idx = bootstrap_indices(n, ev["n_bootstrap"], rng, groups)
 
     def boot_stats(s: np.ndarray) -> dict[str, np.ndarray]:
         rho, prho, r_auc, q_auc = [], [], [], []
@@ -228,7 +242,7 @@ def evaluate_methods(scores: dict[str, np.ndarray], dice: np.ndarray, cfg: dict,
         row = {
             "method": name,
             "spearman_rho": rho.statistic, "rho_ci_low": _ci(b["rho"], level)[0], "rho_ci_high": _ci(b["rho"], level)[1],
-            "rho_p_value": rho.pvalue,
+            "rho_p_value": rho.pvalue if groups is None else np.nan,
             "partial_rho_given_volume": partial_spearman(s, dice, volume),
             "partial_rho_ci_low": _ci(b["partial_rho"], level)[0], "partial_rho_ci_high": _ci(b["partial_rho"], level)[1],
             "review_auc": area(rev), "review_auc_ci_low": _ci(b["review"], level)[0],

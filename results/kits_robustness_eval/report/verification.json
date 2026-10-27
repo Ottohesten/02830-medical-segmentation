@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "input_and_output_hashes_match": true,
+  "png_pixels": [
+    2160,
+    1620
+  ],
+  "dpi": 300,
+  "pdf_pages": 1,
+  "summary_lines": 8,
+  "new_inference_scoring_or_bootstrap": false,
+  "visual_inspection": "PNG inspected; all panels, labels, intervals, and legend readable",
+  "figure_bytes": {
+    "fig_robustness_summary_test.pdf": 30465,
+    "fig_robustness_summary_test.png": 354912,
+    "summary.md": 836,
+    "caption.md": 1362
+  },
+  "summary_matches_task_and_project_log": true
+}

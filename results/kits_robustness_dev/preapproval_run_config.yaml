@@ -1,0 +1,108 @@
+# Robustness step 3: compare candidate strengths on the 20 development scans only.
+# Run --plan first, then ask Otto before the approximately 40-minute candidate run.
+# Run: PYTHONPATH=src .venv-gpu/bin/python scripts/select_robustness_strengths.py --config configs/kits_robustness_dev.yaml --run
+# Ground truth is used only for development Dice; uncertainty scores are not computed.
+
+name: kits_robustness_dev           # Separate timing outputs under results/ and data/predictions/
+seed: 42
+
+compute:
+  device: cuda        # auto = CUDA if available, else MPS (Apple Silicon), else CPU. Or force: cuda / mps / cpu
+  num_threads: 6      # Six physical CPU cores for preprocessing; inference uses CUDA
+  reduce_chunk_slices: 16  # slices processed at a time when reducing the 117-class output (lower = less memory)
+
+paths:                # relative paths are relative to the repository root
+  raw_dir: data/raw                 # downloaded datasets
+  models_dir: models                # pretrained weights
+  predictions_dir: data/predictions # model output per scan (masks, probability maps). Not in git
+  results_dir: results              # small result files (csv, figures). In git
+
+dataset:
+  file: configs/datasets/kits23.yaml  # which dataset (paths, labels, matching TotalSegmentator classes)
+  n_cases: 20        # All 20 original development scans; no test scans selected
+  selection: random   # first = first n in sorted order; random = n drawn with the seed from the full list
+  # Development / test split. dev = the 20 scans of the pilot (the first 20 of the same seeded draw);
+  # test = every other selected scan (80). Listed explicitly so the split can never shift.
+  split:
+    dev: [case_00040, case_00051, case_00135, case_00178, case_00236, case_00249, case_00261, case_00271,
+          case_00291, case_00295, case_00298, case_00456, case_00465, case_00467, case_00528, case_00544,
+          case_00559, case_00563, case_00574, case_00582]
+
+model:
+  task: total         # TotalSegmentator task (v2 "total": 117 structures)
+  resolution: fast    # fast = 3 mm model (one network), full = 1.5 mm model (the organ part)
+  folds: [0]          # nnU-Net folds to use. The public TotalSegmentator weights only contain fold 0
+  tile_step_size: 0.8 # overlap between sliding-window patches (0.5 = more overlap, slower, nnU-Net default)
+
+uncertainty:
+  border_mm: 5        # the uncertainty region is the predicted organ plus this many mm around it
+  second_model_resolution: fastest  # second network for model disagreement: fastest = 6 mm (task 298). null = off
+  tta:                # test-time augmentation: run the network again on slightly changed copies of the scan
+    n_passes: 0       # number of extra passes per scan. 0 = no TTA
+    max_shift_voxels: 2       # random shift of the scan by up to this many voxels (at the network's resolution)
+    intensity_scale: 0.05     # random intensity scaling by up to +-5 %
+    intensity_shift_hu: 20    # random intensity offset by up to +-20 Hounsfield units
+    noise_std_hu: 10          # Gaussian noise with this standard deviation (HU)
+
+heatmap_eval:         # G2: which heatmap points best at the wrong voxels (scripts/evaluate_heatmaps.py)
+  candidates: [entropy, m2_diff]   # entropy = binary entropy of the organ probability; m2_diff = |p_3mm - p_6mm|
+  top_fraction: 0.1   # share of the region's voxels with the highest heatmap values ("top 10 %")
+
+plausibility:        # anatomical check for paired organs (only if the dataset file sets paired_organ: true)
+  body_threshold_hu: -500   # voxels above this CT value count as body when finding the left-right midline
+  min_component_ml: 20      # a side counts as "organ found" if its largest connected piece is at least this big
+
+# Controlled perturbations: degraded copies of each scan, to create segmentation errors on purpose.
+# Results on these are reported separately from the clean scans.
+perturbations:
+  - {name: noise_30, type: noise, strength: 30}
+  - {name: noise_60, type: noise, strength: 60}
+  - {name: noise_120, type: noise, strength: 120}
+  - {name: lowres_6mm, type: lowres, strength: 6}
+  - {name: lowres_8mm, type: lowres, strength: 8}
+  - {name: lowres_12mm, type: lowres, strength: 12}
+  - {name: contrast_80, type: contrast, strength: 0.8}  # Remove 80%; retain 20%.
+  - {name: contrast_90, type: contrast, strength: 0.9}  # Remove 90%; retain 10%.
+perturbation_settings:
+  contrast_level_hu: 40     # gray value that stays fixed when contrast is reduced (soft tissue)
+
+evaluation:
+  splits: [dev] # Development Dice only; no uncertainty evaluation
+  bad_rules:          # which segmentations count as "bad" in the review curve; every rule is reported
+    - {name: worst10, rule: worst_fraction, value: 0.1}      # the worst 10 % of the scans
+    - {name: dice_below_083, rule: threshold, value: 0.83}   # fixed Dice limit, chosen on the development set
+  n_bootstrap: 2000   # resamples for the confidence interval of Spearman rho and the curve areas
+  ci_level: 0.95
+  n_random_orders: 1000  # random review orders averaged for the random baseline
+  combinations:       # GT-free scores merged by rank. LOCKED on the development set:
+    # mean rank of the best dev uncertainty measure and the missing-side plausibility flag.
+    - {name: combo_mean_missing, rule: mean_rank, scores: [model_diff_mean_region, plaus_missing_side]}
+
+visualization:
+  ct_window_level: 40   # soft-tissue CT window in Hounsfield units (center)
+  ct_window_width: 400  # (width)
+  dice_bin_width: 0.01  # histogram bin width in the Dice plots
+  share_bin_width: 0.05 # histogram bin width for shares (0-1) in the label check plot
+  label_worst_n: 3      # how many of the worst scans get their name written in plots
+  dpi: 120
+
+report:                         # figures and tables for the paper (scripts/make_report_figures.py); no new analysis
+  set: clean_dev               # Reference settings only; no G1 score evaluation in step 3
+  primary: model_diff_mean_region   # LOCKED primary measure (used to pick the heatmap example scans)
+  heatmap: entropy              # LOCKED G2 heatmap
+  example_bad_rule: worst10     # "bad" rule used to pick the failure examples
+
+# Predeclared working definition of useful degradation, without looking at uncertainty performance.
+robustness_selection:
+  expected_dev_cases: 20
+  min_dice_drop: 0.02
+  min_affected_cases: 5
+  min_remaining_good_cases: 5
+  catastrophic_dice: 0.50
+  max_new_catastrophic_cases: 2
+  bad_rule: dice_below_083
+  rule: mildest_eligible_per_type
+  status: candidates_only
+  max_run_minutes: 90
+  timing_csv: results/kits_robustness_timing/timings.csv
+  timing_variant: noise_60

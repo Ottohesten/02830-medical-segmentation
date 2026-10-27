@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-21",
+  "driver": "615.78.08",
+  "gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "gpu_memory_mib": 16311,
+  "compute_capability": [
+    12,
+    0
+  ],
+  "sandbox": "GPU devices hidden; nvidia-smi and torch.cuda.is_available fail inside the sandbox",
+  "host": "Driver works; all GPU checks and inference run outside the sandbox",
+  "shared_environment": {
+    "torch": "2.2.2+cu121",
+    "cuda": "12.1",
+    "cuda_detected_on_host": true,
+    "kernel_check": "failed",
+    "error": "CUDA error: no kernel image is available for execution on the device",
+    "compiled_architectures": [
+      "sm_50",
+      "sm_60",
+      "sm_70",
+      "sm_75",
+      "sm_80",
+      "sm_86",
+      "sm_90"
+    ]
+  },
+  "gpu_environment": {
+    "path": ".venv-gpu",
+    "torch": "2.7.1+cu128",
+    "torchvision": "0.22.1+cu128",
+    "cuda": "12.8",
+    "kernel_check": "passed",
+    "elementwise_result": [
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "conv3d_output_shape": [
+      1,
+      2,
+      6,
+      6,
+      6
+    ],
+    "compiled_architectures": [
+      "sm_75",
+      "sm_80",
+      "sm_86",
+      "sm_90",
+      "sm_100",
+      "sm_120",
+      "compute_120"
+    ],
+    "package_check": "136 installed packages, all compatible"
+  },
+  "sources": [
+    "https://pytorch.org/blog/pytorch-2-7/",
+    "https://pytorch.org/get-started/previous-versions/"
+  ],
+  "decision": "Otto approved separate GPU environment and downloads; shared pyproject.toml, uv.lock and .venv preserved"
+}

@@ -1,0 +1,7 @@
+split,method,n_rows,top_k,expected_perturbed_in_top_k,share_perturbed_top_k,median_rank_gain,n_perturbed_moved_up
+dev,model_diff_mean_region,40,4,2.0,0.5,-1.0,9
+dev,entropy_mean_region,40,4,3.0,0.75,11.5,20
+dev,neg_volume_ml,40,4,2.0,0.5,2.0,16
+test,model_diff_mean_region,160,16,7.0,0.4375,2.0,41
+test,entropy_mean_region,160,16,13.0,0.8125,55.5,79
+test,neg_volume_ml,160,16,8.0,0.5,6.0,70

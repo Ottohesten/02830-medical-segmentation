@@ -1,0 +1,5 @@
+split,variant,resolution,n_cases,median_clean_dice,median_perturbed_dice,median_paired_drop,mean_paired_drop,n_clean_bad,n_perturbed_bad,n_new_bad,n_recovered
+dev,lowres_8mm,fast,20,0.9033,0.867,0.02795,0.03497000000000001,4,6,2,0
+dev,lowres_8mm,fastest,20,0.8951,0.89415,0.00745,0.007800000000000001,7,7,0,0
+test,lowres_8mm,fast,80,0.9095500000000001,0.8786499999999999,0.030100000000000002,0.040603749999999994,11,21,10,0
+test,lowres_8mm,fastest,80,0.8943,0.8868499999999999,0.00855,0.0094375,16,16,0,0

@@ -1,0 +1,38 @@
+/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv-gpu/lib/python3.12/site-packages/nnunetv2/utilities/plans_handling/plans_handler.py:37: UserWarning: Detected old nnU-Net plans format. Attempting to reconstruct network architecture parameters. If this fails, rerun nnUNetv2_plan_experiment for your dataset. If you use a custom architecture, please downgrade nnU-Net to the version you implemented this or update your implementation + plans.
+  warnings.warn("Detected old nnU-Net plans format. Attempting to reconstruct network architecture "
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+ 25%|██▌       | 1/4 [00:09<00:28,  9.40s/it]
+100%|██████████| 4/4 [00:09<00:00,  2.35s/it]
+case_00040 clean fast: 23.75 s prediction, 25.67 s total
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+100%|██████████| 4/4 [00:00<00:00, 438.96it/s]
+case_00051 clean fast: 3.45 s prediction, 4.03 s total
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+100%|██████████| 4/4 [00:00<00:00, 459.64it/s]
+case_00040 noise_60 fast: 6.64 s prediction, 8.81 s total
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+100%|██████████| 4/4 [00:00<00:00, 497.90it/s]
+case_00051 noise_60 fast: 2.68 s prediction, 3.36 s total
+/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv-gpu/lib/python3.12/site-packages/nnunetv2/utilities/plans_handling/plans_handler.py:37: UserWarning: Detected old nnU-Net plans format. Attempting to reconstruct network architecture parameters. If this fails, rerun nnUNetv2_plan_experiment for your dataset. If you use a custom architecture, please downgrade nnU-Net to the version you implemented this or update your implementation + plans.
+  warnings.warn("Detected old nnU-Net plans format. Attempting to reconstruct network architecture "
+
+  0%|          | 0/2 [00:00<?, ?it/s]
+ 50%|█████     | 1/2 [00:00<00:00,  4.89it/s]
+100%|██████████| 2/2 [00:00<00:00,  9.65it/s]
+case_00040 clean fastest: 4.55 s prediction, 6.15 s total
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+100%|██████████| 4/4 [00:00<00:00, 385.67it/s]
+case_00051 clean fastest: 1.61 s prediction, 2.11 s total
+
+  0%|          | 0/2 [00:00<?, ?it/s]
+100%|██████████| 2/2 [00:00<00:00, 388.04it/s]
+case_00040 noise_60 fastest: 4.33 s prediction, 6.43 s total
+
+  0%|          | 0/4 [00:00<?, ?it/s]
+100%|██████████| 4/4 [00:00<00:00, 399.82it/s]
+case_00051 noise_60 fastest: 1.70 s prediction, 2.38 s total

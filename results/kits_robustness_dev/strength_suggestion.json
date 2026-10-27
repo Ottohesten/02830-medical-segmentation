@@ -1,0 +1,26 @@
+{
+  "status": "suggestion_from_dev_dice_only",
+  "rule": {
+    "expected_dev_cases": 20,
+    "min_dice_drop": 0.02,
+    "min_affected_cases": 5,
+    "min_remaining_good_cases": 5,
+    "catastrophic_dice": 0.5,
+    "max_new_catastrophic_cases": 2,
+    "bad_rule": "dice_below_083",
+    "rule": "mildest_eligible_per_type",
+    "status": "candidates_only",
+    "max_run_minutes": 480,
+    "timing_csv": "results/kits_robustness_timing/timings.csv",
+    "timing_variant": "noise_60"
+  },
+  "selected_variants": [
+    "lowres_8mm"
+  ],
+  "types_without_eligible_candidate": [
+    "noise",
+    "contrast"
+  ],
+  "uncertainty_scores_computed": false,
+  "test_set_used": false
+}

@@ -1,0 +1,52 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collected 117 items
+
+tests/test_disagreement_scores.py .........                              [  7%]
+tests/test_evaluation.py ..............                                  [ 19%]
+tests/test_followup.py .............                                     [ 30%]
+tests/test_heatmap_display.py ............                               [ 41%]
+tests/test_metrics.py .....                                              [ 45%]
+tests/test_power.py ..                                                   [ 47%]
+tests/test_robustness_timing.py .........                                [ 54%]
+tests/test_study.py ..........s.ss                                       [ 66%]
+tests/test_study_analysis.py sssss..s...s                                [ 76%]
+tests/test_ui_browser.py ssssss                                          [ 82%]
+tests/test_ui_server.py sssssssssssssss.sssss                            [100%]
+
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_study.py:47: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study.py:73: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study.py:93: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study_analysis.py:43: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study_analysis.py:60: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study_analysis.py:90: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study_analysis.py:96: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study_analysis.py:109: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study_analysis.py:151: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_study_analysis.py:207: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_browser.py:118: Google Chrome not installed
+SKIPPED [1] tests/test_ui_browser.py:168: Google Chrome not installed
+SKIPPED [1] tests/test_ui_browser.py:196: Google Chrome not installed
+SKIPPED [1] tests/test_ui_browser.py:242: Google Chrome not installed
+SKIPPED [1] tests/test_ui_browser.py:262: Google Chrome not installed
+SKIPPED [1] tests/test_ui_browser.py:276: Google Chrome not installed
+SKIPPED [1] tests/test_ui_server.py:37: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:46: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:57: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:70: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:81: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:89: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:102: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:127: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:142: study not prepared (run scripts/prepare_study.py)
+SKIPPED [5] tests/test_ui_server.py:158: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:172: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:206: study not prepared (run scripts/prepare_study.py)
+SKIPPED [2] tests/test_ui_server.py:215: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:244: study not prepared (run scripts/prepare_study.py)
+SKIPPED [1] tests/test_ui_server.py:251: study not prepared (run scripts/prepare_study.py)
+======================== 81 passed, 36 skipped in 2.53s ========================

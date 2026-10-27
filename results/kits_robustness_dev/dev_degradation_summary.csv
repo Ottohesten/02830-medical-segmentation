@@ -1,0 +1,9 @@
+variant,type,strength,n_cases,median_clean_dice,median_dice,median_paired_drop,mean_paired_drop,n_clear_drops,n_bad,n_new_bad,n_remaining_good,n_new_catastrophic,eligible,ineligibility_reason
+noise_30,noise,30.0,20,0.9033,0.9077,-0.00115,-0.004725,0,3,0,17,0,False,too_few_clear_drops
+noise_60,noise,60.0,20,0.9033,0.913,-0.0035,-0.0052200000000000015,2,4,1,16,0,False,too_few_clear_drops
+noise_120,noise,120.0,20,0.9033,0.9159999999999999,-0.00485,-0.00167,2,4,1,16,0,False,too_few_clear_drops
+lowres_6mm,lowres,6.0,20,0.9033,0.88495,0.00825,0.011945,4,5,1,15,0,False,too_few_clear_drops
+lowres_8mm,lowres,8.0,20,0.9033,0.867,0.02795,0.03497000000000001,14,6,2,14,0,True,
+lowres_12mm,lowres,12.0,20,0.9033,0.8048,0.1023,0.143055,20,12,8,8,2,True,
+contrast_80,contrast,0.8,20,0.9033,0.9062,-0.0027,-0.0032300000000000002,0,4,0,16,0,False,too_few_clear_drops
+contrast_90,contrast,0.9,20,0.9033,0.9086,-0.00235,-0.0026550000000000002,0,4,0,16,0,False,too_few_clear_drops

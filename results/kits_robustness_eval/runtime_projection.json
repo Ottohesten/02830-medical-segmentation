@@ -1,0 +1,9 @@
+{
+  "estimated_evaluation_minutes": 15.335111508398006,
+  "score_proxy_seconds": 315.4885678039203,
+  "synthetic_queue_evaluation_seconds": 8.159657710999994,
+  "n_queue_evaluations": 12,
+  "safety_factor": 1.5,
+  "test_labels_or_scores_read": false,
+  "limitations": "Two dev scans, voxel-scaled CPU scoring; synthetic largest queue; fixed Dice allowance."
+}
