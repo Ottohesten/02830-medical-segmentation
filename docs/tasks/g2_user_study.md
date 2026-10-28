@@ -66,8 +66,8 @@ Tick each box when done and write the date and a short note under it.
   159 passed with the kits in place (one earlier run had 6 errors that did not come back; probably flaky browser
   tests, watch for it). Server started with `--no-browser` and checked over its API: settings (`full`, 5 min), demo
   queue, T01 plan (scans 1–3 without, 4–6 with heatmap), heatmap refused (403) in the "without" condition and
-  ground truth refused for all study scans. Still to do by hand: click through the demo queue and a test session in
-  Chrome on the study Mac (use **T02**, so T01 stays free for the pilot; clean up afterwards).
+  ground truth refused for all study scans. The hand click-through in Chrome is skipped on purpose: Rasmus is the
+  pilot participant and has not seen the interface, so he must not see it before the pilot.
   G2 in two sentences: participants correct the AI's kidney outline on 6 scans, 3 with and 3 without the
   uncertainty heatmap, and we compare Dice gain per minute and NASA-TLX between the conditions. It tells us whether
   the heatmap helps people correct faster, which is open because the heatmap mostly marks the edge of the outline.
@@ -113,6 +113,9 @@ Tick each box when done and write the date and a short note under it.
 
 *(Date — decision — why. Also add each one to PROJECT_LOG.md.)*
 
+- 2026-10-28 — Rasmus is the pilot participant (T01); another group member runs the session — Rasmus has not used
+  the interface, and pilots must be group members who have not seen it. So he skipped the hand click-through in step 1.
+
 ## 6. Questions for Bjørn or the group
 
 *(Write questions here and tell Bjørn or the group.)*
@@ -123,7 +126,7 @@ Tick each box when done and write the date and a short note under it.
 A new chat starts by reading this section.)*
 
 - 2026-10-20: Task created. Next action: step 1.
-- 2026-10-28: Step 1 done except the hand click-through in Chrome (T02). Next action: click through T02 and clean
-  up, then steps 2–3: find a pilot from the group who has not used the interface and run the pilot as T01 with
-  `full` (deadline today). Note: the pilot plan's rule for "too hard" scans says to rerun `prepare_study.py`, but
+- 2026-10-28: Step 1 done (click-through skipped, see notes). Next action: steps 2–3: Rasmus is the pilot
+  participant, so another group member who knows the interface runs the session as experimenter (session guide,
+  observation form) as T01 with `full` (deadline today). Note: the pilot plan's rule for "too hard" scans says to rerun `prepare_study.py`, but
   that is no longer allowed locally (shared kits); if that rule fires, ask the group who rebuilds `study_kits.zip`.

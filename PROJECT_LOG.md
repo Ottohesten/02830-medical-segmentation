@@ -835,6 +835,8 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   shared code, shared data or another task (CONTRIBUTING.md, section 5).
 - `[admin]` Large shared data are shared via the group's OneDrive (folder "delte store filer"), not git:
   `kits100.zip` → `data/predictions/kits100/`, `study_kits.zip` → `data/study/study_kits/`.
+- `[decision]` (2026-10-28, G2) Rasmus is the pilot participant (T01) since he has not used the interface; another
+  group member runs the pilot session. Study kits unzipped and checked (tests pass); `docs/tasks/g2_user_study.md`.
 
 ---
 
