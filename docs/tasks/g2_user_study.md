@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn (lead; not part of running the study) |
 | **Branch** | `rasmus/user-study` |
 | **Created** | 2026-10-20 |
-| **Status** | Not started |
+| **Status** | In progress (step 1) |
 | **Way of working** | Independent: Rasmus runs the study and makes its decisions. The task is large enough to keep going without waiting for new instructions; questions to Bjørn or the group are welcome, and keep the group posted. |
 | **Deadlines** | Pilot run by **2026-10-28** · analysis plan locked before the first participant · study in weeks 9–10 (**2026-11-02 – 11-13**) · analysis done by **2026-11-18** (before the final presentation 2026-11-25) |
 
@@ -61,7 +61,16 @@ Tick each box when done and write the date and a short note under it.
   Do **not** run `prepare_study.py` yourself: it needs the locked kits100 model output, and everyone must use exactly
   the same prepared scans. Then try the demo queue and one test session (T01).
   Read the pilot plan and the session guide. Be able to explain G2 in two sentences.
-  *Notes:*
+  *Notes:* 2026-10-28: `uv sync` OK. `study_kits.zip` unzipped to `data/study/study_kits/` (282 MB, without the
+  `__MACOSX` files): 6 study scans, 1 practice scan (case_00184), 10 queue scans, heatmap `entropy`. `uv run pytest`:
+  159 passed with the kits in place (one earlier run had 6 errors that did not come back; probably flaky browser
+  tests, watch for it). Server started with `--no-browser` and checked over its API: settings (`full`, 5 min), demo
+  queue, T01 plan (scans 1–3 without, 4–6 with heatmap), heatmap refused (403) in the "without" condition and
+  ground truth refused for all study scans. Still to do by hand: click through the demo queue and a test session in
+  Chrome on the study Mac (use **T02**, so T01 stays free for the pilot; clean up afterwards).
+  G2 in two sentences: participants correct the AI's kidney outline on 6 scans, 3 with and 3 without the
+  uncertainty heatmap, and we compare Dice gain per minute and NASA-TLX between the conditions. It tells us whether
+  the heatmap helps people correct faster, which is open because the heatmap mostly marks the edge of the outline.
 
 - [ ] **2. Plan the pilot.** Agree on a pilot participant from the group who has not used the interface, a time and a
   place. Decide which heatmap display modes the pilot tries (see the pilot plan).
@@ -114,3 +123,7 @@ Tick each box when done and write the date and a short note under it.
 A new chat starts by reading this section.)*
 
 - 2026-10-20: Task created. Next action: step 1.
+- 2026-10-28: Step 1 done except the hand click-through in Chrome (T02). Next action: click through T02 and clean
+  up, then steps 2–3: find a pilot from the group who has not used the interface and run the pilot as T01 with
+  `full` (deadline today). Note: the pilot plan's rule for "too hard" scans says to rerun `prepare_study.py`, but
+  that is no longer allowed locally (shared kits); if that rule fires, ask the group who rebuilds `study_kits.zip`.
