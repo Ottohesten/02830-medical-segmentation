@@ -879,6 +879,67 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   local authenticated `gh pr create` was used successfully. No merge or direct group message; group review
   remains required before merging. Updated "Where we are" with the verified publication status.
 
+## 2026-11-02: missed-errors step 2, exploratory inspection
+
+- `[admin]` Resumed from "Where we are" on `otto/missed-errors`; pull was up to date and offline sync checked
+  133 packages. Use the existing saved inputs. No shared `src/segreview/` code or G3-pool files are changed/read.
+- `[decision]` `configs/kits_missed_errors.yaml` fixes the inspection: pool the same seed-42 kits100 cohort,
+  sort saved `model_diff_mean_region` descending, break exact ties by case ID ascending, inspect Dice < 0.83
+  cases outside ceil(20% × N). Original G1 split labels remain descriptive metadata. All results are exploratory.
+- `[experiment]` Added isolated `scripts/inspect_missed_errors.py` and synthetic tests. It checks cohort/join
+  coverage, source/output separation and saved Dice; saves multiple axial error peaks plus a coronal view.
+  GT is used to select/describe errors only, never to order score ties or create a detector. The original
+  `show_case.py` couples source/output names, so this task uses separate read/write configs without shared edits.
+- `[decision]` Characterize missed voxels by GT kidney/tumor/cyst label, saved p <= 0.10, location outside the
+  existing 5 mm uncertainty region, and recovery by the 6 mm mask. These are descriptive error diagnostics,
+  not new queue scores. Saved probabilities are quantized to 1/255; saved zeros are not proof of exact
+  zero probability before quantization. Inspect one case for timing before processing the remaining misses;
+  each command is capped at 30 minutes, with permission required before any longer run.
+- `[result]` Pooled exploratory queue: **100 cases**, **15** with Dice < 0.83, **11** in the first **20**,
+  **9** nonbad cases in that budget, **4** missed bad cases. No tie at the boundary. Misses: **case_00236,
+  rank 23, Dice 0.8023; case_00406, 42, 0.8004; case_00040, 46, 0.6607; case_00184, 56, 0.8176**.
+  `results/kits_missed_errors/{exploratory_queue.csv,exploratory_missed_cases.csv,
+  exploratory_queue_summary.json}`. Original split labels retained; this is not the locked 80-case G1 result.
+- `[result]` Assistant visually inspected all **4** CT/mask/probability/entropy montages (**19** selected
+  axial/coronal views). case_00236: partly excluded large tumor and kidney tissue; case_00406: almost entire
+  protruding tumor absent from both masks (**99.2%** of GT tumor omitted); case_00040: pelvic kidney absent
+  from both reviewed masks; case_00184: multiple omitted tumor/cyst regions (**42.1% / 77.2%** of those GT
+  labels), with 6 mm Dice **0.8547** despite remaining omissions. Otto's own review not recorded.
+  `results/kits_missed_errors/{exploratory_missed_review.csv,exploratory_review.md,figures/}`.
+- `[result]` Within each miss, **98.5–99.9%** of wrong voxels are omissions. Among its missed organ voxels,
+  **59.6–89.1%** have saved p <= 0.10 and **48.8–86.8%** lie outside the existing 5 mm uncertainty region;
+  the 6 mm mask covers only **2.0–26.8%**. These descriptive measurements support confident shared errors;
+  low rank alone is insufficient evidence. Saved zeros are quantized. `results/kits_missed_errors/
+  {exploratory_error_diagnostics.csv,exploratory_inspection_summary.json}`.
+- `[result]` The severe task example case_00516 is already **rank 3**, saved Dice **0.0027**, in the pooled
+  queue, so it is not a miss under this budget. `results/kits_missed_errors/exploratory_queue.csv`.
+- `[experiment]` First-case timing: **3.92 s**; remaining cases **5.43 / 14.71 / 9.63 s**;
+  sum of case processing **33.69 s**. CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15,
+  torch 2.2.2+cu121 / CUDA build 12.1, 6 threads, seed 42, no GPU used. Exact input/config/code hashes,
+  baseline `8b59d58`, working-tree state, selected slices and timings:
+  `results/kits_missed_errors/{exploratory_images_machine.json,exploratory_inspection_evidence.json}`.
+- `[result]` Verification passed: **100 queue rows**, exact four-case diagnostic/review coverage, saved
+  3 mm/6 mm Dice reproduced within rounding, valid figure/input/code/config hashes and **61 locked result
+  files / 600 source maps unchanged**. No inference, new ranking score, combinations or fresh-pool access.
+  `results/kits_missed_errors/exploratory_verification.json`.
+- `[result]` Complete suite: **139 passed, 36 skipped, 8 existing constant-input warnings, 2.99 s**,
+  including **16** new synthetic checks for tie/budget selection, invalid data, diagnostics, slice selection
+  and source/output isolation. `results/kits_missed_errors/exploratory_tests.txt`.
+- `[dropped]` Single-maximal-organ-slice inspection as the only visual check: it can hide the pelvic kidney
+  while showing the other kidney correctly. Replaced with label-specific error peaks and a coronal view.
+- `[idea]` Step 3: first reuse missing-side/per-side size information, then try per-kidney shape deficits.
+  Measure false alarms on all 100 cases, allowing for normal kidney concavity and entirely missing masses
+  with plausible remaining contours. CT-intensity checks remain a later option if needed. These are hypotheses;
+  no new detector is established by reviewing four misses. First detector results targeted for 2026-11-04.
+- `[admin]` Checked step 2 and updated task/decisions/"Where we are", overview and README. No shared-code
+  edits or direct group messages; G3-pool coordination/lock remains unchanged. Ready to commit/push on
+  `otto/missed-errors` and update draft PR #2; publication outcome follows.
+- `[admin]` Automatic approval rejected the first step 2 commit attempt because it included four CT-derived
+  PNG montages with mask/probability overlays, citing CONTRIBUTING's data prohibition. The commit/push did
+  not run. Removed those images from staging and added a Git ignore rule. They remain local and reproducible
+  with the inspection script; only code, small tables/metadata and notes are committed. Updated the README,
+  task and review guide to state this. No CT-derived images are published.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

@@ -152,6 +152,22 @@ Sizes follow the ACM two-column template (3.33 in / 7 in), PDF with embedded fon
 
 ### Exploratory follow-up analyses (after the G1 lock)
 
+Otto's missed-errors inspection uses an independent config and only reads the saved kits100 inputs:
+
+```bash
+uv run python scripts/inspect_missed_errors.py --config configs/kits_missed_errors.yaml --stage queue
+uv run python scripts/inspect_missed_errors.py --config configs/kits_missed_errors.yaml --stage images
+```
+
+This pools all 100 cases as exploratory development data. It lists Dice < 0.83 cases outside the first 20%
+of the locked-score queue, then saves per-label error diagnostics and axial/coronal CT, mask, probability and
+entropy views in `results/kits_missed_errors/`. Ties use ascending case ID; GT selects diagnostic views only.
+Use `--case case_00236` with `--stage images` to time/inspect one missed case first. No inference or fresh-pool
+evaluation is performed. The original `show_case.py` binds input/output experiment names together; the isolated
+inspection script supports read-only kits100 inputs and separate outputs without changing shared code.
+CT-derived montages are local artifacts excluded from Git. Run the `--stage images` command above to recreate
+them from the shared inputs; the committed review guide links to these local images.
+
 Questions from the supervisor meeting of 2026-10-07, asked after the G1 choices were locked, so they are
 **exploratory** and report the dev and test sets separately. Both scripts only read saved predictions (no inference)
 and never change the locked G1 files. Settings: `exploratory:` in `configs/kits100.yaml`.

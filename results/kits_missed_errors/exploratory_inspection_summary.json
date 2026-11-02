@@ -1,0 +1,41 @@
+{
+  "status": "exploratory; all kits100 cases are development data for this follow-up",
+  "n_cases": 100,
+  "review_budget": 20,
+  "n_bad": 15,
+  "n_bad_in_budget": 11,
+  "n_missed_bad": 4,
+  "score": "model_diff_mean_region",
+  "bad_dice_threshold": 0.83,
+  "tie_rule": "case_id_ascending",
+  "boundary_tied": false,
+  "missed_case_ids": [
+    "case_00236",
+    "case_00406",
+    "case_00040",
+    "case_00184"
+  ],
+  "bad_capture_fraction_at_budget": 0.7333333333333333,
+  "n_nonbad_in_budget": 9,
+  "per_case_fn_fraction_of_errors_min": 0.9847264568831617,
+  "per_case_fn_fraction_of_errors_max": 0.9986447045771163,
+  "fn_low_probability_share_min": 0.5964039033502937,
+  "fn_low_probability_share_max": 0.8914039716706013,
+  "fn_outside_region_share_min": 0.4880023315307147,
+  "fn_outside_region_share_max": 0.8680801908825795,
+  "fn_recovered_by_6mm_share_min": 0.0203759578846372,
+  "fn_recovered_by_6mm_share_max": 0.2682926829268293,
+  "sum_case_processing_seconds": 33.685175113001605,
+  "per_case_processing_seconds": {
+    "case_00236": 3.9207607179996558,
+    "case_00406": 5.427671344999908,
+    "case_00040": 14.708766290001222,
+    "case_00184": 9.62797676000082
+  },
+  "n_selected_slices": 19,
+  "saved_probability_quantization": "1/255; saved p=0 does not imply exact zero before quantization",
+  "visual_reviewer": "Codex (AI assistant); Otto review not recorded",
+  "clinical_scope": "Descriptions of dataset labels and model masks only",
+  "new_ranking_scores_computed": false,
+  "g3_pool_opened": false
+}
