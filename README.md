@@ -195,6 +195,26 @@ The script reuses the G1 combiner, preserves exact score ties, saves scores befo
 both gained and displaced cases at the unchanged 20% budget. Results: `results/kits_missed_combinations/`.
 This does not lock or run the fresh-pool test. Completed inspection/standalone outputs remain unchanged.
 
+The prospective joint test (missed-errors step 5) has its own [protocol](docs/missed_errors_fresh_protocol.md):
+
+```bash
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage freeze
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage benchmark
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage preflight --handoff /path/to/handoff.json
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage score
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage evaluate
+```
+
+Freeze pins the deterministic next-100 cohort, recipe, code and original checkpoint hashes. Benchmark uses
+old kits100 development cases and synthetic metrics only. Preflight without `--handoff` records pending
+coordination without opening fresh headers or voxels. Real group coordination and baseline provenance are
+required before using the fresh inputs. `handoff_template.json` and the protocol describe the CSV/metadata
+needed from Frederik. Source arrays remain outside Git. No inference or download is performed by this script.
+
+Fresh scores are written before GT; an exclusive outcome marker prevents silent reopening. The combination
+and the already locked far score are evaluated together once. Keep completed results and log any technical
+failure/recovery without changing the scientific choices. Ask before downloads or projected stages >30 min.
+
 Questions from the supervisor meeting of 2026-10-07, asked after the G1 choices were locked, so they are
 **exploratory** and report the dev and test sets separately. Both scripts only read saved predictions (no inference)
 and never change the locked G1 files. Settings: `exploratory:` in `configs/kits100.yaml`.

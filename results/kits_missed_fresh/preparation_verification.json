@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "checked_at": "2026-11-02T05:18:49+01:00",
+  "frozen_cases": 100,
+  "kits100_overlap": 0,
+  "draw_positions": [
+    101,
+    200
+  ],
+  "scientific_file_fingerprints": 20,
+  "checkpoint_fingerprints": 2,
+  "known_prior_smoke_cases": [
+    "case_00183",
+    "case_00002"
+  ],
+  "coordination_status": "Otto is checking and will return; no notification/confirmation fabricated",
+  "preflight_ready": false,
+  "fresh_headers_or_voxels_read": false,
+  "fresh_scores_computed": false,
+  "fresh_outcome_stage_started": false,
+  "old_score_and_both_model_dice_reproduction_passed": true,
+  "locked_g1_results_unchanged": 61,
+  "locked_prediction_bytes_unchanged": 600,
+  "earlier_experiment_output_hashes_match": 43,
+  "prepublication_dependency_revision": "Dataset YAML pin added; archived draft preserved; settings/code/cohort/checkpoints unchanged",
+  "libraries": {
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "nibabel": "5.4.2",
+    "torch": "2.2.2"
+  },
+  "lock_sha256": "a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84",
+  "output_hashes": {
+    "benchmark_machine.json": "5d3acbb777e74136a493e2c7e9181773768415b56d12207709f496f11831e134",
+    "benchmark_run.txt": "4b2df305ed10d241f30c1075d1e02b56766eeb43295ed5a3601568d44eb5a980",
+    "cohort.csv": "53bd4caeee140917dd2449b9cb7aea950c2470b5463e8c1454d4e96dfc3db458",
+    "freeze_machine.json": "690ca26a408b34c9f5be3fae4e9e8f839654d98d06bc25b5809ed83c619118f2",
+    "freeze_run.txt": "a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84",
+    "handoff_template.json": "ae9097fe4aa7ca889618c5de9cb45421d4237e6dd329046527fbf8ae5ff1e1bb",
+    "lock.json": "a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84",
+    "old_benchmark_cases.csv": "cd62a5cb488d158057a9b21bfce199099dc2fe3a0408e1ed71783a7ef7b106e1",
+    "preflight.json": "695461c8e4dc154807d63bf6d8886d2eefb0fc3593888b6967adbc7c2d831621",
+    "preflight_machine.json": "62d7c6934ed51c6cdbe6545b5150f950291428ee90e2d1378704e8f0e406e917",
+    "preflight_run.txt": "695461c8e4dc154807d63bf6d8886d2eefb0fc3593888b6967adbc7c2d831621",
+    "prepublication_draft/README.md": "5f40eccec199f49bb1ad5e31ac3481ab2ff96bf9e1ae09a1c4f2289f252676ab",
+    "prepublication_draft/benchmark_machine.json": "04ba458280944ac914f1dfe84474b88cf78e220e59e0d8cb67614ccf09e550f7",
+    "prepublication_draft/benchmark_run.txt": "201860695cf81db18bd530b94925086406e4310b35d902d5c63757b75271f5fc",
+    "prepublication_draft/freeze_machine.json": "6858af84cd5bf0284891c5082d66cf7547e966c8eb20ab49b8cb08ef0380ded8",
+    "prepublication_draft/lock.json": "7e01121c93096f7f8d1a214586ec213198d48ae5d6f64199705e16a20ec892f9",
+    "prepublication_draft/old_benchmark_cases.csv": "b07e1ee13becb9192bc939bc4b9ed08b70eb30f8cc274cdc36215223fcb76761",
+    "prepublication_draft/preflight.json": "aed4b77a5fcaf6df1724bad5209362f7eb96d25373ea9990f23ba9d798574f36",
+    "prepublication_draft/preflight_machine.json": "4917914db3c96bf3642dd4c4de5ebcf428d16817ca42d4a3605fedd2d2a83d53",
+    "prepublication_draft/preflight_run.txt": "aed4b77a5fcaf6df1724bad5209362f7eb96d25373ea9990f23ba9d798574f36",
+    "prepublication_draft/preparation_verification.json": "d1194ec8feae44e59899cfec1f05515207acd5b3424e75a4381e4e02adbd0af2",
+    "prepublication_draft/run_config.yaml": "71039b06673efcc487445ef10f07777c1ae8c59e2818f32380ba57b176333f81",
+    "prepublication_draft/runtime_benchmark.json": "201860695cf81db18bd530b94925086406e4310b35d902d5c63757b75271f5fc",
+    "prepublication_revision.json": "8a838ae26b3f4064647202b4afc1a8965025031800c1c1a3acec0421c2495af6",
+    "run_config.yaml": "ec67c9968f6dff7ac67196e8566673cd8b5c2dfcb0d8f10859b5e41a77854a6b",
+    "runtime_benchmark.json": "4b2df305ed10d241f30c1075d1e02b56766eeb43295ed5a3601568d44eb5a980",
+    "tests.txt": "a4f806eef2623815e94eb89cd6f461706757556594b03a1944c45f955ae5201e"
+  }
+}

@@ -1099,6 +1099,81 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   lack of established superiority/top-20 gain and the severe displaced case. Updated "Where we are" with
   confirmed publication and step 5 preparation. No fresh pool, merge or direct group message.
 
+## 2026-11-02: missed-errors step 5, prospective lock preparation
+
+- `[admin]` Read "Where we are", overview and contributing rules. Pull on `otto/missed-errors` was up to
+  date (`a9bf46b`); offline sync checked 133 packages. Fresh outputs are absent from local prediction folders;
+  the expected `configs/g3_kits.yaml` was not found on `frederik/g3` through the connected GitHub tool.
+  No fresh outcomes were read. Otto will check Bjørn/Frederik coordination and file location and return.
+- `[decision]` Exact prospective recipe: `docs/missed_errors_fresh_protocol.md` and
+  `configs/kits_missed_fresh.yaml`. One selected combination (`g1_missing_hull_mean`) vs. locked G1;
+  preserve the existing 2026-10-21 far-score comparison in the same single outcome stage. For each named
+  comparison: threshold review-AUC, 2,000 paired case resamples, seed 42, 95% CI lower bound above zero
+  (1e-12 numerical-zero tolerance). These are two per-comparison tests with unadjusted CIs, not a familywise
+  5% claim. Report both outcomes, including null results; no extra fresh candidates or fitted weights.
+- `[decision]` Prespecify quality/capture/false alarms after ceil(20% × N), paired CIs and all gained/lost
+  cases with continuous Dice. A primary AUC gain with worse top-20 quality is a tradeoff, not overall workflow
+  superiority. Keep worst10, quality-AUC and Spearman as secondary. No new severity threshold selected.
+- `[decision]` Preserve the originally agreed next 100 seed-42 cases, including case_00183/case_00002,
+  already used in G3's earlier feasibility smoke test (`docs/g3_plan.md`). Disclose that prior exposure;
+  do not replace cases after seeing their earlier GT/feasibility use. Holdout means unused for this ranking
+  development question, not never seen by every G3 activity. Require original baseline weights, not fine-tuned maps.
+- `[decision]` Checked the [official KiTS23 data description](https://kits-challenge.org/kits23/): its
+  patient-based cohort uses each case's most recent preoperative CT. Treating distinct case IDs as independent
+  units follows that description and the G1 protocol; this is an inference, not an independent identity audit.
+  Resolve any contrary patient/overlap information before fresh outcome access. Recorded this in the protocol.
+- `[experiment]` Added isolated `scripts/fresh_missed_errors.py` with deterministic freezing, a real
+  coordination/data preflight, GT-free scoring, old-data reproduction/timing and an exclusive one-time
+  outcome stage for both comparisons. No shared source edits. Synthetic tests cover pool isolation,
+  missing coordination, checkpoint/header mismatch, GT-free scoring, primary criteria, quality and reopening.
+- `[result]` Initial unpublished lock written **2026-11-02 04:46:58 Europe/Copenhagen**: **100 IDs, draw positions
+  101–200, zero kits100 overlap, 19 scientific-file fingerprints, 2 checkpoint hashes**.
+  Archived at `results/kits_missed_fresh/prepublication_draft/{lock.json,run_config.yaml}`; the cohort is
+  unchanged in the parent folder. The two earlier smoke cases are
+  explicitly identified. No new joint ranking outcomes were accessed before freezing.
+- `[result]` **19 new synthetic tests passed**. Full suite **186 passed, 36 skipped, 8 existing warnings,
+  3.15 s**; `results/kits_missed_fresh/tests.txt`. Tests cover a full four-case synthetic joint outcome
+  stage and refusal to reopen it; this is not real fresh-pool evaluation.
+- `[experiment]` Initial old-data benchmark **42.54 s**, cases **case_00574 / case_00563 / case_00135** chosen by
+  small/median/large development grids. Reproduced saved GT-free scores and both model Dice within archived
+  rounding. Per-grid-voxel scoring **1.53228e-7 s**, Dice I/O/evaluation **2.21358e-8 s**; synthetic metric/
+  secondary-bootstrap projection **63.65 s** with safety factor 2. Full fresh stage projection awaits actual
+  header sizes and includes Dice I/O, not only bootstrap. `old_benchmark_cases.csv`, `runtime_benchmark.json`,
+  `benchmark_machine.json` in `results/kits_missed_fresh/prepublication_draft/`. No fresh arrays read.
+- `[result]` Preparation audit passed: frozen cohort/offset/no overlap, exact scientific/config/checkpoint
+  hashes, unchanged G1/earlier results, and no fresh input inventory, score table, Dice or outcome marker.
+  Preflight is **ready: false**, with no fresh header/voxel reads. `results/kits_missed_fresh/
+  {preparation_verification.json,preflight.json}`. Lock state refers to this joint ranking question;
+  prior G3 feasibility/GT exposure remains disclosed.
+- `[admin]` CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121 / CUDA build
+  12.1, 6 threads, seed 42, no GPU. Stage machine files record baseline `a9bf46b`, dirty state, lock hash and
+  timing; preparation verification records NumPy/SciPy/nibabel versions. No shared source files changed.
+- `[admin]` Otto said he will check coordination/output location and return. Keep actual fresh evaluation
+  pending; do not fabricate notification or provenance. Prepared `docs/missed_errors_fresh_handoff.md`
+  (message draft, not sent) and `handoff_template.json` with input contract/reference hashes. No direct
+  group message, fresh data download, inference or >30-minute run was started.
+- `[dropped]` Do not replace missing full-pool outputs with two old smoke cases or rerun inference to
+  manufacture a final result. Preserve the agreed cohort and reuse Frederik's original maps after handoff.
+- `[admin]` Updated task step 5 notes/decisions/"Where we are", overview and README. Steps 1–4 remain
+  complete; step 5 stays unchecked because only its lock/preparation is complete. Ready to commit/push
+  the protocol, code and small preparation files and update draft PR #2; publication outcome follows.
+- `[decision]` Prepublication review found one missing dependency fingerprint: `configs/datasets/kits23.yaml`
+  controls organ label definitions. Added its fingerprint before any fresh access; archived the initial draft
+  and its timing/audit files rather than hiding the amendment. `prepublication_revision.json` records why.
+  Cohort, all scientific settings, code and checkpoint hashes are unchanged; no fresh outcomes opened.
+- `[result]` Final lock written **2026-11-02 05:08:09 Europe/Copenhagen**, with **20 file fingerprints
+  including 2 baseline checkpoints** and the same 100 cases. SHA-256
+  `a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84`.
+  Repeated old-data reproduction under the final lock: **43.39 s**, scoring **1.55355e-7 s/grid voxel**,
+  Dice I/O/evaluation **2.33924e-8 s/grid voxel**, metrics/secondary-bootstrap projection **67.76 s** with
+  safety factor 2. Final evidence is in `results/kits_missed_fresh/`; preflight remains pending with no
+  fresh headers/voxels read. The full duration still depends on actual fresh grid sizes.
+- `[result]` Final preparation audit passed: **20 pinned files, 100 disjoint case IDs, 61 unchanged G1
+  result files, 600 unchanged saved maps and 43 matching earlier-experiment output hashes**. The 27 small
+  text preparation/archive artifacts are fingerprinted in `results/kits_missed_fresh/preparation_verification.json`.
+  No real fresh scores, Dice or outcome-stage markers exist. Verified using the existing virtual environment;
+  no packages downloaded or changed.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the
@@ -1109,5 +1184,6 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   where to back up session data.
 - Group confirmation of the plan and of G1 "go".
 - `configs/hpc.yaml` still points to MSD Spleen.
-- Are all KiTS cases separate patients? Check before fixing the G3 pool.
+- KiTS patient units: official case-based data description checked 2026-11-02; the fresh protocol uses case
+  independence as a documented assumption. Any contrary identity/overlap evidence must be resolved before opening.
 - Report sections and contribution appendix not divided yet.

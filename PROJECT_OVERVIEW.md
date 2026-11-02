@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-11-02 (missed-errors combination screen complete; fresh-test planning next).*
+*Last updated: 2026-11-02 (missed-errors fresh-test recipe locked; coordination/data pending).*
 
 | | |
 |---|---|
@@ -86,9 +86,12 @@ The usual trick (ask several copies of the same model) is impossible because onl
   tested: the predeclared rule selects mean ranks of G1 + missing-side + hull provisionally. Threshold
   review-AUC **0.847 vs. 0.817**, paired difference **+0.030 [-0.032, 0.086]**, with no top-20 count gain
   (11/15 each) and worse simulated quality after 20 corrections. It promotes one original miss but displaces
-  a more severe bad case. No established superiority, fresh lock or pool evaluation yet. Full comparison:
-  `results/kits_missed_combinations/exploratory_combination_summary.md`. Next: exact prospective lock and
-  joint-pool coordination. Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).
+  a more severe bad case. No established superiority. The fresh recipe, 100 next-draw IDs and baseline
+  checkpoint hashes are now locked (`docs/missed_errors_fresh_protocol.md`, `results/kits_missed_fresh/`).
+  Step 5 evaluation remains pending: Otto is checking Bjørn/Frederik coordination and original prediction
+  locations. No fresh ranking results exist. Full development comparison:
+  `results/kits_missed_combinations/exploratory_combination_summary.md`.
+  Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).
 
 ### G2 — interface and user study
 

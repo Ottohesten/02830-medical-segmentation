@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
-| **Status** | Steps 1–4 complete (2026-11-02); step 5 planning next; fresh pool unopened |
+| **Status** | Steps 1–4 complete; step 5 recipe locked (2026-11-02), fresh evaluation pending coordination/data |
 | **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
@@ -240,7 +240,38 @@ A few starting ideas (try them, drop them, or find better ones):
     pass. All **61 locked results / 600 source maps / 23 earlier-stage output fingerprints** are unchanged.
     Sources: `exploratory_tests.txt` and `exploratory_verification.json` in the combination result folder.
 - [ ] **5. Lock and test once on the fresh scans** (see section 3).
-  *Notes:*
+  *Notes (2026-11-02; lock complete, actual fresh test pending):*
+  - Prospective recipe: [missed_errors_fresh_protocol.md](../missed_errors_fresh_protocol.md) and
+    `configs/kits_missed_fresh.yaml`. Only `g1_missing_hull_mean` is added to the already locked far-score
+    test. Both compare threshold review-AUC against G1 in one outcome stage: 2,000 case resamples, seed 42,
+    95% CI lower bound above numerical zero. Two named per-comparison tests, not familywise 5% evidence.
+    Top-20 capture/false alarms, simulated quality, displaced-case Dice and paired CIs are prespecified
+    secondary checks. An AUC gain with worse fixed-budget quality must be reported as a tradeoff.
+  - Froze **100 IDs at seeded positions 101–200, zero kits100 overlap**, **20 file fingerprints**, including
+    **2 original checkpoint hashes**. `results/kits_missed_fresh/{lock.json,cohort.csv,run_config.yaml}`.
+    Keep the 2 prior G3 smoke cases in the already agreed pool and disclose their earlier feasibility/GT
+    exposure. "No fresh outcomes" here means no new joint ranking outcomes, not that these two prior reports
+    never existed. The [official KiTS23 description](https://kits-challenge.org/kits23/) supports case-based
+    patient sampling; independence remains a stated inference, not a separate identity audit.
+  - The isolated runner has freeze/old-data-benchmark/preflight/GT-free-score/one-time-evaluate stages.
+    It refuses missing coordination, nonbaseline checkpoint provenance, changed scientific files, wrong
+    case coverage, misaligned grids and nonstandard probabilities. Scores are saved before GT, and an
+    exclusive marker prevents silent outcome reopening. No shared `src/segreview/` edits or new inference.
+  - **19 new synthetic tests** pass, including the complete synthetic joint outcome stage and its reopening
+    refusal. Full suite **186 passed, 36 skipped, 8 existing warnings, 3.15 s**;
+    `results/kits_missed_fresh/tests.txt`. Old-data benchmark **43.39 s**, reproducing saved scores and both
+    model Dice on case_00574, case_00563 and case_00135 (small/median/large development grids).
+    Metrics/secondary-bootstrap projection **67.76 s** with safety factor 2, plus actual Dice I/O scaling
+    when fresh header sizes are available; the total fresh stage duration is not yet known.
+  - Preparation audit passed: exact frozen cohort, source/checkpoint/config/code hashes, unchanged earlier
+    results, and no fresh headers/voxels/scores/outcome marker. `preparation_verification.json` in the result
+    folder. CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121 / CUDA build 12.1,
+    6 threads, seed 42, no GPU. Stage metadata records baseline `a9bf46b`, dirty state and library versions.
+  - **Actual test still pending.** No G3 prediction directory exists locally; the expected
+    `configs/g3_kits.yaml` was not found on the available Frederik branch. Otto replied that he will check
+    coordination and file location and return. Preflight deliberately reports `ready: false` without
+    opening fresh headers. No notification or confirmation has been invented, and no direct message sent.
+    [Handoff/message draft](../missed_errors_fresh_handoff.md) and `handoff_template.json` are ready.
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
   *Notes:*
 
@@ -299,27 +330,42 @@ A few starting ideas (try them, drop them, or find better ones):
 - **2026-11-02 — Do not open extra CT montages for the two earlier side false alerts in step 4.** Both
   remain outside the selected candidate's top 20. Aggregate rank/displacement accounting answers their
   immediate budget cost; future image review remains an option if a later question requires it.
+- **2026-11-02 — Freeze one candidate and joint execution before fresh ranking outcomes.** Keep the
+  selected mean-of-three definition, 5/6 mm borders, 20 ml components, exact rank ties and original weights.
+  Pin the next 100 IDs and both checkpoint hashes. Preserve the 2026-10-21 far test and report both named
+  per-comparison CIs openly; no claim about a familywise 5% error rate. Do not switch scores after viewing the pool.
+- **2026-11-02 — Do not substitute smoke tests or new inference for the pending joint evaluation.** Two
+  earlier G3 smoke cases are not a 100-case ranking validation. Keep and disclose them rather than replace
+  them after prior GT exposure. Frederik's baseline outputs must be reused once their location/provenance
+  is confirmed; no download or >30-minute stage starts without Otto's go-ahead.
+
+- **2026-11-02 — Pin the dataset definition before publication.** Final review found that the dataset YAML
+  (organ label definition) also needs a fingerprint. Added it and archived the unpublished 19-file draft in
+  `results/kits_missed_fresh/prepublication_draft/`. The final 20-file lock, benchmark and pending preflight
+  are regenerated; cohort, scientific settings, code and checkpoints are unchanged. No fresh outcomes opened.
 
 ## 7. Where we are
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
 
-- **2026-11-02 — Last finished step: 4.** Six combinations evaluated on all 100 development cases. The
-  predeclared rule provisionally recommends `g1_missing_hull_mean`: AUC **0.847 vs. 0.817**, difference
-  **+0.030 [-0.032, 0.086]**. No top-20 count gain (11/15 for both); it gains case_00236 but displaces
-  the more severe case_00582, and simulated quality at 20 worsens. No established superiority or fresh lock.
-  Results/interpretation: `results/kits_missed_combinations/`; earlier results remain unchanged.
-  Branch: `otto/missed-errors`; all locked G1 files/maps are unchanged; the G3 pool remains unopened.
-- **Next concrete action (step 5 preparation):** write the exact prospective score/test protocol for the
-  single provisional candidate and document the weak development evidence. Keep the pre-existing far-score
-  comparison in the same joint evaluation. Tell Bjørn and coordinate the pool IDs, original baseline-model
-  outputs and timing with Frederik before any fresh ranking/GT evaluation (latest 2026-11-18).
-- **Practical improvements:** (1) predeclare top-20 quality and displaced severe errors as secondary checks
-  alongside the unchanged primary AUC; (2) audit the shared pool/prediction provenance so the fresh run uses
-  the intended untouched cases and original weights. Do not add weights or swap criteria to chase examples.
+- **2026-11-02 — Last fully finished step: 4. Step 5 scientific lock/preparation is complete; its fresh
+  evaluation is not.** Recipe/code, next 100 IDs and baseline checkpoint hashes are pinned in
+  `results/kits_missed_fresh/lock.json`; protocol and tested runner are ready. No fresh model/label arrays,
+  scores, ranking metrics or outcome marker have been opened/created. Prior G3 smoke exposure is disclosed.
+  Development result remains weak: AUC +0.030 [-0.032, 0.086], no top-20 gain and worse quality at 20.
+- **Current dependency:** Otto is checking Bjørn/Frederik coordination and the original prediction folder/
+  inference metadata and will return. No G3 prediction directory is available locally. Preflight is pending;
+  do not infer consent/notification or substitute another dataset/model. No direct message has been sent.
+- **Next concrete action when Otto returns:** record real coordination evidence and the source paths,
+  build the 100-case handoff manifest, verify exact IDs/weights/headers/hashes, and project full runtime.
+  Ask before downloads or any projected >30-minute stage. Then freeze all GT-free scores and run both
+  questions together in one outcome stage by 2026-11-18. Keep step 5 unchecked until real results exist.
+- **Practical improvements:** (1) use the ready [handoff draft](../missed_errors_fresh_handoff.md) so data
+  sharing does not trigger duplicate inference; (2) preserve the prespecified quality-at-20/displaced-error
+  outputs so an apparent AUC gain cannot hide a worse practical budget. No weights/criteria changes planned.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
-  the ongoing task. Step 4 was committed as `7648905` and pushed to `origin/otto/missed-errors`.
-  PR title/description cover the combination comparison, weak evidence and severe displaced case.
+  the ongoing task. The prospective lock/preparation is ready for commit/push; record confirmed publication
+  before ending the session. Step 4 remains published as `7648905`.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.
