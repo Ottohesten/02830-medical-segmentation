@@ -838,6 +838,43 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 
 ---
 
+## 2026-11-02: missed-errors step 1, setup and input checks
+
+- `[admin]` Read "Where we are", task rules, overview, CONTRIBUTING and relevant README instructions.
+  `git pull --ff-only` on main was already up to date (`0fe9216`); created `otto/missed-errors` before writing.
+  Step 1 is complete; step 2 has not started. No external messages or pull request have been sent yet.
+- `[result]` Offline `uv sync --locked` checked **133 packages** without dependency changes/downloads.
+  Shared `uv run --locked --offline pytest`: **123 passed, 36 skipped, 8 warnings in 3.32 s**; skips need
+  prepared study data or Chrome, warnings are existing synthetic constant-input correlations.
+  Command/result record: `results/kits_missed_errors/setup_tests.txt`.
+- `[result]` Local setup audit found **100 CT scans, 100 label maps and 600 saved prediction/heatmap files**
+  (**349,419,984 prediction bytes**); all **800** canonical header geometries match their CT.
+  Saved `dice.csv`/`scores.csv` cover all 100 IDs, and `g1_scores_clean_dev.csv`/`g1_scores_clean_test.csv`
+  cover the original **20/80** IDs, without duplicates. `results/kits_missed_errors/{setup_audit.json,
+  setup_inventory.csv}`. Presence/header validation does not establish full payload integrity or archive origin.
+- `[result]` Saved SHA-256 fingerprints for **600** maps and **61** locked result files; all result hashes
+  stayed unchanged during the audit. `results/kits_missed_errors/{setup_inventory.csv,
+  setup_locked_results_sha256.json}`. No downloads, inference, new scores/Dice/ranking evaluation, label-voxel
+  reading or G3-pool access. No shared code changed.
+- `[admin]` Setup machine: **AMD Ryzen 5 7500F**, Linux **7.3.1-1-cachyos**, Python **3.12.15**,
+  torch **2.2.2+cu121**, CUDA build **12.1**, NumPy **1.26.4**; CPU-only audit, seed **42**.
+  GPU/driver query unavailable in this session; no GPU used. `results/kits_missed_errors/setup_machine.json`
+  records baseline commit `0fe9216`, working-tree state and exact source-config/lock hashes.
+- `[decision]` Use all 100 kits100 cases as development data for this follow-up, retaining original G1 split
+  labels for traceability. Step 1 reads the original selection config only; add an independent analysis config
+  with explicit read-only sources before step 2 outputs. Setup evidence stays in `results/kits_missed_errors/`.
+- `[dropped]` GPU-specific environment work is deferred for step 1 because the setup audit needs only CPU.
+  Reuse the saved predictions and shared lock; new kits100 inference is prohibited. No detector ideas tested yet.
+- `[decision]` Fresh scans remain reserved for the one joint evaluation already locked on 2026-10-21
+  (`far_disagree_per_volume` vs. locked G1). Before opening the G3 pool, lock our one or two checks and
+  criteria, tell Bjørn and coordinate model-output reuse with Frederik; latest 2026-11-18.
+- `[idea]` Next (step 2): list Dice < 0.83 cases outside the top 20% of the exploratory 100-case locked-score
+  queue; keep score/rank/error descriptions in a reusable table and inspect several slices per miss.
+  A single `show_case.py` slice may hide the missed structure. First-results target remains 2026-11-04.
+- `[admin]` Updated task step 1, decisions and "Where we are", plus overview status/next steps. Corrected the
+  overview's stale fresh-score choice to the existing 2026-10-21 lock; no scientific lock changed.
+  Step 1 is ready for commit/push on `otto/missed-errors`; publication outcome is recorded below.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

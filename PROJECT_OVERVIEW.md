@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-21 (robustness step 6 complete; report figure/summary ready; group presentation next).*
+*Last updated: 2026-11-02 (missed-errors setup complete; robustness report material remains ready).*
 
 | | |
 |---|---|
@@ -75,6 +75,12 @@ The usual trick (ask several copies of the same model) is impossible because onl
   Full dev/test, both-model, both-rule results: `results/kits_robustness_eval/`. The report figure (PDF/PNG),
   caption, and eight-line summary are ready in `results/kits_robustness_eval/report/`; group presentation is next.
 
+- Confident-error follow-up (Otto, 2026-11-02): step 1 is complete on `otto/missed-errors`. The shared
+  environment/tests and local 100-case input/header checks pass; setup evidence is in
+  `results/kits_missed_errors/`. Next: inspect bad cases missed by the locked queue, using all kits100 as
+  exploratory development data. No new scores or fresh-pool evaluation yet. Task/working notes:
+  [g1_missed_errors.md](docs/tasks/g1_missed_errors.md); first results targeted for 2026-11-04.
+
 ### G2 — interface and user study
 
 - Browser interface (NiiVue + small Python server), Chrome on a MacBook trackpad, English UI. The heatmap shows voxel
@@ -144,12 +150,13 @@ The full working rules (git, branches, locked results, new experiments, what to 
 | 2026-12-02 | Report hand-in (ACM two-column, max 5 pages for 4 people, plus contribution appendix and declaration of generative-AI use) |
 | 2026-12-18 | Defense |
 
-## 6. Next steps (2026-10-20)
+## 6. Next steps (updated 2026-11-02)
 
 1. Send Kristine the three follow-up results (6 mm alone, where 3 mm and 6 mm differ, simulated voxel correction;
    see the log of 2026-10-19) and decide with the group what goes into the report (as exploratory results).
-2. Decide with the group which disagreement score (if any) to test once on the G3 pool: the pre-registered choice
-   (`far_6mm_drops_ml`) or a different one, logged with date and reason before the pool is opened (log 2026-10-20).
+2. The 2026-10-21 log locks `far_disagree_per_volume` for one fresh G3-pool evaluation against the locked G1
+   score. Otto develops confident-error checks on kits100, locks one or two before that joint evaluation,
+   tells Bjørn, and coordinates prediction reuse with Frederik. Open the pool once, latest 2026-11-18.
 3. Everyone installs the project and tries the demo (`README.md` → Quick start).
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
 5. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.
