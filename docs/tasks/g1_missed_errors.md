@@ -262,6 +262,7 @@ and ideas for what could make the result better.)*
   they still consume useful review slots; (3) keep all 100 cases in false-alarm accounting to avoid fitting
   a detector only to the four examples. No shared-code edits are needed for this isolated experiment.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
-  the ongoing task. Step 3 is ready for commit/push; record the confirmed outcome before ending the session.
+  the ongoing task. Step 3 was committed as `4f00ca0` and pushed to `origin/otto/missed-errors`.
+  PR title/description now cover the standalone screen, its limitations and the planned combination step.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.

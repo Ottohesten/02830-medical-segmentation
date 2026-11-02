@@ -1018,6 +1018,10 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   interpretation and false-alarm case lists: `results/kits_missed_checks/{exploratory_checks_summary.md,
   exploratory_false_alarm_cases.csv,exploratory_key_results.json}`. Ready for commit/push and PR #2 update;
   publication outcome follows. No shared-code edits or direct group messages.
+- `[admin]` Step 3 committed as `4f00ca0` and successfully pushed to `origin/otto/missed-errors`.
+  Updated draft PR #2 title/description through the local authenticated GitHub client to cover the final
+  standalone screen, its limitations and the next combination step. Updated "Where we are" with confirmed
+  publication. No merge or direct group message; group review remains required before merging.
 
 ## Open questions (update when answered, with the date)
 
