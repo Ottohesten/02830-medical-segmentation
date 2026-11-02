@@ -939,6 +939,10 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   not run. Removed those images from staging and added a Git ignore rule. They remain local and reproducible
   with the inspection script; only code, small tables/metadata and notes are committed. Updated the README,
   task and review guide to state this. No CT-derived images are published.
+- `[admin]` Saved the safe step 2 version as `eaf9ed0` and successfully pushed it to
+  `origin/otto/missed-errors`. Updated draft PR #2 title/description to the final inspection scope via local
+  `gh`; CT montages remain local/ignored and can be regenerated. Updated "Where we are" with publication
+  status and step 3 size/shape checks. No merge or direct group message.
 
 ## Open questions (update when answered, with the date)
 

@@ -194,6 +194,8 @@ and ideas for what could make the result better.)*
   more code; (2) compare shape deficits against good cases to detect normal-anatomy false alarms;
   (3) Otto can review the four linked montages with the color guide to practice explaining each error.
 - **Publication:** steps 1–2 are tracked by
-  [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2). Step 2 is ready for commit/push;
-  record the confirmed outcome before ending the session. Group review remains required before merging.
+  [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2). Step 2 was committed as
+  `eaf9ed0` and pushed to `origin/otto/missed-errors`; PR title/description now cover the inspection.
+  CT-derived montages remain local/ignored; code, tables, provenance and notes are published.
+  Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.
