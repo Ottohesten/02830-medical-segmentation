@@ -61,17 +61,20 @@ def random_draw(cfg: dict, all_ids: list[str]) -> list[str]:
 def select_case_ids(cfg: dict, all_ids: list[str]) -> list[str]:
     """Pick the scans to use from the full list of scan ids (see module docstring).
 
-    Input: config (dataset.n_cases, dataset.selection, seed), all scan ids of the dataset.
+    dataset.offset (default 0) skips the first scans of the order: with selection random, n_cases 100 and offset 100,
+    the selection is positions 101-200 of the seeded draw, i.e. the next 100 scans after kits100 (the G3 pool).
+    Input: config (dataset.n_cases, dataset.selection, dataset.offset, seed), all scan ids of the dataset.
     Output: the selected ids, sorted.
     """
     ds = cfg["dataset"]
     ids = sorted(all_ids)
-    n = ds["n_cases"] if ds["n_cases"] is not None else len(ids)
+    offset = ds.get("offset", 0)
+    n = ds["n_cases"] if ds["n_cases"] is not None else len(ids) - offset
     selection = ds.get("selection", "first")
     if selection == "first":
-        return ids[:n]
+        return ids[offset:offset + n]
     if selection == "random":
-        return sorted(random_draw(cfg, ids)[:n])
+        return sorted(random_draw(cfg, ids)[offset:offset + n])
     raise ValueError(f"Unknown selection '{selection}'")
 
 

@@ -1,7 +1,9 @@
 # G3 plan: fine-tuning the model on corrected scans (stretch goal)
 
-**Status:** plan and feasibility check only. Nothing has been trained, and the G3 pipeline is not built. G3 is only
-started if G1 and G2 are finished (project plan: weeks 10–11, after the user study).
+**Status (2026-10-27):** design changed to a **learning curve** (Kristine, 2026-10-21; section "Design: learning
+curve"). Feasibility smoke tests done on a Mac (2026-09-30) and on Frederik's RTX 4090 (2026-10-21). Nothing has been
+trained for real, and the G3 pipeline is not built yet. G3 runs in parallel with the user study, owned by Frederik
+([docs/tasks/g3_finetuning.md](tasks/g3_finetuning.md)).
 
 ## Question
 
@@ -16,9 +18,9 @@ new data. This is the only place in the project where the model is trained.
 
 | Set | Scans | Used for |
 |-----|-------|----------|
-| **G3 pool** | KiTS23 scans that are **not** among the 100 of `kits100`: the next scans of the same seeded draw (seed 42, positions 101, 102, ...), e.g. the first 100 of them | the review queue, the simulated corrections and the training data |
-| `kits100` development set | the 20 development scans | choosing the training settings (learning rate, number of epochs) |
-| `kits100` test set | the 80 test scans | the final evaluation, **once**, after all choices are locked on the development set |
+| **G3 pool** | KiTS23 scans that are **not** among the 100 of `kits100`: the next 100 scans of the same seeded draw (seed 42, positions 101–200) | the review queue, the simulated corrections and the training data |
+| `kits100` development set | the 20 development scans | choosing the training settings (learning rate, number of steps) |
+| `kits100` test set | the 80 test scans | drawing the learning curves: Dice after each point, **only** for the curves, after all choices are locked on the development set |
 
 The pool and `kits100` share no scan; the G3 scripts must check this, as the smoke test already does. As far as we
 know each KiTS23 case is a different patient, so no patient is in both; check this in the KiTS23 description before
@@ -34,9 +36,9 @@ the pool is fixed. The 2 scans of the smoke test (case_00183, case_00002, positi
    with the kidney replaced by the ground truth. KiTS kidney and tumor become the model's `kidney_left/right`,
    cysts `kidney_cyst_left/right` (split at the body's midline); kidney voxels the model predicted where the ground
    truth has none become background. Keeping the model's own labels for the other structures stops the training
-   from teaching the model to forget them. Budgets *k* = 10, 20 and 40 scans give a learning curve.
-   A more realistic reviewer (fixing only part of the wrong voxels, as measured in the user study) is an optional
-   extra.
+   from teaching the model to forget them. How many scans are corrected, and in which order: see "Design: learning
+   curve". A more realistic reviewer (fixing only part of the wrong voxels, as measured in the user study) is an
+   optional extra.
 3. **Fine-tuning.** nnU-Net's own trainer, in the variant the model was trained with (`nnUNetTrainerNoMirroring`),
    with nnU-Net's data augmentation and loss (Dice + cross-entropy with deep supervision). Differences from a
    normal nnU-Net training:
@@ -46,39 +48,100 @@ the pool is fixed. The 2 scans of the smoke test (case_00183, case_00002, positi
    - learning rate 0.001 instead of 0.01, and far fewer epochs than the 4000 of the original training. The exact
      number of epochs and the learning rate are chosen on the `kits100` development set from a small grid fixed in
      advance (e.g. 10, 25, 50 epochs × learning rate 0.001, 0.0003);
-   - foreground oversampling on the corrected kidney.
-4. **Which model.** The main experiment fine-tunes the **3 mm model** (task 297), because it makes the masks that
-   G1 and G2 use. The **6 mm model** (task 298) is cheaper (patch 64³ instead of 112 × 112 × 128) and is used
-   first, to test the pipeline and the settings. Note that fine-tuning changes the G1 uncertainty score as well
-   (it uses both models); G3 only evaluates Dice.
+   - foreground oversampling on the corrected kidney: nnU-Net centres a share of the patches on "foreground", which
+     with 117 classes is almost every organ; G3 keeps only the kidney classes as foreground, so these patches are
+     centred on the kidney (nnU-Net's share: one of the 2 patches of a batch).
+4. **Which model.** The learning curves fine-tune the **3 mm model** (task 297), because it makes the masks that
+   G1 and G2 use. The **6 mm model** (task 298) is used only to test the pipeline end to end (one small run, not a
+   result); per training step it is not cheaper on the RTX 4090 (0.18 s for both). Note that fine-tuning changes the
+   G1 uncertainty score as well (it uses both models); G3 only evaluates Dice.
 
-## Comparison
+## Design: learning curve (2026-10-27)
 
-All fine-tuned models use the same budget *k*, settings and number of training steps.
+Kristine's advice (2026-10-21, PROJECT_LOG.md): compare "most uncertain first" with random order as the number of
+corrected scans grows. **If the queue picks useful scans, test Dice rises faster when the model is fine-tuned on the
+most uncertain scans first than on scans in random order. If the most uncertain scans are mainly outliers unique to
+one patient, the queue curve rises more slowly.** This replaces the earlier comparison of models A–D at a fixed
+budget *k* (log 2026-10-21 and 2026-10-27). Everything below is fixed before the pipeline is built and before any
+G3 model is trained.
 
-| Model | Trained on | Question it answers |
-|-------|------------|---------------------|
-| A. Original | (not fine-tuned) | baseline |
-| **B. Queue + correction** | top *k* of the queue, corrected | the G3 method |
-| C. Random + correction | *k* random pool scans, corrected | is the queue a good choice of what to correct? |
-| D. Queue, no correction | top *k* of the queue, with the model's own prediction as target | is the gain from the corrections, or only from more training on KiTS images? |
+**Orders of the 100 pool scans**
 
-- **Primary:** Dice (organ definition `kidney_tumor_cyst`, as in G1) on the 80 test scans, B vs A, paired per scan:
-  Wilcoxon signed-rank test on the per-scan Dice differences and the mean difference with a 95 % bootstrap
-  interval. Also reported for the "bad" scans (Dice < 0.83 with the original model), where a gain matters most.
-- **Secondary:** B vs C and B vs D, the learning curve over *k*, and the development set on its own.
-- Training is random (patch sampling, augmentation). B and C are repeated with 3 seeds if the compute allows,
-  and the spread is reported.
+- **Queue order:** most uncertain first by the locked G1 score `model_diff_mean_region`, computed on this machine
+  from the 3 mm and 6 mm models' output for the pool (no ground truth).
+- **Random order:** random permutations of the pool with seeds 42, 43 and 44 (seeds 45 and 46 are added if time
+  allows).
+
+**Points of the curve:** *k* = 0, 10, 20, …, 100 corrected scans. For each order and each *k*, the model is
+fine-tuned on the first *k* scans of that order, corrected as in Method step 2, starting **from the original model**
+every time (not from the previous point), so the points are independent. *k* = 0 is the original model; *k* = 100
+is the whole pool, the same scans in every order. A run is defined by (scans, training seed); the queue order uses
+training seed 42 and a random order its own seed, so the queue's and seed 42's *k* = 100 runs are the same run and
+are trained once. 10 queue points + 3 random orders × 10 points − 1 = **39 runs**.
+
+**Control without correction (secondary):** one extra run on all 100 pool scans with the model's own prediction as
+the target (no correction), seed 42. Does training on KiTS images alone change test Dice?
+
+**Training, the same for every point:** the 3 mm model (task 297), nnU-Net's trainer (`nnUNetTrainerNoMirroring`)
+from **all** pretrained weights, the model's own batch size (2), the same number of training steps *S* for every *k*
+(so a small *k* means more passes over each scan), learning rate *L* with nnU-Net's decaying schedule, kidney
+foreground oversampling (Method step 3), `nnUNet_compile=false`. The final checkpoint is evaluated (nnU-Net's "best"
+checkpoint is chosen on the training scans, so it says nothing about new scans).
+
+**Choosing the settings (development set only):** grid *S* ∈ {2,500, 6,250} steps × *L* ∈ {0.001, 0.0003}, each
+setting trained at *k* = 50 in the queue order (seed 42) **and** in random order (seed 42), so that the choice
+favors neither order. Criterion: the highest mean Dice (`kidney_tumor_cyst`) over the 20 development scans,
+averaged over the two runs; if two settings are within 0.001, the one with fewer steps is chosen. The original
+model's development Dice is reported next to them. The choice is written in the log before any test scan is
+predicted by a fine-tuned model. 8 runs; the 2 with the chosen setting are reused as the *k* = 50 points.
+
+**Evaluation after each point:** predict the 20 development and 80 test scans with G1's inference code on this
+machine (also the original model: never the Mac's saved predictions, because machines differ). Dice per scan and per
+model, for `kidney_tumor_cyst` and `kidney_cyst_ignore_tumor`. The test set is used **only to draw the curves**; no
+setting or choice is made on it.
+
+**What is reported (fixed now):**
+
+- **Primary:** the mean test Dice against *k*: the queue curve, each random seed's curve and their mean. Summary
+  number: the mean over *k* = 10, …, 90 of (queue − mean of the random seeds), i.e. the area between the curves per
+  point, with a 95 % paired bootstrap interval over the 80 test scans (2,000 resamples, seed 42; the same resampled
+  scans for every model). Positive: the queue helps faster; negative: the most uncertain scans help less.
+- **Training noise:** the bootstrap over scans does not include the randomness of training. The spread between the
+  random seeds' curves (and the three *k* = 100 runs, which train on the same scans) shows it; a difference between
+  the queue and random curves that is smaller than this spread is not read as an effect.
+- **Secondary:** the same on the "bad" test scans (Dice < 0.83 with the original model on this machine); the
+  difference at each *k*; the development-set curves; Dice with the tumor left out; forgetting (below); the control
+  without correction.
 - **Forgetting:** KiTS has no ground truth for the other organs, so for each fine-tuned model we report the share of
   non-kidney voxels whose label changed compared with the original model on the test scans.
 - **Label definition:** TotalSegmentator calls only part of a tumor "kidney" (median 81–84 % in our label check),
   while our ground truth counts the whole tumor. Fine-tuning will teach the model our definition, and part of any
   gain comes from that alone, not from fixing errors. To see how much, Dice is also reported with the tumor left out
-  (`kidney_cyst_ignore_tumor`). None of the controls separates this effect; it is a limitation to report.
+  (`kidney_cyst_ignore_tumor`). Neither the curves nor the control without correction separate this effect; it is a
+  limitation to report. It can favor the queue: the real 3 mm vs. 6 mm differences lie mostly in tumors (log
+  2026-10-19), so the most uncertain scans may teach the definition faster; the curve with the tumor left out shows
+  how much.
 
-## Compute and what needs the HPC
+**The locked ranking test on the pool (log 2026-10-21):** G3 computes the queue (no ground truth) and the simulated
+corrections, but **no ranking metric on the pool** (review-AUC, Spearman, Dice of the pool scans against their rank,
+…) until the group's locked test has run (latest 2026-11-18). The size of each correction (voxels changed) is saved,
+as CONTRIBUTING.md asks, but not compared with the queue order before that test. The pool's 3 mm and 6 mm output is
+saved in G1's format (`data/predictions/g3_pool/`), so the locked test can use it.
 
-Measured (smoke test on this Mac and the original training logs):
+**Compute (estimates from the RTX 4090 smoke test, `results/g3_smoke_gpu/estimates.csv`):** one 3 mm run takes about
+9 min (2,500 steps) or 23 min (6,250 steps); the settings grid (8 runs) about 2 h; the 39 + 1 curve runs 6–15 h;
+predicting 100 scans with each of the ~41 models about 8 h at 7.5 s per scan (less if the prepared scans are
+reused). In total about 15–25 h of GPU time, mostly overnight, with other programs closed (RAM).
+
+## Compute
+
+**Measured on Frederik's RTX 4090 (smoke test 2026-10-21, `results/g3_smoke_gpu/`, `results/g3_smoke_gpu_3mm/`):**
+a training step takes 0.18 s for both models at their own batch size (16 augmentation workers), predicting one scan
+with G1's code 7.5 s (3 mm) and 4.8 s (6 mm); GPU memory at most 17.3 of 24 GB; the PC's RAM (34 GB) is the limit.
+So G3 runs on this PC and does not need the HPC. The section "Design: learning curve" has the resulting estimate.
+The Mac numbers and the HPC planning below are kept for the record.
+
+Measured earlier (smoke test on the Mac and the original training logs):
 
 | What | Where | Measured |
 |------|-------|----------|
@@ -143,11 +206,19 @@ Results (30 September, this Mac; `results/g3_smoke/{cases,sanity,timing}.csv`):
   the scan with −1; nnU-Net's `load_pretrained_weights` fails without a GPU (it loads without `map_location`); and
   the trainer takes its batch size from the plans when it initializes, so it must be changed there.
 
-## If G3 goes ahead: what to build
+## What to build (phase 2, learning curve)
 
-1. `configs/g3_kits.yaml`: pool size, budgets *k*, seeds, the grid of training settings, model resolution.
-2. `src/segreview/finetune.py`: the corrected targets (from the smoke test), export to nnU-Net's preprocessed
-   format, a trainer run that starts from all pretrained weights, and unit tests of the target construction.
-3. `scripts/g3_prepare.py` (queue + targets, needs the G1 inference on the pool), `scripts/g3_train.py` (one model
-   per job), `scripts/g3_evaluate.py` (Dice on dev/test, paired tests), and an LSF job script in `jobs/`.
-4. Lock the settings on the development set, then evaluate the test set once.
+1. `configs/g3_pool.yaml`: G1's inference of the 3 mm and 6 mm models on the pool and the ground-truth-free scores
+   (the queue), saved in G1's format for the locked test. No Dice and no ranking metric on the pool.
+2. `configs/g3_kits.yaml`: the pool, the orders and seeds, the points *k*, the settings grid, the model, the steps.
+3. `src/segreview/finetune.py`: the corrected targets (from the smoke test) with the kidney as foreground, export
+   to nnU-Net's preprocessed format, and a trainer that starts from all pretrained weights and trains on a given
+   list of scans; unit tests.
+4. `scripts/g3_prepare.py` (download, queue, targets), `scripts/g3_train.py` (one run; finished runs are skipped,
+   and a stopped run continues from its last finished epoch), `scripts/g3_evaluate.py` (Dice per scan and model on
+   dev/test; a stopped evaluation continues with the next scan), `scripts/g3_curves.py` (curves, bootstrap summary,
+   figure).
+5. Lock the settings on the development set (log), then run the curves.
+
+Earlier versions of this list (fixed budgets *k* = 10, 20, 40, models A–D, an LSF job for the HPC) were replaced on
+2026-10-27; see the log.

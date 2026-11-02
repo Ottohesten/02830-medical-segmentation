@@ -1,0 +1,11 @@
+case_id,resolution,grid_zyx,voxels_changed_by_correction,prepare_s,predict_s
+case_00056,fastest,75x67x67,3331,1.6,0.2
+case_00151,fastest,88x69x69,1376,14.9,0.4
+case_00430,fastest,50x70x70,11716,1.1,0.3
+case_00519,fastest,38x60x60,1490,1.3,0.1
+case_00533,fastest,82x63x63,3270,1.6,0.1
+case_00556,fastest,40x60x60,3795,0.8,0.1
+case_00560,fastest,56x42x42,618,1.7,0.1
+case_00565,fastest,47x73x73,1134,1.1,0.1
+case_00568,fastest,92x79x79,2699,2.7,0.4
+case_00573,fastest,67x54x54,960,1.4,0.2

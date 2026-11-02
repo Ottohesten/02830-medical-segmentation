@@ -8,7 +8,10 @@ Inference configs/results remain intact; this experiment copies maps into its ow
 import hashlib
 import json
 import os
-import resource
+try:
+    import resource          # peak memory of the process (macOS and Linux)
+except ImportError:          # Windows has no resource module: the peak memory is not recorded there
+    resource = None
 import shutil
 import signal
 import subprocess
@@ -129,7 +132,7 @@ def record_stage(cfg: dict, config_path: Path, out: Path, stage: str):
         raise
     finally:
         info.update({'elapsed_seconds': time.perf_counter() - start,
-                     'process_peak_rss_mib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024,
+                     'process_peak_rss_mib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 if resource else None,
                      'gpu_peak_allocated_mib': torch.cuda.max_memory_allocated() / 2**20 if gpu else None})
         write_json(path, info)
 

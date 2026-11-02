@@ -43,6 +43,17 @@ def test_random_draw_starts_with_the_selection_and_continues_it(tmp_path):
     assert sorted(draw[:5]) == select_case_ids(cfg, IDS)
 
 
+def test_offset_gives_the_next_scans_of_the_same_draw(tmp_path):
+    cfg = make_cfg(tmp_path)                          # 3 scans, random
+    first = select_case_ids(cfg, IDS)
+    cfg["dataset"]["offset"] = 3                      # the next 3 scans of the same draw, as the G3 pool after kits100
+    following = select_case_ids(cfg, IDS)
+    assert following == sorted(random_draw(cfg, IDS)[3:6])
+    assert not set(first) & set(following)
+    cfg["dataset"]["selection"] = "first"
+    assert select_case_ids(cfg, IDS) == IDS[3:6]
+
+
 def test_selection_from_the_case_list_needs_no_downloaded_scans(tmp_path):
     cfg = make_cfg(tmp_path)
     write_case_list(cfg)

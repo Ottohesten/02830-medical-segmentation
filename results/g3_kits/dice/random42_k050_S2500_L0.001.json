@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-28T17:06:28",
+  "cpu_model": "Intel(R) Core(TM) i9-14900K",
+  "memory_total_gib": 31.7,
+  "os": "Windows 11 (version 10.0, build 26200)",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "cpu_count": 32,
+  "python": "3.12.14",
+  "torch": "2.2.2+cu121",
+  "numpy": "1.26.4",
+  "cuda": "12.1",
+  "cudnn": 8801,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "gpu_memory_mib": 24564,
+  "nvidia_driver": "617.14",
+  "gpu_compute_capability": "8.9",
+  "mps_available": false,
+  "git_commit": "c9f0018bdec9d09111c5f2854cf2b21f6671aa41",
+  "git_uncommitted_changes": true,
+  "config": "configs\\g3_kits.yaml",
+  "model": "random42_k050_S2500_L0.001",
+  "model_resolution": "fast",
+  "splits": [
+    "dev",
+    "test"
+  ],
+  "checkpoint": "data\\g3_kits\\runs\\random42_k050_S2500_L0.001\\Dataset297_TotalSegmentator_total_3mm_1559subj\\G3Trainer__nnUNetPlans__3d_fullres\\fold_all\\checkpoint_final.pth"
+}

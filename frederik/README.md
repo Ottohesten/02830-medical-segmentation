@@ -26,6 +26,29 @@ downloads the TotalSegmentator weights and the 2 smoke-test scans. Its output is
 `results/g3_smoke_gpu/setup_check.txt` (checks) and `results/g3_smoke_gpu/windows_env.txt` (package versions).
 Git for Windows must be on PATH, so every run can record its git commit in `machine.json`.
 
+## Long G3 runs
+
+`g3_chain.ps1` runs stages of `scripts/g3_run.py` one after another and stops at the first stage that fails.
+`g3_start.ps1` starts it as a process of its own, so it goes on when the terminal, VS Code or a Claude session is
+closed, and `g3_stop.ps1` stops it with everything it started.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File frederik\g3_start.ps1                   # start or continue (the curves)
+powershell -ExecutionPolicy Bypass -File frederik\g3_start.ps1 prepare test grid # other stages
+powershell -ExecutionPolicy Bypass -File frederik\g3_stop.ps1                    # stop
+Get-Content data\g3_kits\logs\chain_status.txt                                   # progress per stage
+Get-Content data\g3_kits\logs\chain_curves.out -Tail 5                            # the last steps
+```
+
+**Stop and continue at any time.** Stopping loses at most the training epoch in progress (about 1 min) or the scan
+being evaluated: a training run saves its whole state after every epoch and continues from it, an evaluation
+continues with the next scan, and finished runs are skipped. The same holds after a shutdown, a restart or a crash.
+Only one chain runs at a time: `g3_start.ps1` refuses while one is running.
+
+Close games and other heavy programs while it runs: the PC's RAM is the limit (34 GB; other programs often use
+17–19 GB), and a game using the GPU's memory can make a training run fail. Stop G3 before gaming, and continue it
+afterwards.
+
 ## How runs on this PC differ from the group's
 
 - **The code is the same; the machine is not.** The model runs on a GPU instead of a CPU, and the Windows torch build

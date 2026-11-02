@@ -505,7 +505,7 @@ uv run python scripts/power_study.py   --config configs/study.yaml   # planning:
   effect sizes d_z (mean / SD of the per-participant differences), the share of simulated studies where the Wilcoxon
   test finds the effect. These are assumptions for planning, not results.
 
-## G3 (stretch): fine-tuning on corrected scans — plan only
+## G3 (stretch): fine-tuning on corrected scans — learning curve
 
 [docs/g3_plan.md](docs/g3_plan.md) describes the experiment (simulated corrections of the top of the review queue,
 fine-tuning, evaluation on the `kits100` test set) and what needs the HPC. It is not built. A feasibility smoke test
@@ -542,6 +542,26 @@ powershell -ExecutionPolicy Bypass -File frederik\windows_setup.ps1             
 whole G3 plan, disk space): it reads their `summary.csv`, measures the time to predict a scan with G1's inference
 code on the 2 smoke-test scans, and asks the dataset's server for the file sizes of kits100 and the G3 pool. Output:
 `results/g3_smoke_gpu/{estimates,disk,inference_times_gpu}.csv`. The numbers are estimates for planning, not results.
+
+**The learning curve (phase 2; design in [docs/g3_plan.md](docs/g3_plan.md), "Design: learning curve").** Settings:
+`configs/g3_kits.yaml` (orders, *k*, settings grid, evaluation) and `configs/g3_pool.yaml` (the G3 pool, positions
+101–200 of kits100's seeded draw; its ground truth is closed to G1's evaluation). One script runs each stage, one step
+per process, and skips finished work, so a stage can be stopped and started again:
+
+```powershell
+.venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage prepare   # pool output, orders, training data
+.venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage test      # 6 mm pipeline test (minutes)
+.venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage grid      # settings on the dev set + choice
+.venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage curves    # the curves (many hours)
+.venv\Scripts\python.exe scripts\g3_curves.py --config configs\g3_kits.yaml               # curves, summary
+```
+
+The steps are `g3_prepare.py`, `g3_train.py` (one run) and `g3_evaluate.py` (Dice per scan and model on kits100);
+`src/segreview/finetune.py` has the orders, the runs, the training targets and nnU-Net's trainer, and
+`src/segreview/g3_analysis.py` the curves and the summary. Small results go to `results/g3_kits/` (orders, Dice per
+model, training logs per run, the settings choice, curves); trained models, predictions and nnU-Net's data to
+`data/g3_kits/` (not in git). Until the group's locked ranking test has run, nothing computes a ranking metric on the
+pool (PROJECT_LOG.md, 2026-10-21).
 
 ## Layout
 

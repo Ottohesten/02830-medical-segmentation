@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-21 (G3: GPU smoke test on Frederik's RTX 4090 done, whole plan ≈ 7 h of GPU time; robustness step 6 complete, report figure/summary ready).*
+*Last updated: 2026-10-27 (G3: learning-curve design written; blocked by Windows Smart App Control on Frederik's PC). Before: 2026-10-21 (robustness step 6 complete, report figure/summary ready).*
 
 | | |
 |---|---|
@@ -35,7 +35,7 @@ opened, **show where in the scan the AI is unsure**. The goal is the most improv
 |---|---|---|
 | **G1** (core) | Rank scans by likely failure, without ground truth | **Done.** Locked and tested once on 80 test scans |
 | **G2** (core) | Review interface with an uncertainty heatmap + user study | Interface and analysis built and tested; **pilot and study not run yet** |
-| **G3** (stretch) | Fine-tune the model on corrections | Smoke test done on the RTX 4090 (2026-10-21): fine-tuning works there, ≈ 23 min per 3 mm run. Nothing trained for real yet; pipeline (phase 2) next ([task](docs/tasks/g3_finetuning.md)) |
+| **G3** (stretch) | Fine-tune the model on corrections | Learning-curve design written (2026-10-27, `docs/g3_plan.md`); smoke test done on the RTX 4090 (≈ 23 min per 3 mm run). Nothing trained for real yet. **Blocked:** Windows Smart App Control blocks torch on Frederik's PC ([task](docs/tasks/g3_finetuning.md)) |
 
 ### G1 — how the ranking works and how well it does
 
@@ -96,6 +96,12 @@ trained, so there is no result yet. On Frederik's RTX 4090 (2026-10-21) a traini
 models, so one 3 mm fine-tuning run of 6,250 steps takes about 23 min and the whole plan about 7 h of GPU time
 (estimates, `results/g3_smoke_gpu/estimates.csv`); the PC's RAM, not the GPU, is the limit.
 
+Design since 2026-10-27 (Kristine's advice): a **learning curve**. The model is fine-tuned on *k* = 0, 10, …, 100
+corrected pool scans, taken in queue order (most uncertain first) or in random order (3 seeds), each point from the
+original model, with test Dice after each point. If the queue picks useful scans, its curve rises faster; if the most
+uncertain scans are mainly outliers, it rises more slowly. Details, the settings choice on the development set and
+the primary summary: [docs/g3_plan.md](docs/g3_plan.md), "Design: learning curve". Estimated 15–25 h of GPU time.
+
 ## 3. Where things are
 
 | What | Where |
@@ -147,16 +153,17 @@ The full working rules (git, branches, locked results, new experiments, what to 
 | 2026-12-02 | Report hand-in (ACM two-column, max 5 pages for 4 people, plus contribution appendix and declaration of generative-AI use) |
 | 2026-12-18 | Defense |
 
-## 6. Next steps (2026-10-20)
+## 6. Next steps (2026-10-27)
 
 1. Send Kristine the three follow-up results (6 mm alone, where 3 mm and 6 mm differ, simulated voxel correction;
    see the log of 2026-10-19) and decide with the group what goes into the report (as exploratory results).
-2. Decide with the group which disagreement score (if any) to test once on the G3 pool: the pre-registered choice
-   (`far_6mm_drops_ml`) or a different one, logged with date and reason before the pool is opened (log 2026-10-20).
+2. Decided 2026-10-21 (log): the locked test of `far_disagree_per_volume` on the G3 pool, run once after Frederik's
+   model output for the pool exists, together with Otto's missed-errors check; latest 2026-11-18.
 3. Everyone installs the project and tries the demo (`README.md` → Quick start).
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
-5. G3 (Frederik): the pipeline with the 6 mm model (phase 2; the GPU smoke test is done, 2026-10-21)
-   ([docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)).
+5. G3 (Frederik): the learning curve (phase 2, design written 2026-10-27). First Windows Smart App Control must stop
+   blocking torch on Frederik's PC (log 2026-10-27); then downloads, pipeline, settings on the development set, curves
+   ([docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)). The pool's model output feeds the locked test.
 6. Divide the report sections (the Trello board exists).
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).

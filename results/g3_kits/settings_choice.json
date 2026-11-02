@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-28T09:58:56",
+  "steps": 2500,
+  "lr": 0.001,
+  "dev_mean_dice": 0.9371721278218296,
+  "rule": "highest mean development Dice over the setting's runs (queue and random order at k = 50); within 0.001: fewer steps",
+  "organ_definition": "kidney_tumor_cyst",
+  "n_development_scans": 20,
+  "original_model_dev_mean_dice": 0.8472151194228786
+}

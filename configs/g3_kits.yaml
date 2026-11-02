@@ -1,0 +1,58 @@
+# G3 learning curve (docs/g3_plan.md, "Design: learning curve"; task docs/tasks/g3_finetuning.md). Everything here was
+# fixed on 2026-10-27, before the pipeline was built and before any G3 model was trained (PROJECT_LOG.md 2026-10-27).
+# Frederik's PC (RTX 4090, Windows): run with .venv\Scripts\python.exe, e.g.
+#   .venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage prepare   (then grid, curves)
+
+name: g3_kits                         # small results in results/g3_kits/ (git); big files in work_dir (not in git)
+seed: 42
+eval_config: configs/kits100.yaml     # the 20 development and 80 test scans, the organ definitions, the model weights
+pool_config: configs/g3_pool.yaml     # the G3 pool: positions 101-200 of the same seed-42 draw (never in kits100)
+work_dir: data/g3_kits                # nnU-Net's folders, the trained models and their predictions (not in git)
+
+compute:
+  device: cuda                        # stop instead of silently using the CPU
+  num_threads: 1                      # torch CPU threads while training, as nnU-Net's own start on a GPU
+  augmentation_processes: 14          # nnU-Net's data workers while training. The smoke test needed about 12.7 for the
+                                      # GPU never to wait (3 mm: 2.23 s per batch / 0.176 s per step); 14 instead of 16
+                                      # saves about 1.5 GB of RAM, the PC's limit (log 2026-10-21)
+
+model_resolution: fast                # the 3 mm model (task 297) for the curves
+pipeline_test:                        # one small end-to-end test with the 6 mm model; not a result
+  model_resolution: fastest
+  k: 10
+  steps: 250                          # one nnU-Net epoch
+  lr: 0.001
+  dev_scans: 2                        # predicted afterwards
+
+truth_to_classes:                     # ground-truth labels (KiTS: 1 kidney, 2 tumor, 3 cyst) -> the model's classes
+  kidney: [1, 2]                      # (+ _left / _right). Tumor counts as kidney, as in kidney_tumor_cyst
+  kidney_cyst: [3]
+body_threshold_hu: -500               # CT value above which a voxel is body (left-right midline of the ground truth)
+
+orders:
+  queue_score: model_diff_mean_region # the locked G1 score; the queue is most uncertain first (no ground truth)
+  queue_seed: 42                      # training seed of the queue's runs
+  random_seeds: [42, 43, 44]          # random orders; seeds 45 and 46 are added in phase 3 if time allows
+k_values: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]   # corrected pool scans per point; k = 0 is the original model
+control_k: 100                        # the control without correction: all pool scans, the model's own prediction
+
+training:
+  batch_size: 2                       # the 3 mm model's own batch size
+  steps_per_epoch: 250                # nnU-Net's training steps per epoch
+  validation_steps_per_epoch: 50      # nnU-Net's validation steps per epoch (on the training scans: a monitor only)
+  checkpoint: checkpoint_final.pth    # the model evaluated after training (nnU-Net's "best" is chosen on training scans)
+
+settings_grid:                        # chosen on the development set only (docs/g3_plan.md)
+  steps: [2500, 6250]
+  lr: [0.001, 0.0003]
+  k: 50                               # each setting trained at k = 50 ...
+  orders: [queue, random42]           # ... in both kinds of order, so the choice favors neither
+  tie_dice: 0.001                     # settings within this mean development Dice: the one with fewer steps
+
+evaluation:
+  organ_definitions: [kidney_tumor_cyst, kidney_cyst_ignore_tumor]   # Dice of both (dataset file kits23.yaml)
+  primary_definition: kidney_tumor_cyst
+  bad_dice: 0.83                      # "bad" test scans: Dice below this with the original model (as G1)
+  summary_k: [10, 20, 30, 40, 50, 60, 70, 80, 90]   # the primary summary averages (queue - random) over these k
+  n_bootstrap: 2000                   # paired bootstrap over the test scans
+  ci_level: 0.95

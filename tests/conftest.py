@@ -6,6 +6,7 @@ Tests that need the prepared study are skipped if scripts/prepare_study.py has n
 
 import copy
 import json
+import sys
 import threading
 from contextlib import contextmanager
 from pathlib import Path
@@ -26,6 +27,18 @@ def real_study():
     return study, source
 
 
+def link_folder(link: Path, target: Path) -> None:
+    """Make `link` point to the folder `target`: a symbolic link, or on Windows, where symbolic links need extra
+    rights, a directory junction (no rights needed). Deleting the link never deletes what it points to."""
+    try:
+        link.symlink_to(target, target_is_directory=True)
+    except OSError:
+        if sys.platform != "win32":
+            raise
+        import _winapi
+        _winapi.CreateJunction(str(target), str(link))
+
+
 @pytest.fixture()
 def temp_study(real_study, tmp_path):
     """Study config whose folder is a temporary directory linking to the real prepared scans."""
@@ -37,7 +50,7 @@ def temp_study(real_study, tmp_path):
     root.mkdir(parents=True)
     for sub in ("scans", "queue", "guide"):
         if (real / sub).exists():
-            (root / sub).symlink_to(real / sub)
+            link_folder(root / sub, real / sub)
     (root / "manifest.json").write_text((real / "manifest.json").read_text())
     return fake
 
