@@ -1173,6 +1173,10 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   text preparation/archive artifacts are fingerprinted in `results/kits_missed_fresh/preparation_verification.json`.
   No real fresh scores, Dice or outcome-stage markers exist. Verified using the existing virtual environment;
   no packages downloaded or changed.
+- `[admin]` Preparation committed as **`7703fac`** and successfully pushed to `origin/otto/missed-errors`.
+  Updated draft PR #2 to "Develop and lock missed-error ranking checks", including the fixed recipe,
+  development tradeoff, tests and pending real coordination/input handoff. "Where we are" now records
+  confirmed publication. Step 5 remains unchecked; wait for Otto's coordination/data update before pool access.
 
 ## Open questions (update when answered, with the date)
 

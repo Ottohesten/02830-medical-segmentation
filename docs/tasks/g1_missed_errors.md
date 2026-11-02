@@ -365,7 +365,8 @@ and ideas for what could make the result better.)*
   sharing does not trigger duplicate inference; (2) preserve the prespecified quality-at-20/displaced-error
   outputs so an apparent AUC gain cannot hide a worse practical budget. No weights/criteria changes planned.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
-  the ongoing task. The prospective lock/preparation is ready for commit/push; record confirmed publication
-  before ending the session. Step 4 remains published as `7648905`.
+  the ongoing task. The prospective lock/preparation is committed as **`7703fac`** and confirmed pushed to
+  `origin/otto/missed-errors`; the PR title/body now describe the final lock and pending evaluation.
+  Step 4 remains published as `7648905`.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.
