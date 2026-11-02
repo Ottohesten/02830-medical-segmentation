@@ -842,7 +842,7 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 
 - `[admin]` Read "Where we are", task rules, overview, CONTRIBUTING and relevant README instructions.
   `git pull --ff-only` on main was already up to date (`0fe9216`); created `otto/missed-errors` before writing.
-  Step 1 is complete; step 2 has not started. No external messages or pull request have been sent yet.
+  Step 1 is complete; step 2 has not started. No direct messages to group members were sent.
 - `[result]` Offline `uv sync --locked` checked **133 packages** without dependency changes/downloads.
   Shared `uv run --locked --offline pytest`: **123 passed, 36 skipped, 8 warnings in 3.32 s**; skips need
   prepared study data or Chrome, warnings are existing synthetic constant-input correlations.
@@ -873,7 +873,11 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   A single `show_case.py` slice may hide the missed structure. First-results target remains 2026-11-04.
 - `[admin]` Updated task step 1, decisions and "Where we are", plus overview status/next steps. Corrected the
   overview's stale fresh-score choice to the existing 2026-10-21 lock; no scientific lock changed.
-  Step 1 is ready for commit/push on `otto/missed-errors`; publication outcome is recorded below.
+  Step 1 was committed as `3f9b975` and pushed to `origin/otto/missed-errors`, with upstream tracking set.
+- `[admin]` Opened [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) into main
+  for the ongoing task. The app's GitHub integration returned 403 (insufficient integration access), so the
+  local authenticated `gh pr create` was used successfully. No merge or direct group message; group review
+  remains required before merging. Updated "Where we are" with the verified publication status.
 
 ## Open questions (update when answered, with the date)
 

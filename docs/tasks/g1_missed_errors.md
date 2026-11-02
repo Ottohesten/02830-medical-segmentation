@@ -140,5 +140,7 @@ and ideas for what could make the result better.)*
 - **Practical improvements for the next session:** (1) save a per-case table of score, rank and error description
   so candidate checks can be judged against the same misses; (2) inspect several axial slices per case, since
   `show_case.py` shows only the slice with the most ground-truth organ and can hide a missed kidney or tumor.
-- **Publication:** step 1 is ready for commit/push on `otto/missed-errors`; record the outcome before ending
-  the session. No pull request or message to Bjørn/Frederik has been sent yet.
+- **Publication:** step 1 was committed as `3f9b975` and pushed to `origin/otto/missed-errors`.
+  [Draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks the ongoing task.
+  The GitHub app could not create the PR (403); the local `gh` client succeeded. Ask a group member to review
+  before merging when the task is ready. No direct message to Bjørn/Frederik has been sent.
