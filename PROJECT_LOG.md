@@ -1094,6 +1094,10 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   changes saved alongside it. Next: prospective lock preparation and Bjørn/Frederik coordination for one
   joint fresh evaluation by 2026-11-18. No pool access, new lock, shared-code edits or direct group message.
   Step 4 is ready for commit/push and draft PR #2 update; publication outcome follows.
+- `[admin]` Step 4 committed as `7648905` and successfully pushed to `origin/otto/missed-errors`.
+  Updated draft PR #2 through the local GitHub client to describe the final six-combination comparison,
+  lack of established superiority/top-20 gain and the severe displaced case. Updated "Where we are" with
+  confirmed publication and step 5 preparation. No fresh pool, merge or direct group message.
 
 ## Open questions (update when answered, with the date)
 

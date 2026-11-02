@@ -319,6 +319,7 @@ and ideas for what could make the result better.)*
   alongside the unchanged primary AUC; (2) audit the shared pool/prediction provenance so the fresh run uses
   the intended untouched cases and original weights. Do not add weights or swap criteria to chase examples.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
-  the ongoing task. Step 4 is ready for commit/push; record the confirmed outcome before ending the session.
+  the ongoing task. Step 4 was committed as `7648905` and pushed to `origin/otto/missed-errors`.
+  PR title/description cover the combination comparison, weak evidence and severe displaced case.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.
