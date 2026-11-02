@@ -1,0 +1,517 @@
+{
+  "status": "exploratory standalone checks; no combinations or fresh-pool evaluation",
+  "n_cases": 100,
+  "n_bad": 15,
+  "budgets": [
+    {
+      "method": "model_diff_mean_region",
+      "review_budget": 20,
+      "expected_bad_found": 11.0,
+      "expected_false_alarms": 9.0,
+      "expected_original_misses_found": 0.0,
+      "distinct_score_values": 100
+    },
+    {
+      "method": "entropy_mean_region",
+      "review_budget": 20,
+      "expected_bad_found": 13.0,
+      "expected_false_alarms": 7.0,
+      "expected_original_misses_found": 2.0,
+      "distinct_score_values": 100
+    },
+    {
+      "method": "neg_volume_ml",
+      "review_budget": 20,
+      "expected_bad_found": 3.0,
+      "expected_false_alarms": 17.0,
+      "expected_original_misses_found": 2.0,
+      "distinct_score_values": 100
+    },
+    {
+      "method": "plaus_missing_side",
+      "review_budget": 20,
+      "expected_bad_found": 4.166666666666666,
+      "expected_false_alarms": 15.83333333333333,
+      "expected_original_misses_found": 1.5000000000000002,
+      "distinct_score_values": 3
+    },
+    {
+      "method": "plaus_asymmetry",
+      "review_budget": 20,
+      "expected_bad_found": 6.0,
+      "expected_false_alarms": 14.0,
+      "expected_original_misses_found": 2.0,
+      "distinct_score_values": 99
+    },
+    {
+      "method": "size_min_side_neg_ml",
+      "review_budget": 20,
+      "expected_bad_found": 4.0,
+      "expected_false_alarms": 16.0,
+      "expected_original_misses_found": 2.0,
+      "distinct_score_values": 99
+    },
+    {
+      "method": "shape_hull_deficit_max",
+      "review_budget": 20,
+      "expected_bad_found": 9.0,
+      "expected_false_alarms": 11.0,
+      "expected_original_misses_found": 1.0,
+      "distinct_score_values": 100
+    },
+    {
+      "method": "shape_compactness_deficit_max",
+      "review_budget": 20,
+      "expected_bad_found": 7.0,
+      "expected_false_alarms": 13.0,
+      "expected_original_misses_found": 0.0,
+      "distinct_score_values": 100
+    },
+    {
+      "method": "far_disagree_per_volume",
+      "review_budget": 20,
+      "expected_bad_found": 12.0,
+      "expected_false_alarms": 8.0,
+      "expected_original_misses_found": 1.0,
+      "distinct_score_values": 73
+    },
+    {
+      "method": "far_6mm_adds_per_volume",
+      "review_budget": 20,
+      "expected_bad_found": 12.0,
+      "expected_false_alarms": 8.0,
+      "expected_original_misses_found": 2.0,
+      "distinct_score_values": 63
+    }
+  ],
+  "miss_ranks": [
+    {
+      "method": "model_diff_mean_region",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 46.0,
+      "rank_gain": 0.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "model_diff_mean_region",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 56.0,
+      "rank_gain": 0.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "model_diff_mean_region",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 23.0,
+      "rank_gain": 0.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "model_diff_mean_region",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 42.0,
+      "rank_gain": 0.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "entropy_mean_region",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 90.0,
+      "rank_gain": -44.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "entropy_mean_region",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 20.0,
+      "rank_gain": 36.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "entropy_mean_region",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 9.0,
+      "rank_gain": 14.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "entropy_mean_region",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 32.0,
+      "rank_gain": 10.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "neg_volume_ml",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 3.0,
+      "rank_gain": 43.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "neg_volume_ml",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 81.0,
+      "rank_gain": -25.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "neg_volume_ml",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 97.0,
+      "rank_gain": -74.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "neg_volume_ml",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 14.0,
+      "rank_gain": 28.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "plaus_missing_side",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 3.0,
+      "rank_gain": 43.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "plaus_missing_side",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 52.5,
+      "rank_gain": 3.5,
+      "top_budget_probability": 0.1666666666666666
+    },
+    {
+      "method": "plaus_missing_side",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 52.5,
+      "rank_gain": -29.5,
+      "top_budget_probability": 0.1666666666666666
+    },
+    {
+      "method": "plaus_missing_side",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 52.5,
+      "rank_gain": -10.5,
+      "top_budget_probability": 0.1666666666666666
+    },
+    {
+      "method": "plaus_asymmetry",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 1.5,
+      "rank_gain": 44.5,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "plaus_asymmetry",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 52.0,
+      "rank_gain": 4.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "plaus_asymmetry",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 17.0,
+      "rank_gain": 6.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "plaus_asymmetry",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 66.0,
+      "rank_gain": -24.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "size_min_side_neg_ml",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 1.5,
+      "rank_gain": 44.5,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "size_min_side_neg_ml",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 93.0,
+      "rank_gain": -37.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "size_min_side_neg_ml",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 91.0,
+      "rank_gain": -68.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "size_min_side_neg_ml",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 20.0,
+      "rank_gain": 22.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "shape_hull_deficit_max",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 95.0,
+      "rank_gain": -49.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "shape_hull_deficit_max",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 36.0,
+      "rank_gain": 20.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "shape_hull_deficit_max",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 9.0,
+      "rank_gain": 14.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "shape_hull_deficit_max",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 21.0,
+      "rank_gain": 21.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "shape_compactness_deficit_max",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 84.0,
+      "rank_gain": -38.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "shape_compactness_deficit_max",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 70.0,
+      "rank_gain": -14.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "shape_compactness_deficit_max",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 25.0,
+      "rank_gain": -2.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "shape_compactness_deficit_max",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 34.0,
+      "rank_gain": 8.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "far_disagree_per_volume",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 54.0,
+      "rank_gain": -8.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "far_disagree_per_volume",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 23.0,
+      "rank_gain": 33.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "far_disagree_per_volume",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 20.0,
+      "rank_gain": 3.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "far_disagree_per_volume",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 41.0,
+      "rank_gain": 1.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "far_6mm_adds_per_volume",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 82.5,
+      "rank_gain": -36.5,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "far_6mm_adds_per_volume",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 15.0,
+      "rank_gain": 41.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "far_6mm_adds_per_volume",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 14.0,
+      "rank_gain": 9.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "far_6mm_adds_per_volume",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 31.0,
+      "rank_gain": 11.0,
+      "top_budget_probability": 0.0
+    }
+  ],
+  "hull_paired_review_auc": [
+    {
+      "method": "shape_hull_deficit_max",
+      "reference": "model_diff_mean_region",
+      "measure": "review_auc",
+      "bad_rule": "dice_below_083",
+      "diff": -0.0626666666666664,
+      "diff_ci_low": -0.1905124999999998,
+      "diff_ci_high": 0.0556302083333333,
+      "share_boot_better": 0.1795
+    },
+    {
+      "method": "shape_hull_deficit_max",
+      "reference": "model_diff_mean_region",
+      "measure": "review_auc",
+      "bad_rule": "worst10",
+      "diff": -0.1049999999999999,
+      "diff_ci_low": -0.2857305194805194,
+      "diff_ci_high": 0.0543035714285713,
+      "share_boot_better": 0.118
+    }
+  ],
+  "missing_side_flags": [
+    {
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "plaus_missing_side": 1,
+      "left_ml": 169.87028560162685,
+      "right_ml": 0.0,
+      "bad": true,
+      "rank": 46
+    },
+    {
+      "case_id": "case_00293",
+      "dice": 0.9475,
+      "plaus_missing_side": 1,
+      "left_ml": 405.7732177734375,
+      "right_ml": 5.6520538330078125,
+      "bad": false,
+      "rank": 22
+    },
+    {
+      "case_id": "case_00516",
+      "dice": 0.0027,
+      "plaus_missing_side": 2,
+      "left_ml": 1.1896336326599122,
+      "right_ml": 0.0,
+      "bad": true,
+      "rank": 3
+    },
+    {
+      "case_id": "case_00563",
+      "dice": 0.8779,
+      "plaus_missing_side": 1,
+      "left_ml": 279.63303565979004,
+      "right_ml": 0.1766395568847656,
+      "bad": false,
+      "rank": 31
+    }
+  ],
+  "shortlist_for_step4": [
+    "plaus_missing_side",
+    "shape_hull_deficit_max"
+  ],
+  "deprioritized": [
+    "shape_compactness_deficit_max",
+    "size_min_side_neg_ml"
+  ]
+}

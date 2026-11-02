@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-11-02 (missed-errors inspection complete; robustness report material remains ready).*
+*Last updated: 2026-11-02 (missed-errors standalone checks complete; combination testing next).*
 
 | | |
 |---|---|
@@ -75,14 +75,17 @@ The usual trick (ask several copies of the same model) is impossible because onl
   Full dev/test, both-model, both-rule results: `results/kits_robustness_eval/`. The report figure (PDF/PNG),
   caption, and eight-line summary are ready in `results/kits_robustness_eval/report/`; group presentation is next.
 
-- Confident-error follow-up (Otto, 2026-11-02): steps 1–2 are complete on `otto/missed-errors`. In a pooled
+- Confident-error follow-up (Otto, 2026-11-02): steps 1–3 are complete on `otto/missed-errors`. In a pooled
   exploratory queue of all 100 kits100 cases, 4/15 cases below Dice 0.83 lie outside the first 20:
   case_00236, case_00406, case_00040 and case_00184. Multiple-slice review shows a missed pelvic kidney and
   shared tumor/cyst omissions. Among missed voxels, 59.6–89.1% have saved p <= 0.10 across these cases.
   Review, diagnostics and evidence: `results/kits_missed_errors/exploratory_review.md` and
-  `exploratory_inspection_summary.json`. Next: test simple size/shape checks and their false alarms on all 100
-  cases. No new scores/combinations or fresh-pool evaluation yet. Task/working notes:
-  [g1_missed_errors.md](docs/tasks/g1_missed_errors.md); first detector results targeted for 2026-11-04.
+  `exploratory_inspection_summary.json`. Standalone checks now tested on all 100: hull deficit moves
+  case_00236 from rank 23 to 9, but finds 9 bad cases / 11 false alarms in its first 20 versus G1's 11 / 9.
+  The existing missing-side flag catches the pelvic case and flags two nonbad cases. Next: combine these
+  complementary checks with locked G1; neither establishes a better standalone ranking. Full comparison:
+  `results/kits_missed_checks/exploratory_checks_summary.md`. No combinations or fresh-pool evaluation yet.
+  Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).
 
 ### G2 — interface and user study
 

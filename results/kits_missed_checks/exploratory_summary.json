@@ -1,0 +1,10 @@
+{
+  "status": "exploratory screen; all kits100 cases are development data; no fresh-pool result",
+  "n_cases": 100,
+  "n_bad": 15,
+  "n_original_misses": 4,
+  "missing_side_flagged_bad": 2,
+  "missing_side_flagged_nonbad": 2,
+  "new_combinations_evaluated": false,
+  "fresh_pool_used": false
+}

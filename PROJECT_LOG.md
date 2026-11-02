@@ -944,6 +944,81 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   `gh`; CT montages remain local/ignored and can be regenerated. Updated "Where we are" with publication
   status and step 3 size/shape checks. No merge or direct group message.
 
+## 2026-11-02: missed-errors step 3, standalone checks
+
+- `[admin]` Read "Where we are", contributing rules and overview. Pull on `otto/missed-errors` was up to
+  date; offline sync checked 133 packages. Step 3 uses a separate config/output name (`kits_missed_checks`)
+  so completed inspection settings/provenance remain unchanged. No shared `src/segreview/` edits or G3 access.
+- `[decision]` Before inspecting new outcomes, fixed the small screen in `configs/kits_missed_checks.yaml`:
+  existing missing-side/asymmetry, negative minimum saved side volume, maximum component convex-hull deficit,
+  and maximum component compactness deficit. References: locked G1, entropy, total volume, and saved
+  `far_disagree_per_volume` / `far_6mm_adds_per_volume`. No GT-based feature inputs, fitted weights or combinations.
+- `[decision]` Shape uses the two largest 6-connected predicted components of at least 20 ml (existing
+  plausibility threshold). Hull deficit = 1 - occupied voxel volume / convex hull of voxel boxes. Compactness
+  deficit = 1 - 36*pi*V^2/A^3, with physical voxel-face area. Empty/only-tiny predictions get deficit 1;
+  a single convex component does not imply a missing side. These are component proxies, not anatomical labels.
+- `[decision]` Score all 100 development cases before attaching saved Dice. Use unchanged G1 evaluation:
+  both bad rules, review/quality AUC, Spearman/partial rho, 2,000 case resamples, 95% CIs, seed 42,
+  paired differences against locked G1. At top 20%, report expected finds/false alarms and each original
+  miss's average tied rank/inclusion probability. Multiple exploratory comparisons are not fresh-test evidence;
+  no multiplicity adjustment or candidate lock is claimed at this stage.
+- `[experiment]` Added an isolated script and synthetic geometry/tie/source-protection tests. Benchmark
+  small/median/large image grids plus a synthetic evaluation before real extraction/evaluation. Twofold
+  runtime safety factor and 1,800 s stage caps; ask before a projected longer run. No model inference,
+  data download, CT-derived plots or probability/mask files will be written.
+- `[experiment]` Timing benchmark passed: three masks took **4.14 s** total and the synthetic evaluation
+  **1.47 s**. Voxel-scaled projection with a twofold safety factor: **207.18 s / 3.45 min** for features,
+  **117.34 s / 1.96 min** for evaluation; both below the 1,800 s stage cap. No real Dice/GT read by benchmark.
+  `results/kits_missed_checks/{exploratory_benchmark_cases.csv,exploratory_runtime_projection.json,
+  exploratory_benchmark_machine.json}`. All **15** new synthetic tests passed before the benchmark.
+- `[result]` GT-free feature extraction finished in **84.10 s**, with **100 case rows / 195 retained
+  component rows**. Loaded mask volumes match saved source volumes; all shape scores are finite/in [0, 1].
+  No Dice columns or label maps were used. `results/kits_missed_checks/{exploratory_features.csv,
+  exploratory_components.csv,exploratory_feature_inputs.csv,exploratory_features_machine.json}`.
+  Starting the fixed evaluation from these saved features; the original inspection config is unchanged.
+- `[result]` Fixed evaluation finished in **50.30 s**. At the 20-case budget, expected bad / false alarms /
+  original misses included: locked **11 / 9 / 0**; entropy **13 / 7 / 2**; total volume **3 / 17 / 2**;
+  missing-side **4.17 / 15.83 / 1.50**; asymmetry **6 / 14 / 2**; minimum-side size **4 / 16 / 2**;
+  hull **9 / 11 / 1**; compactness **7 / 13 / 0**; far disagreement **12 / 8 / 1**; far 6 mm additions
+  **12 / 8 / 2**. Ties are expected random orders, not arbitrary case-ID choices.
+  `results/kits_missed_checks/{exploratory_budget.csv,exploratory_miss_ranks.csv}`.
+- `[result]` Missing-side flag: **4 actual alerts, 2 bad / 2 nonbad**: case_00040 (Dice **0.6607**),
+  case_00516 (**0.0027**), false alarms case_00293 (**0.9475**) and case_00563 (**0.8779**). Remaining
+  top-20 slots are random among 96 unflagged cases; the 1.50 expected original misses includes 0.50 by chance.
+  Pelvic case fair rank **46 → 3**. `results/kits_missed_checks/exploratory_flag_cases.csv`.
+- `[result]` Hull ranks: case_00236 **23 → 9**, case_00406 **42 → 21** (still outside budget),
+  case_00184 **56 → 36**, case_00040 **46 → 95**. Threshold review-AUC locked **0.8170**, hull **0.7543**,
+  difference **-0.0627 [-0.1905, 0.0556]** (95% paired case-bootstrap CI). Worst10 locked **0.8550**,
+  hull **0.7500**, difference **-0.1050 [-0.2857, 0.0543]**. Hull is not established as superior.
+  `results/kits_missed_checks/{exploratory_metrics.csv,exploratory_paired_vs_locked.csv}`.
+- `[result]` Existing far-disagreement threshold review-AUC **0.8577**, difference to locked
+  **+0.0407 [0.0000, 0.0967]**; the lower CI bound is exactly zero, not above zero. Worst10 **0.8870**,
+  difference **+0.0320 [-0.0100, 0.0775]**. This remains exploratory; the 2026-10-21 fresh-pool lock is
+  unchanged. Both bad rules, quality-AUC, Spearman/partial rho and paired intervals are retained for all methods.
+- `[decision]` Shortlist missing-side flag and hull deficit for step 4 combinations with locked G1: they
+  promote different misses and are GT-free, but neither replaces G1 alone. Keep asymmetry, entropy and
+  directional disagreement as existing controls. No combinations, fresh-test score selection or new lock yet.
+- `[dropped]` Deprioritize the current voxel-face compactness queue: **7 bad / 13 false alarms**, no original
+  miss in top 20, threshold AUC **0.6623**. Deprioritize minimum-side volume as the main queue:
+  **4 bad / 16 false alarms**, AUC **0.4497**. Save these results rather than tune many variants before
+  2026-11-04; this does not disprove all compactness/size ideas. CT-intensity/alternative shape estimators
+  remain options if the simple combinations fail. Task section 6 records the same dated reasons.
+- `[result]` Verification passed: **100 cases / 195 components / 24 metric rows / 36 paired rows /
+  2,424 curve rows / 40 target-rank rows**. Independent average-rank AUC identities and curve areas match,
+  fair budget/false-alarm sums and component maxima/volumes match, and all code/config/input hashes match
+  their stages. **61 locked results / 600 prediction maps** and step 2's config remain unchanged.
+  `results/kits_missed_checks/exploratory_verification.json`. No CT/GT-label voxels, inference or fresh pool.
+- `[result]` Full suite: **154 passed, 36 skipped, 8 existing constant-input warnings, 3.08 s**, including
+  **15** new geometry/tie/source-isolation tests. `results/kits_missed_checks/exploratory_tests.txt`.
+- `[admin]` Machine: AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121 /
+  CUDA build 12.1, NumPy 1.26.4, SciPy 1.17.1, 6 threads, seed 42, CPU only. Exact config/code/input hashes,
+  baseline `e9e63dc`, dirty state and stage runtimes in `results/kits_missed_checks/exploratory_*_machine.json`;
+  config snapshot `run_config.yaml`. Only aggregate tables/metadata are written; no CT-derived images.
+- `[admin]` Checked step 3 and updated task/decisions/"Where we are", overview and README. Readable
+  interpretation and false-alarm case lists: `results/kits_missed_checks/{exploratory_checks_summary.md,
+  exploratory_false_alarm_cases.csv,exploratory_key_results.json}`. Ready for commit/push and PR #2 update;
+  publication outcome follows. No shared-code edits or direct group messages.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
-| **Status** | Steps 1–2 complete (2026-11-02); step 3 next |
+| **Status** | Steps 1–3 complete (2026-11-02); step 4 next |
 | **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
@@ -133,9 +133,62 @@ A few starting ideas (try them, drop them, or find better ones):
     figure/input/config/code hashes, and all **61 locked result files / 600 prediction maps unchanged**.
     `results/kits_missed_errors/exploratory_verification.json`. No inference, new scores, combinations,
     fresh-pool access or shared-code edits.
-- [ ] **3. Try checks.** Build GT-free checks from section 1 or your own ideas. For each: does it rank the missed bad
+- [x] **3. Try checks.** Build GT-free checks from section 1 or your own ideas. For each: does it rank the missed bad
   scans higher, and how many false alarms does it give?
-  *Notes:*
+  *Notes (2026-11-02):*
+  - Separate config `configs/kits_missed_checks.yaml` and output folder `results/kits_missed_checks/`;
+    isolated `scripts/check_missed_errors.py`, no shared-code edits. Candidate definitions were written down
+    before new outcome evaluation. Shape uses at most two largest 6-connected components >= 20 ml, matching
+    the existing plausibility threshold. These are predicted kidney proxies, not anatomical side labels.
+  - New calculations use masks and saved GT-free columns; no CT/label maps or Dice during feature extraction.
+    Saved side volumes originally came from the existing CT-body-midline check. All 100 feature rows were
+    saved before attaching outcomes. Reused unchanged G1 evaluation: both bad rules, review/quality AUC,
+    Spearman/partial rho, 2,000 case-bootstrap resamples and paired differences to locked G1, seed 42.
+  - At the fixed 20-case budget (bad = Dice < 0.83), standalone results are:
+
+    | Method | Expected bad found | Expected false alarms | Expected original misses included |
+    |---|---:|---:|---:|
+    | Locked G1 | 11.00 | 9.00 | 0.00 |
+    | Entropy (existing) | 13.00 | 7.00 | 2.00 |
+    | Small total volume | 3.00 | 17.00 | 2.00 |
+    | Missing-side flag | 4.17 | 15.83 | 1.50 |
+    | Side asymmetry | 6.00 | 14.00 | 2.00 |
+    | Small minimum side | 4.00 | 16.00 | 2.00 |
+    | Convex-hull deficit | 9.00 | 11.00 | 1.00 |
+    | Voxel-face compactness | 7.00 | 13.00 | 0.00 |
+    | Far disagreement (existing) | 12.00 | 8.00 | 1.00 |
+    | Far 6 mm additions (existing) | 12.00 | 8.00 | 2.00 |
+
+  - Ties use expected inclusion under random tie breaking, so fractional counts are expectations. The
+    missing-side flag identifies only **4 cases: 2 bad and 2 nonbad**. Its other 16 places are random among
+    96 unflagged cases; the 1.50 expected original misses is the flagged pelvic case plus 0.50 by chance.
+    Actual flag cases: case_00040 (Dice 0.6607), case_00516 (0.0027), case_00293 (0.9475, false alarm),
+    case_00563 (0.8779, false alarm). Source: `exploratory_flag_cases.csv`.
+  - Hull deficit = 1 - occupied voxel volume / convex hull of voxel boxes. It moves **case_00236 23 → 9**,
+    **case_00406 42 → 21** (still outside budget), **case_00184 56 → 36**, but **case_00040 46 → 95**.
+    The missing-side flag moves case_00040 to **average tied rank 3**. Shape of the remaining kidney cannot
+    detect an absent other kidney; these two checks therefore address different misses.
+  - Threshold review-AUC: locked **0.8170**, hull **0.7543**, compactness **0.6623**, minimum-side size
+    **0.4497**. Hull minus locked **-0.0627, 95% paired CI [-0.1905, 0.0556]**; worst10 AUC
+    **0.7500 vs. 0.8550**, difference **-0.1050 [-0.2857, 0.0543]**. This does not establish a better
+    standalone score. The existing far-disagreement threshold AUC is **0.8577**, difference
+    **+0.0407 [0.0000, 0.0967]** (lower bound exactly zero); the fresh lock is unchanged.
+    All comparisons are exploratory, without multiplicity correction or a claim of generalization.
+  - Carry **missing-side + hull deficit** to step 4 as complementary checks, retaining existing alternatives
+    as controls. Deprioritize this compactness version (no original miss in top 20) and minimum-side volume
+    as the main queue (16/20 false alarms). This does not disprove all shape/size ideas. No combinations
+    or fresh-pool checks have run. Readable interpretation:
+    [exploratory_checks_summary.md](../../results/kits_missed_checks/exploratory_checks_summary.md).
+  - CPU timings: benchmark **5.79 s**, features **84.10 s**, evaluation **50.30 s** (all below 30 min).
+    AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121 / CUDA build 12.1,
+    NumPy 1.26.4, SciPy 1.17.1, 6 threads, seed 42, no GPU. Config snapshot and stage metadata preserve
+    baseline `e9e63dc`, exact code/config/source hashes and the dirty run state.
+  - **154 tests passed, 36 skipped, 8 existing warnings, 3.08 s**, including 15 new geometry/tie/isolation
+    tests. Verification: **100 cases, 195 components, 24 metric rows, 36 paired rows, 2,424 curve rows,
+    40 original-miss rank rows**; independent rank-AUC and curve checks pass. All **61 locked results /
+    600 source maps** and the completed inspection config remain unchanged.
+    Files: `exploratory_{features,components,metrics,paired_vs_locked,budget,miss_ranks}.csv`,
+    `exploratory_verification.json` and `exploratory_tests.txt` in `results/kits_missed_checks/`.
 - [ ] **4. Combine.** Does the locked score + your best check find the bad scans faster than the locked score alone?
   *Notes:*
 - [ ] **5. Lock and test once on the fresh scans** (see section 3).
@@ -175,27 +228,40 @@ A few starting ideas (try them, drop them, or find better ones):
   attempt because its four CT/mask/probability montages conflicted with CONTRIBUTING's data prohibition.
   The commit did not run. Removed the PNGs from staging and added an explicit ignore rule; keep the images
   locally, and commit only code, tables, hashes and notes. Group members can regenerate the figures.
+- **2026-11-02 — Keep step 3 separate from completed inspection.** New name/config `kits_missed_checks`
+  preserves step 2's settings and hashes. Reuse the existing G1 functions without changing shared code;
+  shape uses masks only, with GT outcomes joined only after saving all features.
+- **2026-11-02 — Carry missing-side and hull deficit to combination testing.** The flag promotes the pelvic
+  case to tied rank 3 with two nonbad alerts; hull promotes case_00236 to 9, but has 11 false alarms at the
+  20-case budget and misses the pelvic case. Neither replaces G1; whether their combination helps is step 4.
+  Existing asymmetry, entropy and directional disagreement remain controls, not discarded competitors.
+- **2026-11-02 — Deprioritize current compactness and minimum-side-volume queues.** Compactness finds
+  7 bad / 13 false alarms and no original miss in its first 20. Minimum-side volume finds 4 bad / 16 false
+  alarms; its targeted catches do not justify replacing uncertainty with organ size. Save results instead
+  of tuning many variants before the deadline. CT-intensity and alternative shape estimators remain later
+  options if the simple combinations fail; no claim that these broader ideas cannot work.
 
 ## 7. Where we are
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
 
-- **2026-11-02 — Last finished step: 2.** Four of 15 bad cases lie after the first 20 of the pooled
-  exploratory queue: case_00236 (23), case_00406 (42), case_00040 (46), case_00184 (56). All four montages
-  were inspected by the assistant and plain-language descriptions saved. No new detector/combination has
-  been evaluated. All locked files/maps remain unchanged, and the G3 pool remains unopened.
-  Working branch: `otto/missed-errors`; evidence and the review guide are in `results/kits_missed_errors/`.
-- **Next concrete action (step 3):** use the saved per-case review table to test missing-side/per-side size
-  checks and a small set of per-kidney shape checks on all 100 cases. Measure which misses move up and how
-  many new false alarms appear. Keep the first-results target of 2026-11-04 and the joint fresh test by
-  2026-11-18. Coordinate before changing shared `src/segreview/` code; an isolated task script avoids overlap.
-- **Practical improvements:** (1) reuse the existing size/plausibility columns as a baseline before adding
-  more code; (2) compare shape deficits against good cases to detect normal-anatomy false alarms;
-  (3) Otto can review the four linked montages with the color guide to practice explaining each error.
-- **Publication:** steps 1–2 are tracked by
-  [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2). Step 2 was committed as
-  `eaf9ed0` and pushed to `origin/otto/missed-errors`; PR title/description now cover the inspection.
-  CT-derived montages remain local/ignored; code, tables, provenance and notes are published.
-  Group review remains required before merging.
+- **2026-11-02 — Last finished step: 3.** Standalone size/shape checks have been evaluated on all 100
+  development cases. Hull moves case_00236 23 → 9 but finds only 9/15 bad cases in 20; missing-side flags
+  the pelvic case and two nonbad cases. Keep hull + missing-side for step 4; compactness/minimum-side
+  volume are deprioritized. No combinations or fresh-pool evaluation yet. All locked inputs are unchanged.
+  Branch: `otto/missed-errors`; step 3 results/summary in `results/kits_missed_checks/`; inspection remains
+  in `results/kits_missed_errors/`. First detector results are available before the 2026-11-04 target.
+- **Next concrete action (step 4):** write a small comparison plan/config before evaluating combinations
+  of locked G1 with the missing-side flag and hull deficit. Reuse G1 rank-combination/evaluation functions;
+  compare unchanged G1, existing alternatives and fair 20-case budgets. Do not select based only on the
+  four misses or change the bad/budget thresholds. Keep the one joint fresh-pool test by 2026-11-18;
+  lock one or two checks first, tell Bjørn and reuse Frederik's output as section 3 requires.
+- **Practical improvements:** (1) compare targeted combinations before adding more features, since these
+  checks find different errors; (2) inspect the two nonbad missing-side alerts (case_00293/case_00563) if
+  they still consume useful review slots; (3) keep all 100 cases in false-alarm accounting to avoid fitting
+  a detector only to the four examples. No shared-code edits are needed for this isolated experiment.
+- **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
+  the ongoing task. Step 3 is ready for commit/push; record the confirmed outcome before ending the session.
+  Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.

@@ -168,6 +168,21 @@ inspection script supports read-only kits100 inputs and separate outputs without
 CT-derived montages are local artifacts excluded from Git. Run the `--stage images` command above to recreate
 them from the shared inputs; the committed review guide links to these local images.
 
+Standalone size/shape checks (missed-errors step 3) have their own config and result folder:
+
+```bash
+uv run python scripts/check_missed_errors.py --config configs/kits_missed_checks.yaml --stage benchmark
+uv run python scripts/check_missed_errors.py --config configs/kits_missed_checks.yaml --stage features
+uv run python scripts/check_missed_errors.py --config configs/kits_missed_checks.yaml --stage evaluate
+```
+
+The benchmark projects stage runtimes before the full run. The feature stage reads saved binary masks and
+GT-free source table columns; it uses no CT, label maps or Dice. The evaluation stage then attaches saved Dice,
+reuses both G1 bad rules/paired bootstrap, and reports fair top-20% finds, false alarms and ranks for the four
+original misses in `results/kits_missed_checks/`. Binary ties count by expected inclusion, not file order.
+No combinations, fresh scans, shared-code changes or inference. Shape uses large connected components as
+kidney proxies; digital compactness can depend on voxel geometry and normal kidneys are naturally concave.
+
 Questions from the supervisor meeting of 2026-10-07, asked after the G1 choices were locked, so they are
 **exploratory** and report the dev and test sets separately. Both scripts only read saved predictions (no inference)
 and never change the locked G1 files. Settings: `exploratory:` in `configs/kits100.yaml`.
