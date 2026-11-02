@@ -1023,6 +1023,78 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   standalone screen, its limitations and the next combination step. Updated "Where we are" with confirmed
   publication. No merge or direct group message; group review remains required before merging.
 
+## 2026-11-02: missed-errors step 4, fixed rank combinations
+
+- `[admin]` Resumed from "Where we are", contributing rules and overview on `otto/missed-errors`.
+  Pull was up to date (`29de99a`); offline sync checked 133 packages. This step reuses committed aggregate
+  features only; no scans/maps, inference, downloads, shared-code edits or G3-pool access.
+- `[decision]` Before new outcome evaluation, fixed six combinations in `configs/kits_missed_combinations.yaml`:
+  G1 + missing-side, G1 + hull, G1 + both; each with the existing `mean_rank` and `max_rank` rules.
+  Eight standalone controls include G1, entropy, volume, the two checks, asymmetry and both saved far scores.
+  Primary comparison: threshold review-AUC vs. locked G1. Entropy/far-disagreement are secondary references.
+- `[decision]` No fitted weights or threshold/budget changes. Mean rank requires broadly suspicious scores;
+  max rank lets one high score promote a case. Preserve exact ties on the mathematical rank lattice after
+  calling the unchanged G1 combiner, so floating-point roundoff cannot decide a case's place. Evaluation
+  resamples the fixed full-cohort scores, matching the existing G1 procedure; no refitting within bootstrap.
+- `[decision]` One provisional development recommendation at most: higher threshold review-AUC and no lower
+  expected bad capture in the first 20 than G1; choose highest review-AUC, then quality-AUC, then config order
+  (numerical tolerance 1e-12). Report all six outcomes and every gained/lost bad/nonbad inclusion. Selection
+  uses all 100 cases, not only the four misses. This is not a fresh-test lock or multiplicity-adjusted evidence.
+- `[experiment]` Isolated `scripts/combine_missed_errors.py` reuses the unchanged G1 engine and step 3 helper
+  functions. Added synthetic checks for exact ties, GT exclusion, selection and lost-case accounting.
+  Benchmark a synthetic full-width comparison before evaluation; twofold runtime safety factor and a 1,800 s
+  cap. Scores are saved before attaching real Dice. Results go to `results/kits_missed_combinations/`.
+- `[experiment]` All **13** new synthetic tests passed. Synthetic evaluation took **1.80 s**;
+  projected full evaluation **143.77 s / 2.40 min**, including a twofold safety factor, below the
+  1,800 s cap. `results/kits_missed_combinations/{exploratory_runtime_projection.json,
+  exploratory_benchmark_machine.json,run_config.yaml}`. Starting the fixed real comparison without
+  changing candidates, thresholds or the selection rule.
+- `[result]` Fixed aggregate-only comparison finished in **65.14 s**. Threshold review-AUC / bad / false
+  alarms in first 20: G1 **0.8170 / 11 / 9**; missing-mean **0.8237 / 11 / 9**; missing-max
+  **0.8110 / 11 / 9**; hull-mean **0.8277 / 11 / 9**; hull-max **0.8190 / 10 / 10**;
+  both-mean **0.8470 / 11 / 9**; both-max **0.8397 / 11 / 9**. No combination increases top-20 bad
+  capture; all six threshold difference CIs vs. G1 include zero.
+  `results/kits_missed_combinations/{exploratory_metrics.csv,exploratory_budget.csv,exploratory_paired.csv}`.
+- `[decision]` The rule fixed before evaluation selects **g1_missing_hull_mean** provisionally.
+  Threshold AUC difference to G1 **+0.0300 [-0.0320, 0.0864]**; worst10 **0.8690 vs. 0.8550**,
+  difference **+0.0140 [-0.0685, 0.0883]** (95% paired case-bootstrap CIs). This is not established
+  superiority or a fresh-test lock. All alternatives remain saved; no weights/criteria changed.
+  `results/kits_missed_combinations/exploratory_recommendation.json`.
+- `[result]` Selected top-20 changes: gains case_00236 (**Dice 0.8023, rank 23 → 9**), loses
+  case_00582 (**Dice 0.4605, rank 17 → 45**), and swaps **7 nonbad cases for 7 others**. More original
+  misses caught does not imply net benefit. Simulated mean Dice after 20 perfect corrections is
+  **0.92248 vs. G1 0.92554** (worse). Full quality-AUC **0.95398 vs. 0.95242**, difference
+  **+0.00157 [-0.00188, 0.00439]**. `results/kits_missed_combinations/{exploratory_selected_changes.csv,
+  exploratory_queue_changes.csv,exploratory_tradeoffs.csv,exploratory_curves.csv}`.
+- `[result]` Selected original misses: case_00040 **46 → 43**, case_00184 **56 → 45**, case_00236
+  **23 → 9**, case_00406 **42 → 27**. Both-max captures case_00040 and case_00236 but displaces
+  case_00426 and case_00582 (two new bad / two lost), still no top-20 gain. Earlier missing-side false
+  alerts case_00293/case_00563 are selected ranks **31 / 26**, outside budget; no extra CT review performed.
+- `[result]` Descriptive first-10 capture: selected **9/15 vs. G1 5/15**, with both **11/15** after 20.
+  This was not a new endpoint/selection rule. Threshold AUC difference vs. entropy
+  **+0.0060 [-0.0764, 0.0921]**, vs. existing far disagreement **-0.0107 [-0.0800, 0.0440]**;
+  no superiority established. Full curves and all three-reference paired results are retained.
+- `[dropped]` G1+hull maximum as the fresh candidate: it fails the fixed capture gate (10 bad cases vs.
+  G1's 11). Do not switch to first-10/worst10 after seeing results or fit example-specific weights to hide
+  the severe displaced error. Keep the provisional mean-of-three candidate and all limitations visible;
+  any later change must be dated before fresh data. Task section 6 records the same reasons.
+- `[result]` Audit passed: **100 cases / 6 combinations / 32 metric rows / 132 paired rows /
+  3,232 curve rows / 56 target-rank rows / 600 case-change rows**. Independent rank-lattice/AUC/curve
+  checks, standalone control metrics/CIs, fair budget/displacement totals and the fixed selection rule
+  reproduce exactly. **61 locked results / 600 source maps / 23 earlier-stage output fingerprints**
+  unchanged (map checks are compressed-file hashes only; no image/label voxels loaded).
+  `results/kits_missed_combinations/exploratory_verification.json`.
+- `[result]` Full suite: **167 passed, 36 skipped, 8 existing warnings, 2.69 s**, including **13** new
+  tests. `results/kits_missed_combinations/exploratory_tests.txt`. CPU AMD Ryzen 5 7500F, Linux
+  7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121 / CUDA build 12.1, NumPy 1.26.4, SciPy 1.17.1,
+  6 threads, seed 42, no GPU. Benchmark **1.86 s**; metadata records baseline `29de99a`, dirty state,
+  config/code/input hashes and runtime. `exploratory_{benchmark,evaluate}_machine.json`, `run_config.yaml`.
+- `[admin]` Checked step 4 and updated task/decisions/"Where we are", overview and README. Summary:
+  `results/kits_missed_combinations/exploratory_combination_summary.md`; key results and exact selected
+  changes saved alongside it. Next: prospective lock preparation and Bjørn/Frederik coordination for one
+  joint fresh evaluation by 2026-11-18. No pool access, new lock, shared-code edits or direct group message.
+  Step 4 is ready for commit/push and draft PR #2 update; publication outcome follows.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

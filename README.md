@@ -183,6 +183,18 @@ original misses in `results/kits_missed_checks/`. Binary ties count by expected 
 No combinations, fresh scans, shared-code changes or inference. Shape uses large connected components as
 kidney proxies; digital compactness can depend on voxel geometry and normal kidneys are naturally concave.
 
+Rank combinations (missed-errors step 4) reuse only committed aggregate tables, so no local scan files are needed:
+
+```bash
+uv run python scripts/combine_missed_errors.py --config configs/kits_missed_combinations.yaml --stage benchmark
+uv run python scripts/combine_missed_errors.py --config configs/kits_missed_combinations.yaml --stage evaluate
+```
+
+The config fixes six mean/max-rank alternatives and a development recommendation rule before evaluation.
+The script reuses the G1 combiner, preserves exact score ties, saves scores before attaching Dice, and reports
+both gained and displaced cases at the unchanged 20% budget. Results: `results/kits_missed_combinations/`.
+This does not lock or run the fresh-pool test. Completed inspection/standalone outputs remain unchanged.
+
 Questions from the supervisor meeting of 2026-10-07, asked after the G1 choices were locked, so they are
 **exploratory** and report the dev and test sets separately. Both scripts only read saved predictions (no inference)
 and never change the locked G1 files. Settings: `exploratory:` in `configs/kits100.yaml`.

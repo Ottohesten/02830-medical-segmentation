@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
-| **Status** | Steps 1–3 complete (2026-11-02); step 4 next |
+| **Status** | Steps 1–4 complete (2026-11-02); step 5 planning next; fresh pool unopened |
 | **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
@@ -189,8 +189,56 @@ A few starting ideas (try them, drop them, or find better ones):
     600 source maps** and the completed inspection config remain unchanged.
     Files: `exploratory_{features,components,metrics,paired_vs_locked,budget,miss_ranks}.csv`,
     `exploratory_verification.json` and `exploratory_tests.txt` in `results/kits_missed_checks/`.
-- [ ] **4. Combine.** Does the locked score + your best check find the bad scans faster than the locked score alone?
-  *Notes:*
+- [x] **4. Combine.** Does the locked score + your best check find the bad scans faster than the locked score alone?
+  *Notes (2026-11-02):*
+  - `configs/kits_missed_combinations.yaml` fixed six alternatives before outcome evaluation: G1 +
+    missing-side, G1 + hull, G1 + both, each by mean/max rank using the unchanged G1 combiner. The isolated
+    script reuses step 3 aggregate features and helpers, saves scores before attaching Dice, and preserves
+    true rank ties on an exact lattice. No image reads, fitted weights, shared-code edits or fresh scans.
+  - Fixed selection rule: highest threshold review-AUC among combinations with higher AUC and no fewer
+    top-20 bad cases than G1; ties use quality-AUC then config order. The rule provisionally selects
+    **`g1_missing_hull_mean`**. It is a development recommendation, not a prospective lock or proven gain.
+
+    | Method | Review-AUC (Dice < 0.83) | Bad / first 20 | False alarms / first 20 |
+    |---|---:|---:|---:|
+    | Locked G1 | 0.8170 | 11 | 9 |
+    | G1 + missing, mean | 0.8237 | 11 | 9 |
+    | G1 + missing, max | 0.8110 | 11 | 9 |
+    | G1 + hull, mean | 0.8277 | 11 | 9 |
+    | G1 + hull, max | 0.8190 | 10 | 10 |
+    | G1 + both, mean (selected) | 0.8470 | 11 | 9 |
+    | G1 + both, max | 0.8397 | 11 | 9 |
+
+  - Selected threshold difference to G1: **+0.0300, paired 95% case-bootstrap CI [-0.0320, 0.0864]**.
+    Worst10: **0.8690 vs. 0.8550**, difference **+0.0140 [-0.0685, 0.0883]**. All six threshold
+    difference CIs include zero. No combination improves expected top-20 bad capture. These are six
+    exploratory comparisons on all 100 development cases, without multiplicity correction.
+  - Selected combination gains case_00236 (**Dice 0.8023, rank 23 → 9**) but loses case_00582
+    (**Dice 0.4605, rank 17 → 45**) at the budget of 20. Seven nonbad cases enter while seven leave.
+    Thus there is no net bad-count gain, and the displaced bad case is more severe.
+    Simulated mean Dice after 20 perfect corrections is **0.92248 vs. G1 0.92554** (worse).
+  - The selected candidate leaves the pelvic case outside budget (**46 → 43**); case_00184 moves
+    **56 → 45**, case_00406 **42 → 27**. The max-of-three alternative catches case_00040 and case_00236
+    but displaces case_00426 and case_00582: two new finds, two losses, still 11/15 in the first 20.
+  - Descriptively, the selected full curve finds **9/15 in the first 10 vs. G1 5/15**, but both find
+    11/15 by 20. The 10-case point was not a new selection rule. Full quality-AUC is **0.95398 vs. 0.95242**,
+    difference **+0.00157 [-0.00188, 0.00439]**. AUC gains can coexist with worse quality at a specific budget.
+    The selected threshold AUC difference vs. entropy is **+0.0060 [-0.0764, 0.0921]** and vs. existing
+    far disagreement **-0.0107 [-0.0800, 0.0440]**; superiority over either is not established.
+  - Earlier missing-side false alerts case_00293 and case_00563 are ranks **31 / 26** for the selected
+    candidate and consume no top-20 slots. No extra image review was needed for this aggregate comparison.
+  - Readable result/tradeoffs:
+    [exploratory_combination_summary.md](../../results/kits_missed_combinations/exploratory_combination_summary.md).
+    Complete outputs in `results/kits_missed_combinations/`: combined scores, both-rule metrics, paired
+    comparisons against G1/entropy/far, curves, per-case changes, original-miss ranks and recommendation.
+  - CPU benchmark **1.86 s**, fixed evaluation **65.14 s**. AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos,
+    Python 3.12.15, torch 2.2.2+cu121 / CUDA build 12.1, NumPy 1.26.4, SciPy 1.17.1, 6 threads, seed 42.
+    No GPU; stage metadata/config snapshot record baseline `29de99a`, dirty state and exact source hashes.
+  - **167 passed, 36 skipped, 8 existing warnings, 2.69 s**, including 13 new tests. Verification passed:
+    **100 cases, 6 combinations, 32 metric rows, 132 paired rows, 3,232 curve rows, 56 target-rank rows,
+    600 case-change rows**. Standalone metrics/CIs reproduce step 3; rank/tie/budget/displacement identities
+    pass. All **61 locked results / 600 source maps / 23 earlier-stage output fingerprints** are unchanged.
+    Sources: `exploratory_tests.txt` and `exploratory_verification.json` in the combination result folder.
 - [ ] **5. Lock and test once on the fresh scans** (see section 3).
   *Notes:*
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
@@ -240,29 +288,37 @@ A few starting ideas (try them, drop them, or find better ones):
   alarms; its targeted catches do not justify replacing uncertainty with organ size. Save results instead
   of tuning many variants before the deadline. CT-intensity and alternative shape estimators remain later
   options if the simple combinations fail; no claim that these broader ideas cannot work.
+- **2026-11-02 — Follow the predeclared step 4 selection rule.** Recommend `g1_missing_hull_mean`
+  provisionally by full-cohort threshold AUC and the unchanged budget gate. Its +0.0300 AUC difference
+  has a CI including zero; top-20 bad capture does not increase and quality at 20 worsens. Step 5 must
+  state these limits, lock exact rules and coordinate the one fresh evaluation before opening the pool.
+- **2026-11-02 — Deprioritize G1+hull maximum and post-outcome tuning.** G1+hull max finds only 10/15
+  bad cases in 20, failing the budget gate. Do not switch the primary rule to first-10 performance or
+  worst10, add example-specific weights, or select extra fresh candidates after seeing these outcomes.
+  Keep all six results and the severe displaced case visible instead of optimizing away this finding.
+- **2026-11-02 — Do not open extra CT montages for the two earlier side false alerts in step 4.** Both
+  remain outside the selected candidate's top 20. Aggregate rank/displacement accounting answers their
+  immediate budget cost; future image review remains an option if a later question requires it.
 
 ## 7. Where we are
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
 
-- **2026-11-02 — Last finished step: 3.** Standalone size/shape checks have been evaluated on all 100
-  development cases. Hull moves case_00236 23 → 9 but finds only 9/15 bad cases in 20; missing-side flags
-  the pelvic case and two nonbad cases. Keep hull + missing-side for step 4; compactness/minimum-side
-  volume are deprioritized. No combinations or fresh-pool evaluation yet. All locked inputs are unchanged.
-  Branch: `otto/missed-errors`; step 3 results/summary in `results/kits_missed_checks/`; inspection remains
-  in `results/kits_missed_errors/`. First detector results are available before the 2026-11-04 target.
-- **Next concrete action (step 4):** write a small comparison plan/config before evaluating combinations
-  of locked G1 with the missing-side flag and hull deficit. Reuse G1 rank-combination/evaluation functions;
-  compare unchanged G1, existing alternatives and fair 20-case budgets. Do not select based only on the
-  four misses or change the bad/budget thresholds. Keep the one joint fresh-pool test by 2026-11-18;
-  lock one or two checks first, tell Bjørn and reuse Frederik's output as section 3 requires.
-- **Practical improvements:** (1) compare targeted combinations before adding more features, since these
-  checks find different errors; (2) inspect the two nonbad missing-side alerts (case_00293/case_00563) if
-  they still consume useful review slots; (3) keep all 100 cases in false-alarm accounting to avoid fitting
-  a detector only to the four examples. No shared-code edits are needed for this isolated experiment.
+- **2026-11-02 — Last finished step: 4.** Six combinations evaluated on all 100 development cases. The
+  predeclared rule provisionally recommends `g1_missing_hull_mean`: AUC **0.847 vs. 0.817**, difference
+  **+0.030 [-0.032, 0.086]**. No top-20 count gain (11/15 for both); it gains case_00236 but displaces
+  the more severe case_00582, and simulated quality at 20 worsens. No established superiority or fresh lock.
+  Results/interpretation: `results/kits_missed_combinations/`; earlier results remain unchanged.
+  Branch: `otto/missed-errors`; all locked G1 files/maps are unchanged; the G3 pool remains unopened.
+- **Next concrete action (step 5 preparation):** write the exact prospective score/test protocol for the
+  single provisional candidate and document the weak development evidence. Keep the pre-existing far-score
+  comparison in the same joint evaluation. Tell Bjørn and coordinate the pool IDs, original baseline-model
+  outputs and timing with Frederik before any fresh ranking/GT evaluation (latest 2026-11-18).
+- **Practical improvements:** (1) predeclare top-20 quality and displaced severe errors as secondary checks
+  alongside the unchanged primary AUC; (2) audit the shared pool/prediction provenance so the fresh run uses
+  the intended untouched cases and original weights. Do not add weights or swap criteria to chase examples.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
-  the ongoing task. Step 3 was committed as `4f00ca0` and pushed to `origin/otto/missed-errors`.
-  PR title/description now cover the standalone screen, its limitations and the planned combination step.
+  the ongoing task. Step 4 is ready for commit/push; record the confirmed outcome before ending the session.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.

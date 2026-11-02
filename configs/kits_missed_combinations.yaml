@@ -1,0 +1,50 @@
+# Step 4: six rank combinations fixed before evaluating their outcomes on kits100.
+# Reuse committed step 3 aggregate features; no scans, masks or probabilities are read.
+name: kits_missed_combinations
+seed: 42
+compute: {device: cpu, num_threads: 6}
+paths:
+  raw_dir: data/raw
+  models_dir: models
+  predictions_dir: data/predictions
+  results_dir: results
+dataset: {file: configs/datasets/kits23.yaml, n_cases: 100, selection: random}
+
+checks:
+  source_config: configs/kits100.yaml
+  source_features: results/kits_missed_checks/exploratory_features.csv
+  source_verification: results/kits_missed_checks/exploratory_verification.json
+  inspection_queue: results/kits_missed_errors/exploratory_queue.csv
+  variant: clean
+  primary: model_diff_mean_region
+  review_fraction: 0.20
+  bad_dice_threshold: 0.83
+  base_methods: [model_diff_mean_region, entropy_mean_region, neg_volume_ml, plaus_missing_side,
+                 shape_hull_deficit_max, plaus_asymmetry, far_disagree_per_volume, far_6mm_adds_per_volume]
+  references: [model_diff_mean_region, entropy_mean_region, far_disagree_per_volume]
+  rank_lattice_atol: 0.000000001
+  benchmark: {n_bootstrap: 50, safety_factor: 2, max_stage_seconds: 1800}
+
+combinations:
+  - {name: g1_missing_mean, rule: mean_rank, scores: [model_diff_mean_region, plaus_missing_side]}
+  - {name: g1_missing_max, rule: max_rank, scores: [model_diff_mean_region, plaus_missing_side]}
+  - {name: g1_hull_mean, rule: mean_rank, scores: [model_diff_mean_region, shape_hull_deficit_max]}
+  - {name: g1_hull_max, rule: max_rank, scores: [model_diff_mean_region, shape_hull_deficit_max]}
+  - {name: g1_missing_hull_mean, rule: mean_rank, scores: [model_diff_mean_region, plaus_missing_side, shape_hull_deficit_max]}
+  - {name: g1_missing_hull_max, rule: max_rank, scores: [model_diff_mean_region, plaus_missing_side, shape_hull_deficit_max]}
+
+selection:
+  # Development recommendation only; step 5 must lock/coordinate a fresh test separately.
+  bad_rule: dice_below_083
+  comparison_atol: 0.000000000001
+  eligibility: higher_review_auc_and_no_fewer_bad_in_budget_than_locked
+  order: [review_auc_descending, quality_auc_descending, config_order]
+  max_recommendations: 1
+
+evaluation:
+  bad_rules:
+    - {name: dice_below_083, rule: threshold, value: 0.83}
+    - {name: worst10, rule: worst_fraction, value: 0.1}
+  n_bootstrap: 2000
+  ci_level: 0.95
+  n_random_orders: 1000

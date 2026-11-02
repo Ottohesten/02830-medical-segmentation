@@ -1,0 +1,545 @@
+{
+  "status": "exploratory; no established superiority and no fresh-pool lock",
+  "selected_provisionally": "g1_missing_hull_mean",
+  "all_candidate_budgets": [
+    {
+      "method": "model_diff_mean_region",
+      "review_budget": 20,
+      "expected_bad_found": 11.0,
+      "expected_false_alarms": 9.0,
+      "expected_original_misses_found": 0.0,
+      "distinct_score_values": 100
+    },
+    {
+      "method": "entropy_mean_region",
+      "review_budget": 20,
+      "expected_bad_found": 13.0,
+      "expected_false_alarms": 7.0,
+      "expected_original_misses_found": 2.0,
+      "distinct_score_values": 100
+    },
+    {
+      "method": "far_disagree_per_volume",
+      "review_budget": 20,
+      "expected_bad_found": 12.0,
+      "expected_false_alarms": 8.0,
+      "expected_original_misses_found": 1.0,
+      "distinct_score_values": 73
+    },
+    {
+      "method": "g1_missing_mean",
+      "review_budget": 20,
+      "expected_bad_found": 11.0,
+      "expected_false_alarms": 9.0,
+      "expected_original_misses_found": 1.0,
+      "distinct_score_values": 100
+    },
+    {
+      "method": "g1_missing_max",
+      "review_budget": 20,
+      "expected_bad_found": 11.0,
+      "expected_false_alarms": 9.0,
+      "expected_original_misses_found": 1.0,
+      "distinct_score_values": 50
+    },
+    {
+      "method": "g1_hull_mean",
+      "review_budget": 20,
+      "expected_bad_found": 11.0,
+      "expected_false_alarms": 9.0,
+      "expected_original_misses_found": 1.0,
+      "distinct_score_values": 72
+    },
+    {
+      "method": "g1_hull_max",
+      "review_budget": 20,
+      "expected_bad_found": 10.0,
+      "expected_false_alarms": 10.0,
+      "expected_original_misses_found": 1.0,
+      "distinct_score_values": 70
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "review_budget": 20,
+      "expected_bad_found": 11.0,
+      "expected_false_alarms": 9.0,
+      "expected_original_misses_found": 1.0,
+      "distinct_score_values": 72
+    },
+    {
+      "method": "g1_missing_hull_max",
+      "review_budget": 20,
+      "expected_bad_found": 11.0,
+      "expected_false_alarms": 9.0,
+      "expected_original_misses_found": 2.0,
+      "distinct_score_values": 45
+    }
+  ],
+  "candidate_metrics": [
+    {
+      "bad_rule": "dice_below_083",
+      "method": "model_diff_mean_region",
+      "review_auc": 0.817,
+      "quality_auc": 0.9524154649999996,
+      "spearman_rho": -0.6258258475514067
+    },
+    {
+      "bad_rule": "dice_below_083",
+      "method": "g1_missing_mean",
+      "review_auc": 0.8236666666666667,
+      "quality_auc": 0.9525631449999996,
+      "spearman_rho": -0.6215773462275622
+    },
+    {
+      "bad_rule": "dice_below_083",
+      "method": "g1_missing_max",
+      "review_auc": 0.8109999999999999,
+      "quality_auc": 0.9520307999999996,
+      "spearman_rho": -0.5959012577985942
+    },
+    {
+      "bad_rule": "dice_below_083",
+      "method": "g1_hull_mean",
+      "review_auc": 0.8276666666666667,
+      "quality_auc": 0.9533084799999998,
+      "spearman_rho": -0.748489161582584
+    },
+    {
+      "bad_rule": "dice_below_083",
+      "method": "g1_hull_max",
+      "review_auc": 0.8190000000000001,
+      "quality_auc": 0.9531875049999996,
+      "spearman_rho": -0.7052366910600942
+    },
+    {
+      "bad_rule": "dice_below_083",
+      "method": "g1_missing_hull_mean",
+      "review_auc": 0.847,
+      "quality_auc": 0.9539817699999996,
+      "spearman_rho": -0.7580553235739459
+    },
+    {
+      "bad_rule": "dice_below_083",
+      "method": "g1_missing_hull_max",
+      "review_auc": 0.8396666666666666,
+      "quality_auc": 0.9537847049999996,
+      "spearman_rho": -0.7075395076356428
+    },
+    {
+      "bad_rule": "worst10",
+      "method": "model_diff_mean_region",
+      "review_auc": 0.855,
+      "quality_auc": 0.9524154649999996,
+      "spearman_rho": -0.6258258475514067
+    },
+    {
+      "bad_rule": "worst10",
+      "method": "g1_missing_mean",
+      "review_auc": 0.874,
+      "quality_auc": 0.9525631449999996,
+      "spearman_rho": -0.6215773462275622
+    },
+    {
+      "bad_rule": "worst10",
+      "method": "g1_missing_max",
+      "review_auc": 0.8755,
+      "quality_auc": 0.9520307999999996,
+      "spearman_rho": -0.5959012577985942
+    },
+    {
+      "bad_rule": "worst10",
+      "method": "g1_hull_mean",
+      "review_auc": 0.8360000000000001,
+      "quality_auc": 0.9533084799999998,
+      "spearman_rho": -0.748489161582584
+    },
+    {
+      "bad_rule": "worst10",
+      "method": "g1_hull_max",
+      "review_auc": 0.846,
+      "quality_auc": 0.9531875049999996,
+      "spearman_rho": -0.7052366910600942
+    },
+    {
+      "bad_rule": "worst10",
+      "method": "g1_missing_hull_mean",
+      "review_auc": 0.869,
+      "quality_auc": 0.9539817699999996,
+      "spearman_rho": -0.7580553235739459
+    },
+    {
+      "bad_rule": "worst10",
+      "method": "g1_missing_hull_max",
+      "review_auc": 0.89,
+      "quality_auc": 0.9537847049999996,
+      "spearman_rho": -0.7075395076356428
+    }
+  ],
+  "selected_paired": [
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "model_diff_mean_region",
+      "measure": "spearman_rho",
+      "bad_rule": "",
+      "diff": -0.1322294760225392,
+      "diff_ci_low": -0.2333564738738611,
+      "diff_ci_high": -0.0400356737518513,
+      "share_boot_better": 0.9975
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "model_diff_mean_region",
+      "measure": "quality_auc",
+      "bad_rule": "",
+      "diff": 0.0015663049999999,
+      "diff_ci_low": -0.0018755725000001,
+      "diff_ci_high": 0.0043902113749999,
+      "share_boot_better": 0.833
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "model_diff_mean_region",
+      "measure": "review_auc",
+      "bad_rule": "dice_below_083",
+      "diff": 0.03,
+      "diff_ci_low": -0.0319999999999999,
+      "diff_ci_high": 0.0863663101604278,
+      "share_boot_better": 0.8535
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "model_diff_mean_region",
+      "measure": "review_auc",
+      "bad_rule": "worst10",
+      "diff": 0.014,
+      "diff_ci_low": -0.0685062500000001,
+      "diff_ci_high": 0.0883392857142856,
+      "share_boot_better": 0.669
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "entropy_mean_region",
+      "measure": "spearman_rho",
+      "bad_rule": "",
+      "diff": -0.0183480379944007,
+      "diff_ci_low": -0.135550793918599,
+      "diff_ci_high": 0.0896258156294689,
+      "share_boot_better": 0.6115
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "entropy_mean_region",
+      "measure": "quality_auc",
+      "bad_rule": "",
+      "diff": 0.0004353149999999,
+      "diff_ci_low": -0.0031646243750001,
+      "diff_ci_high": 0.003954159625,
+      "share_boot_better": 0.598
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "entropy_mean_region",
+      "measure": "review_auc",
+      "bad_rule": "dice_below_083",
+      "diff": 0.0059999999999998,
+      "diff_ci_low": -0.0764303571428571,
+      "diff_ci_high": 0.0921116071428567,
+      "share_boot_better": 0.552
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "entropy_mean_region",
+      "measure": "review_auc",
+      "bad_rule": "worst10",
+      "diff": 0.034,
+      "diff_ci_low": -0.0755187499999999,
+      "diff_ci_high": 0.1550312499999997,
+      "share_boot_better": 0.7165
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "far_disagree_per_volume",
+      "measure": "spearman_rho",
+      "bad_rule": "",
+      "diff": -0.1129393716440505,
+      "diff_ci_low": -0.2281054660310461,
+      "diff_ci_high": -0.0090342039585521,
+      "share_boot_better": 0.9815
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "far_disagree_per_volume",
+      "measure": "quality_auc",
+      "bad_rule": "",
+      "diff": 0.0002893649999999,
+      "diff_ci_low": -0.003124494125,
+      "diff_ci_high": 0.0026057009999998,
+      "share_boot_better": 0.607
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "far_disagree_per_volume",
+      "measure": "review_auc",
+      "bad_rule": "dice_below_083",
+      "diff": -0.0106666666666667,
+      "diff_ci_low": -0.080025,
+      "diff_ci_high": 0.0440029411764705,
+      "share_boot_better": 0.3735
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "reference": "far_disagree_per_volume",
+      "measure": "review_auc",
+      "bad_rule": "worst10",
+      "diff": -0.018,
+      "diff_ci_low": -0.103001923076923,
+      "diff_ci_high": 0.0420068181818181,
+      "share_boot_better": 0.34
+    }
+  ],
+  "tradeoffs": [
+    {
+      "method": "g1_missing_mean",
+      "new_bad": 1.0,
+      "lost_bad": 1.0,
+      "new_false_alarms": 2.0,
+      "removed_false_alarms": 2.0
+    },
+    {
+      "method": "g1_missing_max",
+      "new_bad": 1.0,
+      "lost_bad": 1.0,
+      "new_false_alarms": 2.0,
+      "removed_false_alarms": 2.0
+    },
+    {
+      "method": "g1_hull_mean",
+      "new_bad": 1.0,
+      "lost_bad": 1.0,
+      "new_false_alarms": 7.0,
+      "removed_false_alarms": 7.0
+    },
+    {
+      "method": "g1_hull_max",
+      "new_bad": 1.0,
+      "lost_bad": 2.0,
+      "new_false_alarms": 4.0,
+      "removed_false_alarms": 3.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "new_bad": 1.0,
+      "lost_bad": 1.0,
+      "new_false_alarms": 7.0,
+      "removed_false_alarms": 7.0
+    },
+    {
+      "method": "g1_missing_hull_max",
+      "new_bad": 2.0,
+      "lost_bad": 2.0,
+      "new_false_alarms": 3.0,
+      "removed_false_alarms": 3.0
+    }
+  ],
+  "selected_miss_ranks": [
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00040",
+      "dice": 0.6607,
+      "original_rank": 46,
+      "fair_rank": 43.0,
+      "rank_gain": 3.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00184",
+      "dice": 0.8176,
+      "original_rank": 56,
+      "fair_rank": 45.0,
+      "rank_gain": 11.0,
+      "top_budget_probability": 0.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "original_rank": 23,
+      "fair_rank": 9.0,
+      "rank_gain": 14.0,
+      "top_budget_probability": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00406",
+      "dice": 0.8004,
+      "original_rank": 42,
+      "fair_rank": 27.0,
+      "rank_gain": 15.0,
+      "top_budget_probability": 0.0
+    }
+  ],
+  "selected_changes": [
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00026",
+      "dice": 0.8921,
+      "bad": false,
+      "fair_rank": 20.0,
+      "locked_top_probability": 0.0,
+      "top_probability": 1.0,
+      "inclusion_change": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00046",
+      "dice": 0.9146,
+      "bad": false,
+      "fair_rank": 15.0,
+      "locked_top_probability": 0.0,
+      "top_probability": 1.0,
+      "inclusion_change": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00055",
+      "dice": 0.8976,
+      "bad": false,
+      "fair_rank": 17.5,
+      "locked_top_probability": 0.0,
+      "top_probability": 1.0,
+      "inclusion_change": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00178",
+      "dice": 0.8551,
+      "bad": false,
+      "fair_rank": 33.5,
+      "locked_top_probability": 1.0,
+      "top_probability": 0.0,
+      "inclusion_change": -1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00180",
+      "dice": 0.9092,
+      "bad": false,
+      "fair_rank": 51.0,
+      "locked_top_probability": 1.0,
+      "top_probability": 0.0,
+      "inclusion_change": -1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00198",
+      "dice": 0.8575,
+      "bad": false,
+      "fair_rank": 17.5,
+      "locked_top_probability": 0.0,
+      "top_probability": 1.0,
+      "inclusion_change": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00203",
+      "dice": 0.9032,
+      "bad": false,
+      "fair_rank": 39.5,
+      "locked_top_probability": 1.0,
+      "top_probability": 0.0,
+      "inclusion_change": -1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00236",
+      "dice": 0.8023,
+      "bad": true,
+      "fair_rank": 9.0,
+      "locked_top_probability": 0.0,
+      "top_probability": 1.0,
+      "inclusion_change": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00247",
+      "dice": 0.8968,
+      "bad": false,
+      "fair_rank": 13.0,
+      "locked_top_probability": 0.0,
+      "top_probability": 1.0,
+      "inclusion_change": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00259",
+      "dice": 0.8969,
+      "bad": false,
+      "fair_rank": 11.5,
+      "locked_top_probability": 0.0,
+      "top_probability": 1.0,
+      "inclusion_change": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00260",
+      "dice": 0.8779,
+      "bad": false,
+      "fair_rank": 21.5,
+      "locked_top_probability": 1.0,
+      "top_probability": 0.0,
+      "inclusion_change": -1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00271",
+      "dice": 0.9203,
+      "bad": false,
+      "fair_rank": 36.5,
+      "locked_top_probability": 1.0,
+      "top_probability": 0.0,
+      "inclusion_change": -1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00280",
+      "dice": 0.8942,
+      "bad": false,
+      "fair_rank": 29.0,
+      "locked_top_probability": 1.0,
+      "top_probability": 0.0,
+      "inclusion_change": -1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00526",
+      "dice": 0.9233,
+      "bad": false,
+      "fair_rank": 49.5,
+      "locked_top_probability": 1.0,
+      "top_probability": 0.0,
+      "inclusion_change": -1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00554",
+      "dice": 0.8921,
+      "bad": false,
+      "fair_rank": 11.5,
+      "locked_top_probability": 0.0,
+      "top_probability": 1.0,
+      "inclusion_change": 1.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "case_id": "case_00582",
+      "dice": 0.4605,
+      "bad": true,
+      "fair_rank": 45.0,
+      "locked_top_probability": 1.0,
+      "top_probability": 0.0,
+      "inclusion_change": -1.0
+    }
+  ],
+  "no_combination_increased_top20_bad_capture": true
+}
