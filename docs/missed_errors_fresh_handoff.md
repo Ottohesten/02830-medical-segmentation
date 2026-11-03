@@ -2,7 +2,9 @@
 
 **Draft only — not sent by the assistant.** On 2026-11-03 Otto relayed Bjørn's instruction to use Frederik's
 `g3_pool.zip` and pool config; maps are now local. Source metadata and current gaps are recorded in
-`results/kits_missed_fresh/handoff_sources.json`. The 100 CTs/labels are absent; download approval is pending.
+`results/kits_missed_fresh/handoff_sources.json`. Otto approved the download and all 100 CTs/labels are now
+local. `results/kits_missed_fresh/handoff_inputs.csv` contains their paths and the four required model maps;
+byte/presence verification passed. Source provenance/coordination fields and header/runtime preflight remain pending.
 The scientific recipe is [locked separately](missed_errors_fresh_protocol.md); input paths are logistics.
 
 Suggested message:
@@ -15,8 +17,9 @@ Suggested message:
 > pool's ranking outcomes are opened once. The pool is the fixed next 100 seed-42 cases after kits100;
 > `results/kits_missed_fresh/cohort.csv` lists the exact IDs. The two prior G3 smoke-test cases remain included.
 >
-> Frederik: where are the original 3 mm and 6 mm masks/probability maps, CTs/labels and inference metadata?
-> Please confirm the baseline models were used (not fine-tuned weights), that these are the same pool IDs,
+> Frederik: the shared 3 mm/6 mm maps and downloaded CTs/labels are now local, with a 100-case path manifest.
+> Please supply the original inference provenance/checkpoint hashes and confirm the baseline models were used
+> (not fine-tuned weights), that these are the same pool IDs,
 > and that no ranking metrics for these comparisons have already been evaluated. No new inference is needed.
 >
 > Bjørn: the exact protocol/config and checkpoint hashes are on draft PR #2. Let us coordinate the single

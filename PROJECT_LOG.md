@@ -1227,6 +1227,43 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   Final formatting review normalized the inventory CSV line endings and updated its byte fingerprint;
   data values and the scientific lock are unchanged. Download approval remains pending; no fresh results.
 
+## 2026-11-03: missed-errors step 5, approved CT/label download
+
+- `[admin]` Otto explicitly approved the prepared download ("Lad os hente filerne"). Read "Where we are",
+  overview and contributing rules; pull on `otto/missed-errors` was up to date at `105ae54`, offline sync
+  checked 133 packages. The reviewed plan still contains exactly 200 missing files and has SHA-256
+  `901d98b2ba915d4138b9ca24eb07388a3eda3e51797affe51e0133bf8a4d41cf`.
+- `[experiment]` Started the isolated approved download with the unchanged frozen cohort/recipe and no
+  inference/evaluation. Command: `scripts/prepare_fresh_download.py --config configs/kits_missed_fresh.yaml
+  --pool-config configs/g3_pool.yaml --stage download`. Existing inputs and the source case list are
+  preserved; 1,800 s between-file time cap. `results/kits_missed_fresh/download_approval.json` records
+  approval, machine, source commit and lock/plan hashes; progress is in `download_run.txt`.
+- `[experiment]` The first transfer attempt stopped on a remote connection reset after **195/200 files**.
+  Preserved its log as `download_attempt_1.txt` and recorded `download_attempt_1_machine.json` (336.75 s
+  since approval when the failure was recorded). Resumed the same reviewed plan for the remaining five
+  files; existing files are skipped. An external timeout keeps the retry within the original total
+  1,800 s budget. No scientific stage, header/voxel access or analysis choice was involved.
+- `[result]` Download completed: **100 CTs + 100 labels, 8,262,473,787 bytes**, exact frozen-plan coverage,
+  nonempty files and no remaining planned `.part` files. All 200 compressed files have SHA-256 fingerprints
+  in `results/kits_missed_fresh/download_inventory.csv`; `download_verification.json` passed in **6.04 s**.
+  These are local byte/presence checks, not server-checksum, file-format or geometry validation.
+- `[result]` Retry fetched **5 files in 12.85 s**, preserved **195 complete files**; all 200 were local
+  **368 s after approval was recorded**, below the original 1,800 s budget. `download_result.json`,
+  `download_download_machine.json`, `download_run.txt` and the preserved first-attempt evidence.
+- `[result]` Prepared `handoff_inputs.csv` for the frozen 100 cases; all **600 CT/label/required-model-map
+  paths exist**. All **20 scientific fingerprints, 61 locked G1 result files and 600 kits100 model maps**
+  remain unchanged. No fresh headers/voxel arrays, scores, Dice or outcome-stage markers were opened/created.
+- `[decision]` Keep the existing cohort and approved plan after the connection reset. Drop restarting the
+  entire transfer: resuming only five missing files avoids repeat downloads and preserves complete inputs.
+  No case-list rewrite, new inference, shared-code merge or scientific amendment was needed.
+- `[result]` Full suite **193 passed, 36 skipped, 8 existing warnings, 3.86 s**;
+  `results/kits_missed_fresh/download_tests.txt`. CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python
+  3.12.15, torch 2.2.2+cu121; no GPU used, seed 42. Download metadata and verification record the machine,
+  baseline `105ae54`, library versions and unchanged plan/lock hashes.
+- `[admin]` Updated task/"Where we are", overview and handoff draft. Download substep is complete; step 5
+  remains unchecked. Next: complete real baseline provenance/coordination fields, header checks and full
+  runtime preflight before scoring and the single joint outcome stage. No direct group message sent.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

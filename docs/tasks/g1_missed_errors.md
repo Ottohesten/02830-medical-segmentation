@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
-| **Status** | Steps 1–4 complete; step 5 recipe locked (2026-11-02), fresh evaluation pending coordination/data |
+| **Status** | Steps 1–4 complete; step 5 recipe locked and inputs local (2026-11-03), fresh evaluation pending handoff/preflight |
 | **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
@@ -290,6 +290,21 @@ A few starting ideas (try them, drop them, or find better ones):
     from the preserved 2026-11-02 preparation snapshot. All 20 pinned scientific files remain unchanged.
   - Download approval has been requested under Otto's standing rule; no CT/label download has started.
     Complete the source handoff/provenance and data/header/runtime checks before the joint test.
+  *Approved download result (2026-11-03):*
+  - Otto approved the download. All **100 CTs and 100 labels**, **8,262,473,787 bytes**, are now local
+    under `data/raw/kits23/{images,segmentations}/`. Exact plan coverage, nonempty files, **200 SHA-256
+    fingerprints** and no remaining planned `.part` files verified. `download_inventory.csv` and
+    `download_verification.json` record the result. These are byte/presence checks, not header/geometry checks.
+  - A remote connection reset stopped attempt 1 after **195 files**; the identical retry preserved those
+    files and fetched the last **5 in 12.85 s**. All files were local **368 s after approval was recorded**,
+    within the original 1,800 s budget. Approval, both attempt logs and retry machine/result metadata saved.
+  - `handoff_inputs.csv` now lists all 100 cases with existing CT, label and four required model-map paths.
+    All **20 scientific fingerprints, 61 locked G1 result files and 600 kits100 maps** are unchanged.
+    No fresh headers/voxel arrays, scores, Dice or outcome stage opened. No inference or shared-code edits.
+  - Full suite **193 passed, 36 skipped, 8 existing warnings, 3.86 s**, `download_tests.txt`.
+    CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121, no GPU used;
+    machine/code/lock details are saved in the download metadata/verification. Seed remains 42.
+    Next: complete baseline provenance/coordination evidence, then header and full-runtime preflight.
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
   *Notes:*
 
@@ -366,6 +381,10 @@ A few starting ideas (try them, drop them, or find better ones):
   but do not cherry-pick changes to the shared data selector: that would change a pinned scientific dependency
   and requires coordination. The isolated download helper implements only the frozen cohort's file transfer.
   No new model inference, pool replacement, score change or outcome access is needed.
+- **2026-11-03 — Resume only missing transfers after a connection reset.** Reuse the approved identical plan,
+  preserve its 195 complete files and retrieve only the last five within the original total time budget.
+  Reject restarting the whole download: it adds transfer time without improving the agreed input set.
+  No source-list rewrite or new model inference is needed to recover a transfer error.
 
 ## 7. Where we are
 
@@ -377,13 +396,15 @@ and ideas for what could make the result better.)*
   `results/kits_missed_fresh/lock.json`; protocol and tested runner are ready. No fresh model/label arrays,
   scores, ranking metrics or outcome marker have been opened/created. Prior G3 smoke exposure is disclosed.
   Development result remains weak: AUC +0.030 [-0.032, 0.086], no top-20 gain and worse quality at 20.
-- **Current inputs/dependency:** all 600 expected model maps are now local at `data/predictions/g3_pool/clean`,
-  with exact frozen-ID coverage. All 100 CTs and 100 labels are missing. Bjørn's reuse/config/lock instruction
+- **Current inputs/dependency:** all 600 expected model maps are local at `data/predictions/g3_pool/clean`;
+  all 100 CTs and 100 labels are now local at `data/raw/kits23/{images,segmentations}/` after Otto's approved
+  download. Exact plan coverage and 200 byte fingerprints verified; `download_verification.json`.
+  `handoff_inputs.csv` lists the 100 cases and existing paths. Bjørn's reuse/config/lock instruction
   was relayed by Otto; source config and G3 preparation-machine metadata are retrieved. Run-specific weight
-  hashes are absent from that metadata; do not fabricate confirmation. Download approval is pending.
-- **Next concrete action:** after Otto approves, execute the reviewed 200-file `download_plan.csv` using
-  `prepare_fresh_download.py` (the generic local selector ignores offset). Complete the real handoff evidence,
-  verify exact IDs/weights/headers/hashes, and project full runtime.
+  hashes are absent from that metadata; do not fabricate confirmation.
+- **Next concrete action:** complete the real source provenance/coordination evidence and handoff metadata,
+  then verify exact IDs/weights/headers/hashes and project full runtime. The path manifest is ready;
+  no more CT/label transfer or inference is needed for the frozen cohort.
   Ask before downloads or any projected >30-minute stage. Then freeze all GT-free scores and run both
   questions together in one outcome stage by 2026-11-18. Keep step 5 unchecked until real results exist.
 - **Practical improvements:** (1) finish the existing-output provenance handoff so sharing does not trigger
@@ -394,6 +415,8 @@ and ideas for what could make the result better.)*
   `origin/otto/missed-errors`; the PR title/body now describe the final lock and pending evaluation.
   The 2026-11-03 upload audit, source config and exact download helper/plan are published as **`a67a013`**;
   draft PR #2 includes the received maps, missing CTs/labels and pending download approval.
+  The approved download is finished and its verification/notes are ready for commit/push; record publication
+  before ending the session.
   Step 4 remains published as `7648905`.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.

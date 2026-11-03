@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-11-03 (fresh-pool maps received; CT/label download approval and handoff pending).*
+*Last updated: 2026-11-03 (all fresh-pool inputs local; source handoff/preflight pending).*
 
 | | |
 |---|---|
@@ -89,8 +89,10 @@ The usual trick (ask several copies of the same model) is impossible because onl
   a more severe bad case. No established superiority. The fresh recipe, 100 next-draw IDs and baseline
   checkpoint hashes are now locked (`docs/missed_errors_fresh_protocol.md`, `results/kits_missed_fresh/`).
   Step 5 evaluation remains pending: all 600 expected fresh-pool model maps are now local and Frederik's
-  config is retrieved; the 100 CTs/labels are missing. An exact offline download plan is ready, awaiting
-  Otto's approval; source handoff/provenance still needs completion. No fresh ranking results exist.
+  config is retrieved. All 100 CTs and 100 labels are now downloaded (8,262,473,787 bytes; exact plan coverage
+  and 200 byte fingerprints verified). `results/kits_missed_fresh/download_verification.json` and
+  `handoff_inputs.csv` document the completed transfer/paths. Source handoff/provenance and header/runtime
+  preflight still need completion. No fresh ranking results exist.
   Full development comparison:
   `results/kits_missed_combinations/exploratory_combination_summary.md`.
   Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).

@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-03T17:42:05+01:00",
+  "platform": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "cpu": "x86_64",
+  "cpu_count": 12,
+  "python": "3.12.15",
+  "torch": "2.2.2+cu121",
+  "numpy": "1.26.4",
+  "cuda": "12.1",
+  "gpu": null,
+  "mps_available": false,
+  "git_commit": "105ae54b6c9d96b5e54f4f0dac70c70e2aed9f7d",
+  "git_uncommitted_changes": false,
+  "os": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "client_date": "2026-11-03",
+  "approval_source": "Otto: Lad os hente filerne",
+  "approved_scope": "Download the frozen 100 CTs and 100 label files; stop between files at 1800 seconds",
+  "download_plan_sha256": "901d98b2ba915d4138b9ca24eb07388a3eda3e51797affe51e0133bf8a4d41cf",
+  "scientific_lock_sha256": "a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84",
+  "execution_device": "cpu",
+  "seed": 42,
+  "fresh_voxel_arrays_read": false
+}
