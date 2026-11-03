@@ -305,6 +305,23 @@ A few starting ideas (try them, drop them, or find better ones):
     CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121, no GPU used;
     machine/code/lock details are saved in the download metadata/verification. Seed remains 42.
     Next: complete baseline provenance/coordination evidence, then header and full-runtime preflight.
+  *Source-handoff/preflight follow-up (2026-11-03):*
+  - Verified that **model, uncertainty and plausibility config sections are identical** between kits100
+    and the retrieved G3 pool config. All **100 frozen IDs / 600 required input paths** exist and all
+    **20 scientific fingerprints** remain unchanged. `handoff_provenance_audit.json` records this setup
+    check; a matching config does not prove which weights generated the uploaded maps.
+  - Rechecked upstream metadata: the preparation record is unchanged and still has no checkpoint hashes.
+    Listed only the three filenames in upstream `results/g3_pool/`; did not read source score/GT tables.
+    The private pending handoff is at `data/handoffs/kits_missed_fresh.pending.json` (ignored by Git).
+    Actual hashes are null; expected reference hashes are explicitly separate.
+  - Ran the unchanged preflight with that honest pending handoff: **ready: false**, no fresh headers or
+    voxel arrays opened. Four missing facts: exact-score notification to Bjørn; Frederik's baseline-output
+    confirmation; no prior joint ranking evaluation; checkpoint hashes from Frederik's original run.
+    Previous preflight evidence is preserved in `preflight_history/2026-11-02_pending/`.
+  - [Updated handoff/message draft](../missed_errors_fresh_handoff.md) supplies exact PowerShell hash
+    commands and expected hashes for comparison. Otto has been asked for actual group replies; the
+    assistant has sent no direct group message. Header checks and runtime projection remain pending.
+    Full suite **193 passed, 36 skipped, 8 existing warnings, 3.20 s**; `handoff_tests.txt`.
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
   *Notes:*
 
@@ -386,6 +403,11 @@ A few starting ideas (try them, drop them, or find better ones):
   Reject restarting the whole download: it adds transfer time without improving the agreed input set.
   No source-list rewrite or new model inference is needed to recover a transfer error.
 
+- **2026-11-03 — Keep source confirmation separate from a matching config.** Identical declared settings
+  and filenames do not identify the weights that actually produced an archive. Keep the existing preflight
+  gate; do not fill missing dates/hash confirmations from local reference values. The private handoff now
+  separates expected hashes from its still-null confirmed hashes. No scientific amendment or new inference.
+
 ## 7. Where we are
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
@@ -402,13 +424,18 @@ and ideas for what could make the result better.)*
   `handoff_inputs.csv` lists the 100 cases and existing paths. Bjørn's reuse/config/lock instruction
   was relayed by Otto; source config and G3 preparation-machine metadata are retrieved. Run-specific weight
   hashes are absent from that metadata; do not fabricate confirmation.
-- **Next concrete action:** complete the real source provenance/coordination evidence and handoff metadata,
-  then verify exact IDs/weights/headers/hashes and project full runtime. The path manifest is ready;
-  no more CT/label transfer or inference is needed for the frozen cohort.
+  Follow-up confirms all three relevant config sections equal kits100 and all 20 scientific fingerprints
+  match. Preflight was run with an honest pending handoff and remains **ready: false**, before header access.
+- **Next concrete action:** Otto supplies actual group replies for the four issues in `preflight.json`:
+  Bjørn informed of the exact check, Frederik confirms baseline archive provenance, no prior joint ranking
+  evaluation, and the original-run checkpoint hashes. Hash commands/message draft are in
+  [the handoff guide](../missed_errors_fresh_handoff.md). Fill `data/handoffs/kits_missed_fresh.pending.json`
+  with only confirmed facts, then rerun preflight, verify headers/hashes and project full runtime.
+  The path manifest is ready; no more CT/label transfer or inference is needed for the frozen cohort.
   Ask before downloads or any projected >30-minute stage. Then freeze all GT-free scores and run both
   questions together in one outcome stage by 2026-11-18. Keep step 5 unchecked until real results exist.
-- **Practical improvements:** (1) finish the existing-output provenance handoff so sharing does not trigger
-  duplicate inference; (2) preserve the prespecified quality-at-20/displaced-error
+- **Practical improvements:** (1) use the ready two-command hash request and single handoff to finish
+  provenance without extra data transfer; (2) preserve the prespecified quality-at-20/displaced-error
   outputs so an apparent AUC gain cannot hide a worse practical budget. No weights/criteria changes planned.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
   the ongoing task. The prospective lock/preparation is committed as **`7703fac`** and confirmed pushed to
@@ -420,3 +447,5 @@ and ideas for what could make the result better.)*
   Step 4 remains published as `7648905`.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.
+  The source-handoff comparison/pending preflight and updated guide are ready for commit/push; record
+  confirmed publication before ending the session.

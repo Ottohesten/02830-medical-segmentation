@@ -1268,6 +1268,40 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   tests and pending source-provenance/header/runtime preflight. Updated "Where we are" with confirmed
   publication. Data arrays remain ignored/outside Git; step 5 evaluation remains unopened.
 
+## 2026-11-03: missed-errors step 5, source handoff and pending preflight
+
+- `[admin]` Resumed from "Where we are", overview and contributing/task/protocol rules. Pull on
+  `otto/missed-errors` was up to date at `cec2b3f`; offline sync checked 133 packages. No new data download,
+  inference or shared-source edits. All science files remain frozen.
+- `[result]` Verified exact equality of the **model, uncertainty and plausibility** sections between
+  kits100 and the retrieved pool config, **100 frozen IDs / 600 existing required input paths**, and all
+  **20 scientific fingerprints**. `results/kits_missed_fresh/handoff_provenance_audit.json`. This checks
+  intended settings and source identity, not which checkpoint files produced the uploaded predictions.
+- `[result]` Rechecked upstream G3 preparation metadata through GitHub: blob
+  `516fddba6516e5b1b20d1d178d24e89cf29171f8` is unchanged and still has no checkpoint hashes. Upstream
+  `results/g3_pool/` lists only inference times, scores and second-model times. Read filenames/metadata
+  only, not the score table or GT results. Updated `handoff_sources.json` to reflect the completed download.
+- `[experiment]` Prepared an honest pending handoff at `data/handoffs/kits_missed_fresh.pending.json`
+  (ignored by Git), with existing path/metadata links, reported evidence and separate expected hash values.
+  Confirmed hashes/dates/prior-ranking status remain null. Ran the unchanged frozen preflight with it:
+  **ready: false; no fresh headers/voxel arrays opened**. `preflight.json`, `preflight_run.txt`,
+  `preflight_machine.json`; earlier preflight files preserved in `preflight_history/2026-11-02_pending/`.
+- `[decision]` Four facts remain pending: exact-check notification to Bjørn, Frederik's baseline-archive
+  confirmation, no previous evaluation of these joint ranking questions, and hashes from the original-run
+  checkpoint files. Do not substitute matching config filenames or local reference hashes for these facts.
+  Preserve the published gate; no scientific recipe amendment, cohort replacement or new inference.
+- `[admin]` Asked Otto for actual group replies while completing independent checks. Expanded
+  `docs/missed_errors_fresh_handoff.md` with the exact two PowerShell hash commands, expected values,
+  pending handoff path and preflight command. This is a draft for Otto; no direct group message sent.
+- `[result]` Full suite **193 passed, 36 skipped, 8 existing warnings, 3.20 s**;
+  `results/kits_missed_fresh/handoff_tests.txt`. CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python
+  3.12.15, torch 2.2.2+cu121 / CUDA build 12.1, seed 42, no GPU computation. Audit/preflight metadata
+  record baseline `cec2b3f`, dirty state, machine and unchanged scientific lock hash.
+- `[admin]` Updated task/decisions/"Where we are" and overview. Source-setting checks are complete;
+  header validation, full runtime projection, fresh scores and the joint outcome stage remain pending.
+  Step 5 stays unchecked. Next: record actual confirmations, rerun preflight, and ask before any projected
+  stage above 30 minutes. No fresh ranking results or numerical changes.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

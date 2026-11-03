@@ -92,7 +92,9 @@ The usual trick (ask several copies of the same model) is impossible because onl
   config is retrieved. All 100 CTs and 100 labels are now downloaded (8,262,473,787 bytes; exact plan coverage
   and 200 byte fingerprints verified). `results/kits_missed_fresh/download_verification.json` and
   `handoff_inputs.csv` document the completed transfer/paths. Source handoff/provenance and header/runtime
-  preflight still need completion. No fresh ranking results exist.
+  preflight still need completion. Declared model/uncertainty/plausibility settings match kits100;
+  preflight remains pending four real group confirmations, including original-run checkpoint hashes.
+  No fresh headers, arrays or ranking outcomes have been opened.
   Full development comparison:
   `results/kits_missed_combinations/exploratory_combination_summary.md`.
   Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).

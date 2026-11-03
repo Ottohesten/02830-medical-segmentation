@@ -1,0 +1,111 @@
+{
+  "checked_at": "2026-11-03T17:59:48+01:00",
+  "scientific_lock_unchanged": true,
+  "scientific_lock_sha256": "a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84",
+  "pinned_files_verified": 20,
+  "declared_settings": {
+    "model": {
+      "kits100": {
+        "task": "total",
+        "resolution": "fast",
+        "folds": [
+          0
+        ],
+        "tile_step_size": 0.8
+      },
+      "g3_pool": {
+        "task": "total",
+        "resolution": "fast",
+        "folds": [
+          0
+        ],
+        "tile_step_size": 0.8
+      },
+      "equal": true
+    },
+    "uncertainty": {
+      "kits100": {
+        "border_mm": 5,
+        "second_model_resolution": "fastest",
+        "tta": {
+          "n_passes": 0,
+          "max_shift_voxels": 2,
+          "intensity_scale": 0.05,
+          "intensity_shift_hu": 20,
+          "noise_std_hu": 10
+        }
+      },
+      "g3_pool": {
+        "border_mm": 5,
+        "second_model_resolution": "fastest",
+        "tta": {
+          "n_passes": 0,
+          "max_shift_voxels": 2,
+          "intensity_scale": 0.05,
+          "intensity_shift_hu": 20,
+          "noise_std_hu": 10
+        }
+      },
+      "equal": true
+    },
+    "plausibility": {
+      "kits100": {
+        "body_threshold_hu": -500,
+        "min_component_ml": 20
+      },
+      "g3_pool": {
+        "body_threshold_hu": -500,
+        "min_component_ml": 20
+      },
+      "equal": true
+    }
+  },
+  "frozen_case_ids": 100,
+  "existing_handoff_paths": 600,
+  "local_reference_checkpoint_sha256": {
+    "model_3mm": "1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac",
+    "model_6mm": "3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270"
+  },
+  "source_run_checkpoint_hashes_confirmed": false,
+  "upstream_prepare_metadata_recheck": {
+    "git_blob_sha": "516fddba6516e5b1b20d1d178d24e89cf29171f8",
+    "unchanged": true,
+    "contains_checkpoint_hashes": false
+  },
+  "upstream_g3_pool_filenames_only": [
+    "inference_times.csv",
+    "scores.csv",
+    "second_model_times.csv"
+  ],
+  "upstream_score_or_GT_result_tables_read": false,
+  "private_pending_handoff": "data/handoffs/kits_missed_fresh.pending.json",
+  "pending_handoff_issues": [
+    "Missing bjorn_notified_at",
+    "Missing frederik_confirmed_at",
+    "Fresh ranking-metric status not confirmed",
+    "Original baseline checkpoint hashes not confirmed"
+  ],
+  "ready_for_fresh_header_preflight": false,
+  "ready_for_scoring_or_outcomes": false,
+  "fresh_headers_read": false,
+  "fresh_voxel_arrays_read": false,
+  "fresh_scores_or_outcomes_created": false,
+  "machine": {
+    "date": "2026-11-03T17:59:48",
+    "platform": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+    "cpu": "x86_64",
+    "cpu_count": 12,
+    "python": "3.12.15",
+    "torch": "2.2.2+cu121",
+    "numpy": "1.26.4",
+    "cuda": "12.1",
+    "gpu": null,
+    "mps_available": false,
+    "git_commit": "cec2b3fabe8da0d22ad6407f0c3027a5f4c20c89",
+    "git_uncommitted_changes": false,
+    "os": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+    "cpu_model": "AMD Ryzen 5 7500F 6-Core Processor"
+  },
+  "execution_device": "cpu",
+  "seed": 42
+}

@@ -7,6 +7,51 @@ local. `results/kits_missed_fresh/handoff_inputs.csv` contains their paths and t
 byte/presence verification passed. Source provenance/coordination fields and header/runtime preflight remain pending.
 The scientific recipe is [locked separately](missed_errors_fresh_protocol.md); input paths are logistics.
 
+## Remaining confirmations before preflight
+
+The November 3 follow-up audit verifies that the model, uncertainty and plausibility settings in
+`configs/g3_pool.yaml` equal kits100's settings, all 600 required input paths exist, and the 20 scientific
+fingerprints are unchanged. This checks the intended setup; it does not establish which weights produced
+the shared maps. Latest upstream preparation metadata still contains no checkpoint hashes.
+
+Four facts are pending in `results/kits_missed_fresh/handoff_provenance_audit.json`:
+
+- Bjørn was informed of the exact frozen combination and its joint test.
+- Frederik confirms the archive contains the original baseline predictions used for this pool.
+- These two ranking comparisons have not already been evaluated on the pool.
+- The two checkpoint hashes from that original run match the locked reference hashes.
+
+Otto can relay the short request below. The assistant has not sent it. Use actual reply dates/evidence;
+do not replace missing confirmations with the config declaration or a branch push.
+
+Frederik can compute hashes from his repository root in PowerShell (adjust the model root if installed
+elsewhere). Hash the original files used to make `g3_pool.zip`, with their provenance, rather than a
+fine-tuned copy or replacement downloaded later:
+
+```powershell
+Get-FileHash -Algorithm SHA256 -LiteralPath "models\totalsegmentator\nnunet\results\Dataset297_TotalSegmentator_total_3mm_1559subj\nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres\fold_0\checkpoint_final.pth"
+Get-FileHash -Algorithm SHA256 -LiteralPath "models\totalsegmentator\nnunet\results\Dataset298_TotalSegmentator_total_6mm_1559subj\nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres\fold_0\checkpoint_final.pth"
+```
+
+Expected hashes, **for comparison only**:
+
+| Original model | SHA-256 |
+|---|---|
+| 3 mm / task 297 / fold 0 | `1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac` |
+| 6 mm / task 298 / fold 0 | `3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270` |
+
+An explicitly pending handoff is prepared at `data/handoffs/kits_missed_fresh.pending.json` (ignored by Git).
+Its confirmed-hash field is null; expected reference hashes are stored separately. The CT/model path
+manifest and source metadata are already linked. Fill only facts supplied by the group, then run:
+
+```bash
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage preflight --handoff data/handoffs/kits_missed_fresh.pending.json
+```
+
+While confirmations are missing, this must remain `ready: false` without opening fresh headers. Once
+complete, preflight checks shapes/affines, probability representation and file hashes. Project full score
+and evaluation runtimes before using arrays; ask Otto before any projected stage above 30 minutes.
+
 Suggested message:
 
 > I have frozen one missed-errors candidate: mean suspicion ranks of locked G1, missing-side score and

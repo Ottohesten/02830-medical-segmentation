@@ -1,8 +1,11 @@
 {
   "ready": false,
   "issues": [
-    "Need actual Bj\u00f8rn/Frederik coordination and an input handoff"
+    "Missing bjorn_notified_at",
+    "Missing frederik_confirmed_at",
+    "Fresh ranking-metric status not confirmed",
+    "Original baseline checkpoint hashes not confirmed"
   ],
   "fresh_headers_or_voxels_read": false,
-  "checked_at": "2026-11-02T05:10:23+01:00"
+  "checked_at": "2026-11-03T18:00:51+01:00"
 }
