@@ -1301,6 +1301,9 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   header validation, full runtime projection, fresh scores and the joint outcome stage remain pending.
   Step 5 stays unchecked. Next: record actual confirmations, rerun preflight, and ask before any projected
   stage above 30 minutes. No fresh ranking results or numerical changes.
+- `[admin]` Source-setting audit, honest pending preflight and expanded handoff guide committed as
+  **`84aaf8a`** and confirmed pushed to `origin/otto/missed-errors`. Updated draft PR #2 and "Where we are"
+  with this publication and the four pending group facts. No header/array access or joint test execution.
 
 ## Open questions (update when answered, with the date)
 

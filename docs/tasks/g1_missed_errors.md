@@ -447,5 +447,5 @@ and ideas for what could make the result better.)*
   Step 4 remains published as `7648905`.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.
-  The source-handoff comparison/pending preflight and updated guide are ready for commit/push; record
-  confirmed publication before ending the session.
+  The source-handoff comparison/pending preflight and updated guide are committed as **`84aaf8a`** and
+  confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records the four pending confirmations.
