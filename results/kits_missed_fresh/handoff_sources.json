@@ -1,0 +1,21 @@
+{
+  "retrieved_on": "2026-11-03",
+  "config": {
+    "url": "https://github.com/Ottohesten/02830-medical-segmentation/blob/frederik/g3/configs/g3_pool.yaml",
+    "git_blob_sha": "5086b7356820b02e5f41a6373fce1c2281366835"
+  },
+  "prepare_machine": {
+    "url": "https://github.com/Ottohesten/02830-medical-segmentation/blob/frederik/g3/results/g3_kits/prepare_machine.json",
+    "git_blob_sha": "516fddba6516e5b1b20d1d178d24e89cf29171f8"
+  },
+  "coordination": {
+    "source": "Otto relayed Bjørn's instructions in this conversation on 2026-11-03; original message date not supplied",
+    "summary": "Use Frederik's g3_pool.zip in data/predictions/g3_pool; retrieve configs/g3_pool.yaml from frederik/g3; lock the check in the log before opening pool outcomes",
+    "direct_messages_sent_by_assistant": false
+  },
+  "limitations": [
+    "Upstream config declares baseline released tasks/fold 0 and no ranking evaluation; declarations are not an independent output provenance audit",
+    "G3 prepare metadata reports dirty source state and does not contain checkpoint hashes",
+    "Fresh CT/label files are absent; download awaits Otto's approval; no fresh headers or voxel arrays opened"
+  ]
+}

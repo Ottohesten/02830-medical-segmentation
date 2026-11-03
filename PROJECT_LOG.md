@@ -1178,6 +1178,51 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   development tradeoff, tests and pending real coordination/input handoff. "Where we are" now records
   confirmed publication. Step 5 remains unchecked; wait for Otto's coordination/data update before pool access.
 
+## 2026-11-03: missed-errors step 5, pool upload and download preparation
+
+- `[admin]` Read "Where we are", overview and contributing/task rules. `otto/missed-errors` was clean;
+  `git pull --ff-only origin otto/missed-errors` was up to date at `a508f37`. Offline locked sync checked
+  all 133 packages. No dependencies or shared source files changed.
+- `[result]` Otto's uploaded pool maps are at `data/predictions/g3_pool/clean`, rather than `data/g3_pool`.
+  Filename/presence audit: **600 files, 283,184,552 bytes**, exactly the **100 frozen IDs × 6 map kinds**,
+  no missing/unexpected filenames. **0/100 CTs and 0/100 labels** are local. No map/CT/label headers or
+  voxel arrays read, scores calculated or fresh outcomes opened. `results/kits_missed_fresh/
+  {upload_inventory.csv,upload_audit.json,upload_audit_machine.json}`. This is not yet geometry/content validation.
+- `[admin]` Otto relayed Bjørn's instruction to use Frederik's `g3_pool.zip`, retrieve `configs/g3_pool.yaml`
+  from `frederik/g3`, download its scans, and lock the check in the log before opening the pool. Original
+  message timestamp was not supplied. The scientific lock was already committed/pushed on 2026-11-02.
+  No direct group message was sent by the assistant.
+- `[decision]` Retrieved `configs/g3_pool.yaml` unchanged through the GitHub connector, blob
+  `5086b7356820b02e5f41a6373fce1c2281366835`, SHA-256
+  `2872fd4bb598db2f43ace331f640b122adcfb2635f8b6d50d54478e8dc584e2c`. Seed 42, offset 100 and count 100
+  reproduce the frozen pool exactly. The config declares baseline 3 mm/6 mm fold-0 models and no pool
+  ranking evaluation; this is a source declaration, not an independent verification of the uploaded maps.
+- `[result]` Retrieved upstream `results/g3_kits/prepare_machine.json` as
+  `results/kits_missed_fresh/source_prepare_machine.json`: Windows 11, Intel i9-14900K, RTX 4090,
+  torch 2.2.2+cu121, Python 3.12.14; reported source `c9f0018` with dirty state, run **2,693 s**.
+  It does not include checkpoint hashes. `handoff_sources.json` records exact source links/blob IDs and
+  evidence limits. Listed upstream result filenames but did not read pool score or GT-result tables.
+- `[result]` Found a branch compatibility issue: local `select_case_ids` ignores `dataset.offset`, unlike
+  Frederik's version. Calling it with the retrieved config selects **100 kits100 IDs and 0 frozen pool IDs**.
+  `upload_audit.json`. Do not run the generic download command on this branch.
+- `[decision]` Added isolated `scripts/prepare_fresh_download.py`. Its offline plan verifies the upstream
+  config against the published cohort and lists exactly **200 missing CT/label files** in
+  `results/kits_missed_fresh/download_plan.csv`. Its download stage requires the unchanged reviewed plan,
+  preserves existing files and the locked case list, and stops between files at the configured 1,800 s cap.
+  No inference, new ranking choice, pool replacement or GT evaluation. No CT/label download started.
+- `[dropped]` Do not cherry-pick the shared offset implementation just for this download: it changes a pinned
+  scientific dependency and touches shared code. The isolated file-transfer helper resolves the compatibility
+  issue without altering the scientific lock or requiring a broader source merge.
+- `[result]` **7 new logistics tests passed**. Full suite **193 passed, 36 skipped, 8 existing warnings,
+  4.10 s**, `results/kits_missed_fresh/upload_tests.txt`. Covers the exact next-draw IDs, offline planning,
+  changed settings/cohort rejection, preservation of existing files/list, and the between-file time cap.
+  Scientific lock unchanged (`a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84`);
+  all **20 pinned files** verified. Prior preparation evidence remains preserved.
+- `[admin]` Requested Otto's approval for the 200-file download, following his standing instruction. File
+  sizes and transfer duration are not yet measured; no estimate is presented as an observed result. Finish
+  the real handoff/provenance, header checks and full runtime projection before the single joint evaluation.
+  Updated task/decisions/"Where we are", overview, handoff draft and README. Step 5 remains unchecked.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

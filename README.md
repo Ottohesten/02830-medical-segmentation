@@ -215,6 +215,21 @@ Fresh scores are written before GT; an exclusive outcome marker prevents silent 
 and the already locked far score are evaluated together once. Keep completed results and log any technical
 failure/recovery without changing the scientific choices. Ask before downloads or projected stages >30 min.
 
+`configs/g3_pool.yaml` is copied unchanged from Frederik's `frederik/g3` branch. It selects positions
+101–200 with `dataset.offset: 100`. The older shared data selector on **this branch ignores offset**;
+therefore do not use `download_data.py --config configs/g3_pool.yaml` here. Use the isolated logistics helper:
+
+```bash
+uv run python scripts/prepare_fresh_download.py --config configs/kits_missed_fresh.yaml --pool-config configs/g3_pool.yaml --stage plan
+# Only after Otto approves the download:
+uv run python scripts/prepare_fresh_download.py --config configs/kits_missed_fresh.yaml --pool-config configs/g3_pool.yaml --stage download
+```
+
+Planning is offline and writes `results/kits_missed_fresh/download_plan.csv`. It verifies exact agreement
+with the frozen cohort before listing CT/label URLs. Download executes that reviewed plan, skips existing
+files, never rewrites the source case list, and stops between files at the configured 30-minute cap.
+It performs no inference, score calculation or GT evaluation. Shared source and the scientific lock stay unchanged.
+
 Questions from the supervisor meeting of 2026-10-07, asked after the G1 choices were locked, so they are
 **exploratory** and report the dev and test sets separately. Both scripts only read saved predictions (no inference)
 and never change the locked G1 files. Settings: `exploratory:` in `configs/kits100.yaml`.

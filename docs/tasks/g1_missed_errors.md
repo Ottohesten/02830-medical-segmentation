@@ -272,6 +272,24 @@ A few starting ideas (try them, drop them, or find better ones):
     coordination and file location and return. Preflight deliberately reports `ready: false` without
     opening fresh headers. No notification or confirmation has been invented, and no direct message sent.
     [Handoff/message draft](../missed_errors_fresh_handoff.md) and `handoff_template.json` are ready.
+  *Input handoff update (2026-11-03):*
+  - Otto supplied the model maps at `data/predictions/g3_pool/clean`: **600 NIfTI files, 283,184,552 bytes**,
+    exactly **100 frozen IDs × 6 map kinds**, with no missing or unexpected map filenames. This is a
+    filename/presence audit only; fresh headers, voxel arrays, scores and outcomes remain unopened.
+  - All **100 CTs and 100 labels are absent** locally. Otto relayed Bjørn's instruction to reuse Frederik's
+    `g3_pool.zip`, retrieve `configs/g3_pool.yaml` from `frederik/g3`, and lock before opening the pool.
+    Copied that config unchanged. It declares the original model settings and no pool ranking evaluation.
+    Also retrieved G3's `prepare_machine.json` (RTX 4090, Windows 11, torch 2.2.2+cu121); it has no checkpoint
+    hashes. `handoff_sources.json` records sources and the limits of this provenance evidence.
+  - The upstream config reproduces the frozen IDs, but the **local shared selector ignores its offset**:
+    using the generic download command here selects 100 kits100 IDs and 0 pool IDs. Use isolated
+    `scripts/prepare_fresh_download.py`; it verifies the frozen cohort and preserves existing files/list.
+    No shared code or scientific recipe change. Offline `download_plan.csv` lists the exact 200 missing files.
+  - **7 new logistics tests passed; full suite 193 passed, 36 skipped, 8 existing warnings, 4.10 s**.
+    `upload_tests.txt`, `upload_audit.json` and `upload_inventory.csv` record this handoff check separately
+    from the preserved 2026-11-02 preparation snapshot. All 20 pinned scientific files remain unchanged.
+  - Download approval has been requested under Otto's standing rule; no CT/label download has started.
+    Complete the source handoff/provenance and data/header/runtime checks before the joint test.
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
   *Notes:*
 
@@ -344,25 +362,32 @@ A few starting ideas (try them, drop them, or find better ones):
   `results/kits_missed_fresh/prepublication_draft/`. The final 20-file lock, benchmark and pending preflight
   are regenerated; cohort, scientific settings, code and checkpoints are unchanged. No fresh outcomes opened.
 
+- **2026-11-03 — Preserve the lock while adapting input logistics.** Retrieve Frederik's pool config unchanged,
+  but do not cherry-pick changes to the shared data selector: that would change a pinned scientific dependency
+  and requires coordination. The isolated download helper implements only the frozen cohort's file transfer.
+  No new model inference, pool replacement, score change or outcome access is needed.
+
 ## 7. Where we are
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
 
-- **2026-11-02 — Last fully finished step: 4. Step 5 scientific lock/preparation is complete; its fresh
+- **2026-11-03 — Last fully finished step: 4. Step 5 scientific lock/preparation is complete; its fresh
   evaluation is not.** Recipe/code, next 100 IDs and baseline checkpoint hashes are pinned in
   `results/kits_missed_fresh/lock.json`; protocol and tested runner are ready. No fresh model/label arrays,
   scores, ranking metrics or outcome marker have been opened/created. Prior G3 smoke exposure is disclosed.
   Development result remains weak: AUC +0.030 [-0.032, 0.086], no top-20 gain and worse quality at 20.
-- **Current dependency:** Otto is checking Bjørn/Frederik coordination and the original prediction folder/
-  inference metadata and will return. No G3 prediction directory is available locally. Preflight is pending;
-  do not infer consent/notification or substitute another dataset/model. No direct message has been sent.
-- **Next concrete action when Otto returns:** record real coordination evidence and the source paths,
-  build the 100-case handoff manifest, verify exact IDs/weights/headers/hashes, and project full runtime.
+- **Current inputs/dependency:** all 600 expected model maps are now local at `data/predictions/g3_pool/clean`,
+  with exact frozen-ID coverage. All 100 CTs and 100 labels are missing. Bjørn's reuse/config/lock instruction
+  was relayed by Otto; source config and G3 preparation-machine metadata are retrieved. Run-specific weight
+  hashes are absent from that metadata; do not fabricate confirmation. Download approval is pending.
+- **Next concrete action:** after Otto approves, execute the reviewed 200-file `download_plan.csv` using
+  `prepare_fresh_download.py` (the generic local selector ignores offset). Complete the real handoff evidence,
+  verify exact IDs/weights/headers/hashes, and project full runtime.
   Ask before downloads or any projected >30-minute stage. Then freeze all GT-free scores and run both
   questions together in one outcome stage by 2026-11-18. Keep step 5 unchecked until real results exist.
-- **Practical improvements:** (1) use the ready [handoff draft](../missed_errors_fresh_handoff.md) so data
-  sharing does not trigger duplicate inference; (2) preserve the prespecified quality-at-20/displaced-error
+- **Practical improvements:** (1) finish the existing-output provenance handoff so sharing does not trigger
+  duplicate inference; (2) preserve the prespecified quality-at-20/displaced-error
   outputs so an apparent AUC gain cannot hide a worse practical budget. No weights/criteria changes planned.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
   the ongoing task. The prospective lock/preparation is committed as **`7703fac`** and confirmed pushed to

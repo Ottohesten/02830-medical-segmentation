@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-11-02 (missed-errors fresh-test recipe locked; coordination/data pending).*
+*Last updated: 2026-11-03 (fresh-pool maps received; CT/label download approval and handoff pending).*
 
 | | |
 |---|---|
@@ -88,8 +88,10 @@ The usual trick (ask several copies of the same model) is impossible because onl
   (11/15 each) and worse simulated quality after 20 corrections. It promotes one original miss but displaces
   a more severe bad case. No established superiority. The fresh recipe, 100 next-draw IDs and baseline
   checkpoint hashes are now locked (`docs/missed_errors_fresh_protocol.md`, `results/kits_missed_fresh/`).
-  Step 5 evaluation remains pending: Otto is checking Bjørn/Frederik coordination and original prediction
-  locations. No fresh ranking results exist. Full development comparison:
+  Step 5 evaluation remains pending: all 600 expected fresh-pool model maps are now local and Frederik's
+  config is retrieved; the 100 CTs/labels are missing. An exact offline download plan is ready, awaiting
+  Otto's approval; source handoff/provenance still needs completion. No fresh ranking results exist.
+  Full development comparison:
   `results/kits_missed_combinations/exploratory_combination_summary.md`.
   Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).
 

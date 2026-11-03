@@ -1,6 +1,8 @@
 # Fresh ranking test: coordination draft and input handoff
 
-**Draft only — not sent to Bjørn or Frederik.** Otto is checking coordination and file location.
+**Draft only — not sent by the assistant.** On 2026-11-03 Otto relayed Bjørn's instruction to use Frederik's
+`g3_pool.zip` and pool config; maps are now local. Source metadata and current gaps are recorded in
+`results/kits_missed_fresh/handoff_sources.json`. The 100 CTs/labels are absent; download approval is pending.
 The scientific recipe is [locked separately](missed_errors_fresh_protocol.md); input paths are logistics.
 
 Suggested message:
