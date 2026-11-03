@@ -72,13 +72,34 @@ Tick each box when done and write the date and a short note under it.
   uncertainty heatmap, and we compare Dice gain per minute and NASA-TLX between the conditions. It tells us whether
   the heatmap helps people correct faster, which is open because the heatmap mostly marks the edge of the outline.
 
-- [ ] **2. Plan the pilot.** Agree on a pilot participant from the group who has not used the interface, a time and a
+- [x] **2. Plan the pilot.** Agree on a pilot participant from the group who has not used the interface, a time and a
   place. Decide which heatmap display modes the pilot tries (see the pilot plan).
-  *Notes:*
+  *Notes:* 2026-11-03: Rasmus is the pilot (has not used the interface), on his own MacBook with Chrome and trackpad.
+  No separate experimenter: Rasmus ran it alone, so there are no live observations, only the logs and the interview.
+  T01 with `full`; the mode comparison on the demo queue afterwards.
 
-- [ ] **3. Run the pilot (by 2026-10-28).** Follow the pilot plan; take notes in its observation form; ask the
+- [x] **3. Run the pilot (by 2026-10-28).** Follow the pilot plan; take notes in its observation form; ask the
   interview questions. Use a T id. Clean up test data afterwards.
-  *Notes:*
+  *Notes:* 2026-11-03 (6 days late), T01, `full`, 5 min per scan. Whole session 16:38–16:52 (about 14 min, without
+  consent and debriefing). Flow guide → practice → answer → 3 scans → TLX → 3 scans → TLX → end worked; all files saved.
+
+  | # | Scan | Condition | End | Time (s) | Strokes | Dice before → after |
+  |---|------|-----------|-----|---------:|--------:|---------------------|
+  | 1 | case_00470 | without | done | 110 | 14 | 0.847 → 0.835 |
+  | 2 | case_00259 | without | done | 46 | 0 | 0.897 → 0.897 |
+  | 3 | case_00460 | without | done | 30 | 0 | 0.890 → 0.890 |
+  | 4 | case_00554 | with | done | 44 | 0 | 0.892 → 0.892 |
+  | 5 | case_00438 | with | done | 76 | 9 | 0.888 → 0.910 |
+  | 6 | case_00426 | with | done | 95 | 13 | 0.723 → 0.783 |
+
+  No timeouts. Only adding, never erasing; on scan 1 the added voxels were mostly outside the kidney.
+  Interview: time was enough; hardest was the last scan (several "bubbles" on one tumor); the blue map made it
+  easier; at the start unsure whether to mark kidney only or kidney and tumor, the task text ("including any
+  tumor") answered it; the trackpad worked very well; TLX questions clear. The pilot believes he edited every scan
+  and could see errors, but cannot remember which scans 2 and 4 were.
+  Scans 2–4 have no stroke events at all and unchanged masks. To rule out a bug, a new browser test paints on all 6
+  study scans across the scan changes and the questionnaire (`test_painting_is_saved_on_every_study_scan`): it
+  passes, so most likely nothing was painted there, not lost. Mode comparison on the demo queue: still to do.
 
 - [ ] **4. Decide from the pilot.** Using the decision rules in the pilot plan, propose: heatmap display mode, time
   limit per scan, and any fixes to the interface or the session script. Write the proposal and the reasons here and in
@@ -128,5 +149,7 @@ A new chat starts by reading this section.)*
 - 2026-10-20: Task created. Next action: step 1.
 - 2026-10-28: Step 1 done (click-through skipped, see notes). Next action: steps 2–3: Rasmus is the pilot
   participant, so another group member who knows the interface runs the session as experimenter (session guide,
-  observation form) as T01 with `full` (deadline today). Note: the pilot plan's rule for "too hard" scans says to rerun `prepare_study.py`, but
+  observation form) as T01 with `full` (deadline today).
+- 2026-11-03: Pilot T01 run (steps 2–3). Half done: the mode comparison on the demo queue. Next action: mode
+  comparison, then step 4 (proposal), then clean up T01. P01 cannot start before step 5 (lock). Note: the pilot plan's rule for "too hard" scans says to rerun `prepare_study.py`, but
   that is no longer allowed locally (shared kits); if that rule fires, ask the group who rebuilds `study_kits.zip`.

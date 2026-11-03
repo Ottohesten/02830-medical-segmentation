@@ -357,3 +357,49 @@ def fill_tlx(b, shift=0.0) -> dict:
     answers = b.js("Object.fromEntries([...document.querySelectorAll('.tlx-range')].map((r) => [r.dataset.key, r.valueAsNumber]))")
     assert len(set(answers.values())) == 6                                   # each click set its own value
     return answers
+
+
+def test_painting_is_saved_on_every_study_scan(server, browser):
+    """Painting works on all 6 study scans, also after each scan change and after the questionnaire.
+
+    Added after the pilot of 2026-11-03: scans 2-4 were saved without strokes, and the pilot could not
+    remember whether he had painted on them. Until then only the demo queue was tested with painting.
+    """
+    base, study = server
+    b = browser
+    m = manifest(study)
+    root = study_dir(study)
+    sessions = root / "sessions" / "P02"
+    b.goto(base + "/")
+    b.js("document.getElementById('participant').value = 'P02'")
+    b.click("#start-study")
+    b.wait_for("!document.getElementById('guide').hidden")
+    b.click("#guide-go")
+    b.click("#intro-go")
+    b.wait_for("document.getElementById('viewer').dataset.mode === 'edit'")
+    b.click("#done")
+    b.wait_for("document.getElementById('viewer').dataset.mode === 'answer'")
+    b.click("#answer-continue")
+    b.js(PAGE_HELPERS)
+
+    for k, item in enumerate(assignment("P02", m["study_scans"], "P"), start=1):
+        b.wait_for(f"document.getElementById('intro-title').textContent === 'Scan {k} of 6'")
+        b.click("#intro-go")
+        b.wait_for("document.getElementById('viewer').dataset.mode === 'edit'")
+        before = b.js("t.maskSum()")
+        cx, cy = b.js("(() => { const r = state.viewer.canvas.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; })()")
+        b.drag([(cx - 40 + 6 * i, cy + 2 * i) for i in range(15)])
+        b.js("t.frame()")
+        assert b.js("t.maskSum()") > before, f"scan {k}: painting did not change the mask on screen"
+        b.click("#done")
+        if k in (3, 6):
+            b.wait_for("!document.getElementById('tlx').hidden")
+            fill_tlx(b)
+            b.click("#tlx-submit")
+        b.wait_for(f"document.getElementById('intro-title').textContent === 'Scan {k + 1} of 6'"
+                   if k < 6 else "!document.getElementById('end').hidden")
+        log = json.loads((sessions / f"{item['case_id']}_log.json").read_text())
+        saved = np.asanyarray(nib.load(sessions / f"{item['case_id']}_mask.nii.gz").dataobj) > 0
+        original = np.asanyarray(nib.load(root / "scans" / item["case_id"] / "mask.nii.gz").dataobj) > 0
+        assert log["strokes"] == 1, f"scan {k}: {log['strokes']} strokes logged"
+        assert (saved & ~original).sum() > 0, f"scan {k}: the saved mask has no painted voxels"
