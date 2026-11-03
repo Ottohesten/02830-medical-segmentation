@@ -1222,6 +1222,10 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   sizes and transfer duration are not yet measured; no estimate is presented as an observed result. Finish
   the real handoff/provenance, header checks and full runtime projection before the single joint evaluation.
   Updated task/decisions/"Where we are", overview, handoff draft and README. Step 5 remains unchecked.
+- `[admin]` Published the upload audit/config/download helper and plan as **`a67a013`** on
+  `origin/otto/missed-errors`; updated draft PR #2 with the current handoff and 193 passing tests.
+  Final formatting review normalized the inventory CSV line endings and updated its byte fingerprint;
+  data values and the scientific lock are unchanged. Download approval remains pending; no fresh results.
 
 ## Open questions (update when answered, with the date)
 

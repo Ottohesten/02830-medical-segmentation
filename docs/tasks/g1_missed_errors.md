@@ -392,6 +392,8 @@ and ideas for what could make the result better.)*
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
   the ongoing task. The prospective lock/preparation is committed as **`7703fac`** and confirmed pushed to
   `origin/otto/missed-errors`; the PR title/body now describe the final lock and pending evaluation.
+  The 2026-11-03 upload audit, source config and exact download helper/plan are published as **`a67a013`**;
+  draft PR #2 includes the received maps, missing CTs/labels and pending download approval.
   Step 4 remains published as `7648905`.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.

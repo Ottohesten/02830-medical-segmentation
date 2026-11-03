@@ -21,7 +21,7 @@
   "pinned_scientific_files_verified": 20,
   "source_config": "configs/g3_pool.yaml",
   "source_config_sha256": "2872fd4bb598db2f43ace331f640b122adcfb2635f8b6d50d54478e8dc584e2c",
-  "inventory_sha256": "c8d3ea444579e795e5e88d39e26ab879f70ae9e4aea6f18e7f9e1b2715a708c3",
+  "inventory_sha256": "bee5aae36c975ca46481daba4ca3d769e32f39a63066a0004ac6973c9dc901b4",
   "download_plan_sha256": "901d98b2ba915d4138b9ca24eb07388a3eda3e51797affe51e0133bf8a4d41cf",
   "new_logistics_helper_sha256": "8880f898321f407190cab0f9742c13f76f10e278d4d6e286cdbf321b9e0cd946",
   "source_provenance": "handoff_sources.json; upstream declared settings and preparation machine, no run-specific checkpoint hashes",
