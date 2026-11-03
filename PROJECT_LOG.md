@@ -1263,6 +1263,10 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 - `[admin]` Updated task/"Where we are", overview and handoff draft. Download substep is complete; step 5
   remains unchecked. Next: complete real baseline provenance/coordination fields, header checks and full
   runtime preflight before scoring and the single joint outcome stage. No direct group message sent.
+- `[admin]` Download records/verification and updated notes committed as **`cb72790`** and confirmed pushed
+  to `origin/otto/missed-errors`. Draft PR #2 now records all inputs local, the transfer retry, 193 passing
+  tests and pending source-provenance/header/runtime preflight. Updated "Where we are" with confirmed
+  publication. Data arrays remain ignored/outside Git; step 5 evaluation remains unopened.
 
 ## Open questions (update when answered, with the date)
 

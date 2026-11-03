@@ -414,9 +414,9 @@ and ideas for what could make the result better.)*
   the ongoing task. The prospective lock/preparation is committed as **`7703fac`** and confirmed pushed to
   `origin/otto/missed-errors`; the PR title/body now describe the final lock and pending evaluation.
   The 2026-11-03 upload audit, source config and exact download helper/plan are published as **`a67a013`**;
-  draft PR #2 includes the received maps, missing CTs/labels and pending download approval.
-  The approved download is finished and its verification/notes are ready for commit/push; record publication
-  before ending the session.
+  the approved completed download, byte verification and input manifest are published as **`cb72790`**.
+  Both are confirmed pushed to `origin/otto/missed-errors`; draft PR #2 now records all inputs local and
+  the remaining source-provenance/header/runtime preflight. No fresh ranking evaluation has been run.
   Step 4 remains published as `7648905`.
   Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
   No direct message to Bjørn/Frederik has been sent.
