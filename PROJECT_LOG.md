@@ -1126,6 +1126,85 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
   and at 11:23 the `queue_k080` evaluation continued with scan 25 of 100 (none evaluated twice). Left: its
   remaining scans, then 11 runs (*k* = 80 for the three random orders, *k* = 90 for all four, and at *k* = 100
   three runs plus the control), about 25 min each; done around 16:00.
+- `[experiment]` **Learning curves done 2026-11-02 17:05** (`END curves exit 0`): all 40 runs (39 corrected plus the
+  control without correction) trained and evaluated on the 20 development and 80 test scans; no step failed. About
+  17.3 h in all (2026-10-28 10:00–21:37 and 2026-11-02 11:19–17:05). Today's steps took about 20 % longer than on
+  2026-10-28 (training 13.7–14.3 min instead of 11.5–11.8, evaluation 15.6–16.7 min instead of 13.0); the cause was
+  not checked. `scripts/g3_curves.py` wrote `results/g3_kits/curves.csv`, `summary.csv`, `seed_spread.csv`,
+  `models.csv` and `figures/learning_curve_test.{png,pdf}`.
+- `[result]` **Primary summary (fixed beforehand, docs/g3_plan.md): queue minus random, mean over *k* = 10–90, all 80
+  test scans, kidney + tumor + cyst: +0.0019 Dice (95 % paired bootstrap CI −0.0009 to +0.0058).** The queue order
+  is not clearly better than random order. At *k* = 100 all orders train on the same 100 scans, so their difference
+  there (+0.0015) is training noise alone, and it is about as large as the primary estimate.
+- `[result]` Correcting scans helps a lot, and early, in both orders: test Dice 0.870 with the original model, 0.94
+  after 10 corrected scans, 0.95 from about 40, 0.955 at 70–100. The control (all 100 pool scans with the model's own
+  prediction as target, no correction) reaches 0.877, so the gain comes from the corrections, not from training on
+  the pool's scans.
+
+  | *k* | Queue | Random, mean of 3 seeds | Queue − random | Spread of the 3 random seeds | Bad scans (n = 11): queue − random |
+  |---|---|---|---|---|---|
+  | 0 | 0.8700 | 0.8700 | | | |
+  | 10 | 0.9410 | 0.9385 | +0.0025 | 0.0166 | +0.071 |
+  | 20 | 0.9454 | 0.9450 | +0.0004 | 0.0015 | +0.039 |
+  | 30 | 0.9487 | 0.9496 | −0.0009 | 0.0061 | +0.017 |
+  | 40 | 0.9507 | 0.9489 | +0.0018 | 0.0008 | +0.017 |
+  | 50 | 0.9536 | 0.9488 | +0.0048 | 0.0071 | +0.029 |
+  | 60 | 0.9523 | 0.9500 | +0.0023 | 0.0065 | +0.033 |
+  | 70 | 0.9545 | 0.9525 | +0.0020 | 0.0035 | +0.005 |
+  | 80 | 0.9547 | 0.9522 | +0.0026 | 0.0008 | +0.003 |
+  | 90 | 0.9546 | 0.9535 | +0.0012 | 0.0052 | −0.002 |
+  | 100 | 0.9547 | 0.9532 | +0.0015 | 0.0044 | +0.002 |
+
+  Mean test Dice (kidney + tumor + cyst) over all 80 test scans; spread: highest minus lowest random seed.
+- `[result]` Secondary (11 scans, nine *k* values, intervals not corrected for multiple comparisons): on the 11 "bad"
+  test scans (Dice below 0.83 with the original model; mean 0.608) the queue is ahead at small *k*: at *k* = 10
+  0.913 against 0.842 (+0.071, CI +0.037 to +0.114); mean over *k* = 10–90 +0.023 (CI +0.009 to +0.048). The gap is
+  gone from *k* = 70. The random seeds differ widely on these scans (at *k* = 10: 0.767–0.904). With tumors ignored
+  the gap is smaller: on the bad scans +0.007 (CI −0.001 to +0.018); on all test scans the queue is slightly below
+  random at *k* = 10–30 (−0.008 to −0.004), and the mean over *k* is −0.0010 (CI −0.0025 to +0.0010). So the queue's
+  advantage on the bad scans may be mostly about tumors (counted as kidney in the primary definition); not checked.
+  Development set (20 scans): +0.0019 (CI −0.0017 to +0.0067).
+- `[result]` Limits: the intervals cover the choice of test scans, not training noise. The queue has one training
+  seed, the random mean three, and the random seeds' spread at the same *k* (0.001–0.017) is larger than the
+  queue − random difference at 8 of the 10 *k* values.
+- `[result]` Forgetting: on average every fine-tuned model relabels 1.7–2.2 % of the test voxels the original model
+  gives other structures (the control 1.6 %), so most of it comes from fine-tuning itself. Whether these changes are
+  errors cannot be checked: KiTS has ground truth only for kidney, tumor and cyst.
+- `[admin]` Logged per run (step 9): config, git commit (`c9f0018` plus the uncommitted G3 code), machine, loss,
+  learning rate and time per epoch, the corrected scans and peak memory in `results/g3_kits/training/`; the voxels
+  changed per corrected scan in `results/g3_kits/targets_fast.csv`; Dice and forgetting per scan and model in
+  `results/g3_kits/dice/`. Not in git (for the OneDrive): the trained models in `data/g3_kits/runs/` (12 GB) and the
+  predictions in `data/g3_kits/predictions/` (1.3 GB). Tests: 187 passed, 7 skipped.
+- `[admin]` For the group's locked test (Otto), so the models need not run again: the pool's model output
+  `data/predictions/g3_pool/` (600 files: per scan the 3 mm and 6 mm masks and probabilities, the entropy and the
+  difference map; no ground truth) zipped as `data/g3_pool.zip` for the group's OneDrive folder "delte store filer".
+  283.3 MB, entries under `g3_pool/clean/` (unzip into `data/predictions/`), SHA-256
+  `4c0c0d68590527dd9e14c821969623ab7581523f8b3d51106994bf1f81c2c15d`. The group folder is not synced on this PC, so
+  Frederik uploads it in the browser.
+
+## 2026-11-03: provenance of the pool's model output for the locked test
+
+- `[admin]` Asked by the group for the preflight of the joint locked test on the pool (`docs/tasks/g1_missed_errors.md`
+  on `otto/missed-errors`). Checked on Frederik's PC:
+  - The pool's model output (`data/predictions/g3_pool/`, shared as `g3_pool.zip`) was written by
+    `scripts/g3_prepare.py` on 2026-10-27 20:08–20:45 with the public TotalSegmentator v2 weights, tasks 297 (3 mm)
+    and 298 (6 mm), fold 0, not fine-tuned. The first fine-tuned model was created at 20:53, in `data/g3_kits/runs/`.
+  - SHA-256 of the two `checkpoint_final.pth`: 3 mm `1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac`
+    (164,939,235 bytes), 6 mm `3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270` (164,951,587 bytes),
+    last modified at the download on 2026-10-20. Identical to Otto's verified download
+    (`results/robustness_setup/download_verification.json`) and to the hashes in Otto's lock
+    (`results/kits_missed_fresh/lock.json` on `otto/missed-errors`).
+  - The code that wrote the output (`scripts/g3_prepare.py`, `src/segreview/{inference,pipeline,uncertainty,data}.py`,
+    `configs/g3_pool.yaml`, `configs/kits100.yaml`) was not changed after the run; it is committed unchanged in
+    `de91651`.
+- `[admin]` The locked ranking test has not been run: no review-AUC, Spearman or other ranking metric on the pool, and
+  no such file in `results/g3_pool/` or `results/g3_kits/`. The pool's ground truth was used only for (a) G3's
+  simulated corrections (allowed, 2026-10-21); their sizes per scan are in `results/g3_kits/targets_fast.csv` and
+  `targets_fastest.csv`, never compared with the queue or the scores; and (b) the smoke tests before the lock: the
+  model's kidney Dice on case_00002 and case_00183 (pool positions 101–102), 0.904–0.930 (Mac 2026-10-14,
+  `results/g3_smoke/`; GPU 2026-10-21, `results/g3_smoke_gpu*/`).
+- `[admin]` Frederik cannot confirm that Bjørn knows the exact locked check: per the task document Otto tells Bjørn,
+  so Otto or Bjørn confirms it.
 
 ---
 

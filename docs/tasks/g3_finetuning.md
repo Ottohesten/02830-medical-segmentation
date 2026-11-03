@@ -154,16 +154,20 @@ Tick each box when done and write the date and a short note (numbers + file path
   switched off; restarted 2026-10-28 08:32 (PROJECT_LOG.md 2026-10-28). Done 2026-10-28 09:58: **2,500 steps,
   learning rate 0.001** (mean development Dice 0.9372 over both orders; the original model 0.8472). Logged before
   the curves started.
-- [ ] **8. Learning curves:** the 39 runs + the control without correction, test and development Dice after each
+- [x] **8. Learning curves:** the 39 runs + the control without correction, test and development Dice after each
   point; curves, summary and figure.
   *Notes:* 2026-10-28 10:00: started. 2026-10-28 21:37: stopped after 28 of 40 runs (*k* = 10–70 in all four
   orders), because the PC was switched off with its power button (PROJECT_LOG.md 2026-11-02). 2026-11-02 11:19:
-  continued (`frederik/g3_start.ps1`); 11 runs and the rest of one evaluation left, about 4 h 45 min.
+  continued (`frederik/g3_start.ps1`); 11 runs and the rest of one evaluation left, about 4 h 45 min. Done
+  2026-11-02 17:05 (about 17.3 h in all), then `scripts/g3_curves.py`. Results in section 5.
 - [ ] **9. Log per run:** config, commit and machine; loss per epoch (training and validation), learning rate, time
   per epoch; which scans were corrected and how many voxels changed (not compared with the queue order before the
   locked test); predictions and Dice per scan and per model; time and memory. Small files in `results/g3_*/`;
   trained models and predictions in `data/` (the log says where, for the OneDrive).
-  *Notes:*
+  *Notes:* 2026-11-02: all in place (PROJECT_LOG.md 2026-11-02): `results/g3_kits/training/` (config, commit,
+  machine, loss, learning rate and time per epoch, corrected scans, peak memory), `results/g3_kits/targets_fast.csv`
+  (voxels changed), `results/g3_kits/dice/` (Dice and forgetting per scan and model). Not in git: the models in
+  `data/g3_kits/runs/` (12 GB) and the predictions in `data/g3_kits/predictions/` (1.3 GB).
 
 ### Phase 3 — more seeds, extra analyses
 
@@ -194,6 +198,25 @@ Tick each box when done and write the date and a short note (numbers + file path
 - **RAM is the limit on this PC, not the GPU:** with 16 workers and other programs open (18.7 GB before the test),
   the RAM was full for the 3 mm model. For the real runs: close other programs, or use 12–14 workers (about 12–13
   are needed for the GPU never to wait).
+
+**Phase 2 (2026-11-02), learning curve on the RTX 4090** (details: PROJECT_LOG.md, 2026-11-02; files and figure:
+`results/g3_kits/`, `results/g3_kits/figures/learning_curve_test.png`):
+
+- **Primary summary** (fixed beforehand): queue minus random, mean over *k* = 10–90, 80 test scans, kidney + tumor
+  + cyst: **+0.0019 Dice (95 % CI −0.0009 to +0.0058)**. The queue order is not clearly better than random order.
+  At *k* = 100, where all orders use the same scans, training noise alone gives +0.0015.
+- **Correcting helps, and early:** test Dice 0.870 with the original model, 0.94 after 10 corrected scans (queue
+  0.941, random 0.939), 0.95 from about 40, 0.955 at 70–100. The control without correction (100 pool scans, the
+  model's own prediction as target): 0.877.
+- **Bad test scans** (n = 11, original Dice 0.608; secondary): the queue is ahead at small *k* (+0.071 at *k* = 10;
+  mean over *k* +0.023, CI +0.009 to +0.048); gone from *k* = 70. With tumors ignored only +0.007 (CI −0.001 to
+  +0.018).
+- **Limits:** the intervals do not include training noise. The queue has one training seed, and the random seeds'
+  spread at the same *k* (0.001–0.017) is mostly larger than the difference.
+- **Forgetting:** 1.7–2.2 % of the voxels of other structures relabelled (the control 1.6 %); KiTS has no ground
+  truth to check them.
+- **Time:** 40 runs in about 17.3 h (one 2,500-step run 11.5–14.3 min; predicting the 100 development and test
+  scans 13–17 min).
 
 ## 6. Decisions made in this task
 
@@ -269,3 +292,9 @@ A new chat starts by reading this section.)*
   its power button (no crash); the files were intact. Continued 2026-11-02 11:19 (`frederik/g3_start.ps1`); done
   about 16:00. Not committed yet. **Next action:** when `chain_status.txt` says `END curves exit 0`, run
   `scripts/g3_curves.py --config configs/g3_kits.yaml`, then the results summary (section 5).
+- 2026-11-02 17:05: **Phase 2 finished** (steps 8–9): curves, summary and figure in `results/g3_kits/` (section 5).
+  Primary summary: queue − random +0.0019 Dice (95 % CI −0.0009 to +0.0058), so the queue order is not clearly
+  better. Tests 187 passed, 7 skipped. Not committed yet. **Next action:** Frederik commits the branch and decides on
+  phase 3 (e.g. more random and queue seeds, since training noise is as large as the difference). The pool's model
+  output for the group's locked test exists since 2026-10-27 (`results/g3_pool/scores.csv`,
+  `data/predictions/g3_pool/`).

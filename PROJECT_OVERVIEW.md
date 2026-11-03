@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-27 (G3: learning-curve design written; blocked by Windows Smart App Control on Frederik's PC). Before: 2026-10-21 (robustness step 6 complete, report figure/summary ready).*
+*Last updated: 2026-11-02 (G3: learning curve done; the queue order is not clearly better than random order). Before: 2026-10-27 (G3: learning-curve design written).*
 
 | | |
 |---|---|
@@ -35,7 +35,7 @@ opened, **show where in the scan the AI is unsure**. The goal is the most improv
 |---|---|---|
 | **G1** (core) | Rank scans by likely failure, without ground truth | **Done.** Locked and tested once on 80 test scans |
 | **G2** (core) | Review interface with an uncertainty heatmap + user study | Interface and analysis built and tested; **pilot and study not run yet** |
-| **G3** (stretch) | Fine-tune the model on corrections | Learning-curve design written (2026-10-27, `docs/g3_plan.md`); smoke test done on the RTX 4090 (≈ 23 min per 3 mm run). Nothing trained for real yet. **Blocked:** Windows Smart App Control blocks torch on Frederik's PC ([task](docs/tasks/g3_finetuning.md)) |
+| **G3** (stretch) | Fine-tune the model on corrections | **Learning curve done** (2026-11-02): 10 corrected scans raise test Dice from 0.870 to 0.94; the queue order is not clearly better than random order (+0.002 Dice, 95 % CI −0.001 to +0.006) ([task](docs/tasks/g3_finetuning.md)) |
 
 ### G1 — how the ranking works and how well it does
 
@@ -91,16 +91,21 @@ The usual trick (ask several copies of the same model) is impossible because onl
 ### G3 — learning from corrections
 
 Kristine's question (2026-10-06): are the scans with the biggest errors also the ones where correction helps future
-training most? G3 is how we would answer it. The plan and smoke test show fine-tuning can start, but nothing has been
-trained, so there is no result yet. On Frederik's RTX 4090 (2026-10-21) a training step takes about 0.18 s for both
-models, so one 3 mm fine-tuning run of 6,250 steps takes about 23 min and the whole plan about 7 h of GPU time
-(estimates, `results/g3_smoke_gpu/estimates.csv`); the PC's RAM, not the GPU, is the limit.
+training most? G3 answers it with a **learning curve** (design 2026-10-27, Kristine's advice). The model is
+fine-tuned on *k* = 0, 10, …, 100 corrected pool scans, taken in queue order (most uncertain first) or in random
+order (3 seeds), each point from the original model, with test Dice after each point. If the queue picks useful
+scans, its curve rises faster; if the most uncertain scans are mainly outliers, it rises more slowly. Details, the
+settings choice on the development set and the primary summary: [docs/g3_plan.md](docs/g3_plan.md), "Design:
+learning curve".
 
-Design since 2026-10-27 (Kristine's advice): a **learning curve**. The model is fine-tuned on *k* = 0, 10, …, 100
-corrected pool scans, taken in queue order (most uncertain first) or in random order (3 seeds), each point from the
-original model, with test Dice after each point. If the queue picks useful scans, its curve rises faster; if the most
-uncertain scans are mainly outliers, it rises more slowly. Details, the settings choice on the development set and
-the primary summary: [docs/g3_plan.md](docs/g3_plan.md), "Design: learning curve". Estimated 15–25 h of GPU time.
+**Result (2026-11-02; 40 fine-tuning runs, 17 h on Frederik's RTX 4090):** correcting scans helps a lot, and early.
+Test Dice is 0.870 with the original model, 0.94 after 10 corrected scans and 0.955 after 70–100, in both orders; a
+control trained on the model's own predictions instead of corrections reaches only 0.877. **The queue order is not
+clearly better than random order:** queue minus random, mean over *k* = 10–90 on the 80 test scans, is +0.0019 Dice
+(95 % CI −0.0009 to +0.0058), about the size of the training noise. On the 11 test scans where the original model
+did worst (Dice below 0.83), the queue is ahead with few corrected scans (+0.07 Dice at *k* = 10, gone from
+*k* = 70); a secondary finding, perhaps mostly about tumors. Figure: `results/g3_kits/figures/learning_curve_test.png`;
+details: PROJECT_LOG.md, 2026-11-02.
 
 ## 3. Where things are
 
@@ -161,9 +166,11 @@ The full working rules (git, branches, locked results, new experiments, what to 
    model output for the pool exists, together with Otto's missed-errors check; latest 2026-11-18.
 3. Everyone installs the project and tries the demo (`README.md` → Quick start).
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
-5. G3 (Frederik): the learning curve (phase 2, design written 2026-10-27). First Windows Smart App Control must stop
-   blocking torch on Frederik's PC (log 2026-10-27); then downloads, pipeline, settings on the development set, curves
-   ([docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)). The pool's model output feeds the locked test.
+5. G3 (Frederik): the learning curve is done (2026-11-02, section 2;
+   [docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)). Next: commit, and decide on phase 3 (more seeds). The
+   pool's model output for the locked test (item 2) exists since 2026-10-27: `results/g3_pool/scores.csv`, and the
+   predictions as `g3_pool.zip` in the OneDrive folder "delte store filer" (not in git; SHA-256 in the log of
+   2026-11-02).
 6. Divide the report sections (the Trello board exists).
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).
