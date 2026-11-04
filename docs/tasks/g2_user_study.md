@@ -112,8 +112,9 @@ Tick each box when done and write the date and a short note under it.
   the log, and tell the group. Rasmus decides; ask the group if a choice is unclear.
   *Notes:* 2026-11-04, decided (see section 5): time limit 5 min, `heatmap_display.mode: contour`,
   `viewer.mask_opacity` 0.45 → 0.2. Four tests assumed `full` or the old opacity; they now test against the config
-  (160 passed). Still open before step 5: (a) a clearer "kidney including any tumor" on the guide screen and in
-  the script, (b) a second pilot T03 (heatmap first) with `contour`, if a group member who has not seen the
+  (160 passed). Guide screen: the first sentence now says "covers the kidneys exactly, including any tumor or
+  cyst" (before, it only came further down the list); the session guide already answers the question. Still open
+  before step 5: (b) a second pilot T03 (heatmap first) with `contour`, if a group member who has not seen the
   interface is available, (c) are the errors on the study scans visible enough (section 6)?
 
 - [ ] **5. Lock the analysis plan.** Fill in the "Lock" table in `docs/study/analysis_plan.md` (date, who, commit,
@@ -175,7 +176,7 @@ A new chat starts by reading this section.)*
 - 2026-11-03: Pilot T01 run (steps 2–3). Half done: the mode comparison on the demo queue. Next action: mode
   comparison, then step 4 (proposal), then clean up T01. P01 cannot start before step 5 (lock).
 - 2026-11-04: Step 3 done (incl. mode comparison), step 4 mostly decided: 5 min, `contour`, mask fill 0.2.
-  Next action: clarify "including any tumor" on the guide screen; ask the group the two questions in section 6;
+  Guide text clarified (tumor/cyst). Next action: ask the group the two questions in section 6;
   then second pilot (if possible) and step 5 (lock). The study weeks have started (2026-11-02): P01 is delayed
   until the lock. Note: the pilot plan's rule for "too hard" scans says to rerun `prepare_study.py`, but
   that is no longer allowed locally (shared kits); if that rule fires, ask the group who rebuilds `study_kits.zip`.
