@@ -203,13 +203,15 @@ def served_heatmap(base, participant, file_set, case_id):
     return nib.Nifti1Image.from_bytes(gzip.decompress(data)).get_fdata(dtype=np.float32)
 
 
-def test_full_display_serves_the_prepared_heatmap_unchanged(server):
-    base, study = server
-    m = manifest(study)
-    assert json.loads(get(base + "/api/settings")[1])["heatmap_display"]["mode"] == "full"
-    cid = m["practice_scans"][0]
-    assert get(f"{base}/files/P01/scans/{cid}/heatmap.nii.gz")[1] == \
-        (study_dir(study) / "scans" / cid / "heatmap.nii.gz").read_bytes()
+def test_full_display_serves_the_prepared_heatmap_unchanged(temp_study):
+    from tests.conftest import running_server
+    temp_study["study"]["heatmap_display"] = {"mode": "full", "top_percent": 10, "contour_margin_mm": 3}
+    m = manifest(temp_study)
+    with running_server(temp_study) as base:
+        assert json.loads(get(base + "/api/settings")[1])["heatmap_display"]["mode"] == "full"
+        cid = m["practice_scans"][0]
+        assert get(f"{base}/files/P01/scans/{cid}/heatmap.nii.gz")[1] == \
+            (study_dir(temp_study) / "scans" / cid / "heatmap.nii.gz").read_bytes()
 
 
 @pytest.mark.parametrize("mode", ["top", "contour"])
@@ -253,7 +255,7 @@ def test_session_records_the_settings_and_refuses_a_changed_display(temp_study):
     path = study_dir(temp_study) / "sessions" / "P04" / "session.json"
     with running_server(temp_study) as base:
         code, record = post(f"{base}/api/session/P04", b"")
-        assert code == 200 and record["settings"]["heatmap_display"]["mode"] == "full"
+        assert code == 200 and record["settings"]["heatmap_display"] == temp_study["study"]["heatmap_display"]
         assert record["settings"]["heatmap"] == "entropy" and record["settings"]["tlx"] == "after_each_block"
         assert post(f"{base}/api/session/P04", b"")[0] == 200            # resumed with the same settings
         assert len(json.loads(path.read_text())["starts"]) == 2
@@ -266,7 +268,8 @@ def test_session_records_the_settings_and_refuses_a_changed_display(temp_study):
         log = json.loads((path.parent / f"{cid}_log.json").read_text())
         assert log["heatmap_display"] == record["settings"]["heatmap_display"]
     before = path.read_text()
-    temp_study["study"]["heatmap_display"] = {"mode": "top"}
+    other = "top" if record["settings"]["heatmap_display"]["mode"] != "top" else "full"
+    temp_study["study"]["heatmap_display"] = {"mode": other}
     with running_server(temp_study) as base:
         code, reply = post(f"{base}/api/session/P04", b"")
         assert code == 409 and "started with" in reply["error"]

@@ -837,6 +837,10 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   `kits100.zip` → `data/predictions/kits100/`, `study_kits.zip` → `data/study/study_kits/`.
 - `[decision]` (2026-10-28, G2) Rasmus is the pilot participant (T01) since he has not used the interface; another
   group member runs the pilot session. Study kits unzipped and checked (tests pass); `docs/tasks/g2_user_study.md`.
+- `[decision]` (2026-11-04, G2) After pilot T01 (2026-11-03) and the display comparison: time limit stays 5 min (no
+  timeouts, all scans under 2 min); heatmap display `contour` (pilot found `full` covering the border and preferred
+  `contour`); mask fill opacity 0.45 → 0.2 (the fill hid the tissue under the mask). Open: are the study scans'
+  errors visible enough (3 of 6 not edited), second pilot T03. P01 waits for the lock. `docs/tasks/g2_user_study.md`.
 
 ---
 

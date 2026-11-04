@@ -28,7 +28,8 @@ study:
   heatmap: entropy                    # LOCKED on the development set (results/kits100/heatmap_eval_dev_summary.csv)
   heatmap_display:                    # how the heatmap is shown (src/segreview/heatmap_display.py). The pilot decides;
                                       # lock it before P01. It is saved in every session (session.json) and scan log.
-    mode: full                        # full = the whole heatmap (as in the first user tests);
+    mode: contour                     # pilot 2026-11-04 chose contour (docs/tasks/g2_user_study.md);
+                                      # full = the whole heatmap (as in the first user tests);
                                       # top = only the top_percent most uncertain voxels of the region;
                                       # contour = a thin line around those voxels, per slice (they stay uncovered)
     top_percent: 10                   # top/contour: share (%) of the region's voxels that is kept. Region = the
@@ -62,7 +63,7 @@ viewer:
   heatmap_min: 0.1                    # entropy below this (bits) is not drawn, so only uncertain voxels show
   heatmap_opacity: 0.6
   mask_color: [235, 40, 40]           # red; the mask is always drawn on top of the heatmap
-  mask_opacity: 0.45                  # fill of the mask
+  mask_opacity: 0.2                   # fill of the mask (0.45 before the pilot: hid the tissue under the mask)
   mask_outline_px: 2                  # solid outline along the mask's edge (screen pixels), so it stays visible
                                       # on top of the heatmap; 0 = no outline
   compare_colors:                     # ground-truth comparison (practice answer, demo queue)

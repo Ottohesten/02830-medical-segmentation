@@ -461,8 +461,8 @@ uv run python scripts/run_ui.py        --config configs/study.yaml   # start the
   slice shader puts overlays over the drawing, so `ui/viewer.js` gives NiiVue its own shader.
 - **Heatmap:** voxel entropy, chosen on the KiTS development set because it points best at wrong voxels
   (`scripts/evaluate_heatmaps.py`). `study.heatmap_display` sets how it is shown: `full` (default), `top` (only the
-  `top_percent` most uncertain voxels near the kidney) or `contour` (a thin line around them). The pilot decides
-  (see the pilot plan). The server computes the shown map from the prepared heatmap (no new preparation needed),
+  `top_percent` most uncertain voxels near the kidney) or `contour` (a thin line around them). The pilot chose
+  `contour` (2026-11-04, [task document](docs/tasks/g2_user_study.md)). The server computes the shown map from the prepared heatmap (no new preparation needed),
   records the setting per session (`sessions/<id>/session.json`) and in every scan log, and refuses to resume a
   session with a different setting.
 - **Ground truth:** only the practice scan and the demo queue have it (`truth.nii.gz`); the server refuses it for

@@ -141,10 +141,12 @@ def test_painting_with_pointer_events_changes_the_saved_mask(server, browser):
     b.drag(stroke)
     b.js("t.frame()")
     after = b.screenshot()
-    # The paint shows where the pointer was: the pixel under the stroke turned red.
+    # The paint shows where the pointer was: the pixel under the stroke turned red (how red depends on the
+    # fill opacity, viewer.mask_opacity).
     mid = stroke[7]
     p0, p1 = pixel(before, *mid), pixel(after, *mid)
-    assert p1[0] - max(p1[1], p1[2]) > 60 and abs(p0[0] - p0[1]) < 30, (p0, p1)
+    redness = 100 * study["viewer"]["mask_opacity"]
+    assert p1[0] - max(p1[1], p1[2]) > redness and abs(p0[0] - p0[1]) < 30, (p0, p1)
 
     log = finish_queue_scan(b, study, case_id)
     saved, original = saved_and_original(study, case_id)
@@ -285,7 +287,7 @@ def test_study_flow_guide_practice_timeout_answer(quick_server, browser):
     b.wait_for("!document.getElementById('guide').hidden")
     # The session is recorded with the settings it runs with (e.g. how the heatmap is shown).
     session = json.loads((root / "sessions" / "P01" / "session.json").read_text())
-    assert session["settings"]["heatmap_display"]["mode"] == "full" and len(session["starts"]) == 1
+    assert session["settings"]["heatmap_display"] == study["study"]["heatmap_display"] and len(session["starts"]) == 1
     b.wait_for("document.getElementById('guide-image').naturalWidth > 0", timeout=20)
     assert b.js("document.querySelector('.toolbar').getClientRects().length") == 0
     b.click("#guide-go")
