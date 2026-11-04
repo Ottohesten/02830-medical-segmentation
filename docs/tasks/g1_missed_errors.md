@@ -467,5 +467,6 @@ and ideas for what could make the result better.)*
   No direct message to Bjørn/Frederik has been sent.
   The source-handoff comparison/pending preflight and updated guide are committed as **`84aaf8a`** and
   confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records the four pending confirmations.
-  The November 4 checkpoint verification/three-issue preflight and updated guide are ready for commit/push;
-  record confirmed publication before ending the session.
+  The November 4 checkpoint verification/three-issue preflight and updated guide are committed as
+  **`2304af2`** and confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records both exact hash
+  matches and the three remaining confirmations.

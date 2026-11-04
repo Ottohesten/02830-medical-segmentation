@@ -1332,6 +1332,9 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   hash/upload request complete. Remaining action: record the three actual group facts, rerun header
   preflight and project runtime before the single joint outcome stage. Step 5 remains unchecked. No direct
   group message sent; model weights remain outside Git.
+- `[admin]` Checkpoint verification, updated handoff and three-issue preflight committed as **`2304af2`**
+  and confirmed pushed to `origin/otto/missed-errors`. Updated draft PR #2 and "Where we are" with the
+  two exact hash matches and remaining coordination facts. No fresh header/array access or outcome run.
 
 ## Open questions (update when answered, with the date)
 
