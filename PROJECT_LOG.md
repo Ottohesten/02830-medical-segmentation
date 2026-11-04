@@ -1428,6 +1428,10 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 - `[result]` 6/8 — The combination promotes case_00527 (Dice 0.778522, rank 23 → 11) but displaces case_00560 (0.777604, rank 4 → 39); raw counts alone hide this swap.
 - `[result]` 7/8 — Its secondary quality-AUC gain is +0.001075 [0.000079, 0.001878], unadjusted; this broader quality signal does not replace the primary result or measure human effort.
 - `[result]` 8/8 — All scores preceded GT and both questions were evaluated once; preserve G1 and the complete fresh results, with the disclosed prior G3 smoke exposure, without tuning on this pool.
+- `[admin]` Written report materials, plotting code/tests and final notes committed as **`3584a1b`** and
+  confirmed pushed to `origin/otto/missed-errors`; draft PR #2 updated. "Where we are" records completed
+  step 5 and ready step 6 materials. Only Otto's actual group presentation/feedback remains. No merge or
+  direct group message; group code review remains required before merging.
 
 ## Open questions (update when answered, with the date)
 

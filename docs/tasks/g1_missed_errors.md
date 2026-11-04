@@ -544,6 +544,6 @@ and ideas for what could make the result better.)*
   The November 4 checkpoint verification/three-issue preflight and updated guide are committed as
   **`2304af2`** and confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records both exact hash
   matches and the three remaining confirmations.
-  The completed joint test is committed as **`402dd91`**, confirmed pushed; draft PR #2 now describes both
-  primary null findings and the secondary nuance. Step 6 report materials are ready for commit/push;
-  record confirmed publication before ending the session. Actual presentation remains pending.
+  The completed joint test is committed as **`402dd91`** and step 6 report materials as **`3584a1b`**;
+  both are confirmed pushed to `origin/otto/missed-errors`. Draft PR #2 describes the two primary null
+  findings, secondary nuance and ready report materials. Only the actual presentation remains pending.
