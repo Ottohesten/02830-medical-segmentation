@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "frozen_cases": 100,
+  "kits100_overlap": 0,
+  "draw_positions": [
+    101,
+    200
+  ],
+  "scientific_file_fingerprints": 19,
+  "checkpoint_fingerprints": 2,
+  "known_prior_smoke_cases": [
+    "case_00183",
+    "case_00002"
+  ],
+  "coordination_status": "Otto is checking and will return; no notification/confirmation fabricated",
+  "preflight_ready": false,
+  "fresh_headers_or_voxels_read": false,
+  "fresh_scores_computed": false,
+  "fresh_outcome_stage_started": false,
+  "old_score_and_both_model_dice_reproduction_passed": true,
+  "locked_g1_results_unchanged": 61,
+  "earlier_experiment_output_hashes_match": true,
+  "libraries": {
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "nibabel": "5.4.2",
+    "torch": "2.2.2"
+  },
+  "lock_sha256": "7e01121c93096f7f8d1a214586ec213198d48ae5d6f64199705e16a20ec892f9",
+  "output_hashes": {
+    "benchmark_machine.json": "04ba458280944ac914f1dfe84474b88cf78e220e59e0d8cb67614ccf09e550f7",
+    "benchmark_run.txt": "201860695cf81db18bd530b94925086406e4310b35d902d5c63757b75271f5fc",
+    "cohort.csv": "53bd4caeee140917dd2449b9cb7aea950c2470b5463e8c1454d4e96dfc3db458",
+    "freeze_machine.json": "6858af84cd5bf0284891c5082d66cf7547e966c8eb20ab49b8cb08ef0380ded8",
+    "handoff_template.json": "ae9097fe4aa7ca889618c5de9cb45421d4237e6dd329046527fbf8ae5ff1e1bb",
+    "lock.json": "7e01121c93096f7f8d1a214586ec213198d48ae5d6f64199705e16a20ec892f9",
+    "old_benchmark_cases.csv": "b07e1ee13becb9192bc939bc4b9ed08b70eb30f8cc274cdc36215223fcb76761",
+    "preflight.json": "aed4b77a5fcaf6df1724bad5209362f7eb96d25373ea9990f23ba9d798574f36",
+    "preflight_machine.json": "4917914db3c96bf3642dd4c4de5ebcf428d16817ca42d4a3605fedd2d2a83d53",
+    "preflight_run.txt": "aed4b77a5fcaf6df1724bad5209362f7eb96d25373ea9990f23ba9d798574f36",
+    "run_config.yaml": "71039b06673efcc487445ef10f07777c1ae8c59e2818f32380ba57b176333f81",
+    "runtime_benchmark.json": "201860695cf81db18bd530b94925086406e4310b35d902d5c63757b75271f5fc",
+    "tests.txt": "a4f806eef2623815e94eb89cd6f461706757556594b03a1944c45f955ae5201e"
+  }
+}

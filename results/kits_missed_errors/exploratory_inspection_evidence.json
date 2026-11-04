@@ -1,0 +1,161 @@
+{
+  "case_00236": {
+    "case_id": "case_00236",
+    "slices": [
+      {
+        "axis": 2,
+        "index": 15,
+        "description": "axial z=15: peak kidney"
+      },
+      {
+        "axis": 2,
+        "index": 12,
+        "description": "axial z=12: peak tumor"
+      },
+      {
+        "axis": 2,
+        "index": 14,
+        "description": "axial z=14: peak organ"
+      },
+      {
+        "axis": 1,
+        "index": 243,
+        "description": "coronal y=243: peak missed area"
+      }
+    ],
+    "figure": "figures/exploratory_case_00236_inspection.png",
+    "figure_sha256": "ca3e8d749b7f2ecf840018d77fbba108df4bfce1a9d25690a15ca2fb199d6a91",
+    "inputs_sha256": {
+      "data/raw/kits23/images/case_00236.nii.gz": "b5ae3209cd777f6f4562a22fabff2d009010b4cd711ff49316c842513dc1e802",
+      "data/raw/kits23/segmentations/case_00236.nii.gz": "07685d7cce3239ee30e6fdcfefa038ac92228ce5831656020c660f0f50aae7d9",
+      "data/predictions/kits100/clean/case_00236_mask.nii.gz": "7008aa5b9799728d7c46f43fe2f4e4c8cf12182c218819c9b393f50dacbd96a9",
+      "data/predictions/kits100/clean/case_00236_m2_mask.nii.gz": "cb966e03703aa2ca5434a53b33a5e1bb8e2705da9e596a117f8968daa9cae5ee",
+      "data/predictions/kits100/clean/case_00236_prob.nii.gz": "19798f2626ab9c28f3e8dabb8a36be0022751fa622a5b42d1e1367af1ce1ae3b",
+      "data/predictions/kits100/clean/case_00236_entropy.nii.gz": "6bcfaf9f5209a465d31b06460e0f5d5637eb7fdb26f8cb77a9a4a658d5c91f39"
+    },
+    "seconds": 3.9207607179996558
+  },
+  "case_00406": {
+    "case_id": "case_00406",
+    "slices": [
+      {
+        "axis": 2,
+        "index": 52,
+        "description": "axial z=52: peak kidney"
+      },
+      {
+        "axis": 2,
+        "index": 53,
+        "description": "axial z=53: peak tumor"
+      },
+      {
+        "axis": 2,
+        "index": 60,
+        "description": "axial z=60: peak false_positive"
+      },
+      {
+        "axis": 1,
+        "index": 259,
+        "description": "coronal y=259: peak missed area"
+      }
+    ],
+    "figure": "figures/exploratory_case_00406_inspection.png",
+    "figure_sha256": "f8628f059d1386be7f800ac3a3d6e1f555ffaa456255b0ccd2134ba29277a630",
+    "inputs_sha256": {
+      "data/raw/kits23/images/case_00406.nii.gz": "a449ac2ed75b3ee7d7e595fcab633e917447fa73c03fc96ba613a1444c174636",
+      "data/raw/kits23/segmentations/case_00406.nii.gz": "16082c483ce322e07164cd6288743708a943d209245aa2b4fe29506818644608",
+      "data/predictions/kits100/clean/case_00406_mask.nii.gz": "cca04efe616d5917ae7d30d6068d4355f67fb98bfbb9eb47c0274ec0ec180e8a",
+      "data/predictions/kits100/clean/case_00406_m2_mask.nii.gz": "ebaf8a2be353b840f8e29b0eafbb4a582e58eaa461a404d074fe5e6131bb632a",
+      "data/predictions/kits100/clean/case_00406_prob.nii.gz": "c52e7e96c1e1663d74d7fc4944bed837e4788cf130bb89a9aceb424bf669d45f",
+      "data/predictions/kits100/clean/case_00406_entropy.nii.gz": "4951ca5f5257345cc29ab82accdf34ed01f4ded71fca37749d9d13fc61c27020"
+    },
+    "seconds": 5.427671344999908
+  },
+  "case_00040": {
+    "case_id": "case_00040",
+    "slices": [
+      {
+        "axis": 2,
+        "index": 79,
+        "description": "axial z=79: peak kidney"
+      },
+      {
+        "axis": 2,
+        "index": 139,
+        "description": "axial z=139: peak tumor"
+      },
+      {
+        "axis": 2,
+        "index": 112,
+        "description": "axial z=112: peak false_positive"
+      },
+      {
+        "axis": 2,
+        "index": 141,
+        "description": "axial z=141: peak organ"
+      },
+      {
+        "axis": 1,
+        "index": 279,
+        "description": "coronal y=279: peak missed area"
+      }
+    ],
+    "figure": "figures/exploratory_case_00040_inspection.png",
+    "figure_sha256": "2b690ad708f824b216f498bd78960d334c7b3ff1055c64b3cd7471b44d4d9fc8",
+    "inputs_sha256": {
+      "data/raw/kits23/images/case_00040.nii.gz": "d0098068040f8fac079925d489428ef3b486d63975f51778c1dd981d5e7ff17f",
+      "data/raw/kits23/segmentations/case_00040.nii.gz": "aac455071161bb89738b2a3606380100389f0c746b7fda44b9a1b8f6012c3311",
+      "data/predictions/kits100/clean/case_00040_mask.nii.gz": "6176247aa2eff84934f6dc8fffa3c2408695c4532d3f5f326dd3db50242ec5b7",
+      "data/predictions/kits100/clean/case_00040_m2_mask.nii.gz": "de0303ba09c0553630e6f0031ee84532e0c58a40b80ecd8680cab214f8d2cca0",
+      "data/predictions/kits100/clean/case_00040_prob.nii.gz": "370ddb3f8fc4a8ba6c9044cdd0701fb65f282b6804b711b2a46e61f9b4c8834a",
+      "data/predictions/kits100/clean/case_00040_entropy.nii.gz": "364b795ba06b698527e1ea513cdaf2090361f412fdd77e80d03365bc6eed5ec7"
+    },
+    "seconds": 14.708766290001222
+  },
+  "case_00184": {
+    "case_id": "case_00184",
+    "slices": [
+      {
+        "axis": 2,
+        "index": 75,
+        "description": "axial z=75: peak kidney"
+      },
+      {
+        "axis": 2,
+        "index": 72,
+        "description": "axial z=72: peak tumor"
+      },
+      {
+        "axis": 2,
+        "index": 81,
+        "description": "axial z=81: peak cyst"
+      },
+      {
+        "axis": 2,
+        "index": 78,
+        "description": "axial z=78: peak false_positive"
+      },
+      {
+        "axis": 2,
+        "index": 77,
+        "description": "axial z=77: peak organ"
+      },
+      {
+        "axis": 1,
+        "index": 276,
+        "description": "coronal y=276: peak missed area"
+      }
+    ],
+    "figure": "figures/exploratory_case_00184_inspection.png",
+    "figure_sha256": "c1dd594312cb85a9126e60b0373c735816c03d13defd3c3cdc0a04fb03071cb1",
+    "inputs_sha256": {
+      "data/raw/kits23/images/case_00184.nii.gz": "d65b497d685e52ba8b87dcfc10a0fa4b31ad17023510f3e0f7a2bfb61f0e3873",
+      "data/raw/kits23/segmentations/case_00184.nii.gz": "609bedbe1a91014c12d9562257a746c2dc50ccafc3754e7b572b4ad7d27ff6b8",
+      "data/predictions/kits100/clean/case_00184_mask.nii.gz": "8abadafbeff74bcdf30c0ce5189e28099dfb6b71636336e32e677f67f219e31b",
+      "data/predictions/kits100/clean/case_00184_m2_mask.nii.gz": "bcd75caf97146a1387d164a8f6adae530cccf6e8ca04ce0339500a4cae77c6c2",
+      "data/predictions/kits100/clean/case_00184_prob.nii.gz": "533d009cc4695ac76d7c23f6725cbb3bcc5d3a1ce0e6d3372eea6b00a3ab1fb4",
+      "data/predictions/kits100/clean/case_00184_entropy.nii.gz": "371817b978435595bcfb0d4a61b32dadcec0bd177ac27496b9fcd8840e80cbb2"
+    },
+    "seconds": 9.62797676000082
+  }
+}

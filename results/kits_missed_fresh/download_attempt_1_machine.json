@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-03T17:47:41+01:00",
+  "platform": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "cpu": "x86_64",
+  "cpu_count": 12,
+  "python": "3.12.15",
+  "torch": "2.2.2+cu121",
+  "numpy": "1.26.4",
+  "cuda": "12.1",
+  "gpu": null,
+  "mps_available": false,
+  "git_commit": "105ae54b6c9d96b5e54f4f0dac70c70e2aed9f7d",
+  "git_uncommitted_changes": true,
+  "os": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "attempt": 1,
+  "exit_code": 1,
+  "error": "Connection reset by peer",
+  "complete_files": 195,
+  "missing_files": 5,
+  "missing_paths": [
+    "data/raw/kits23/segmentations/case_00573.nii.gz",
+    "data/raw/kits23/images/case_00578.nii.gz",
+    "data/raw/kits23/segmentations/case_00578.nii.gz",
+    "data/raw/kits23/images/case_00583.nii.gz",
+    "data/raw/kits23/segmentations/case_00583.nii.gz"
+  ],
+  "elapsed_since_approval_seconds": 336.753831,
+  "remaining_total_budget_seconds": 1463,
+  "scientific_changes": false,
+  "fresh_headers_or_voxel_arrays_read": false
+}

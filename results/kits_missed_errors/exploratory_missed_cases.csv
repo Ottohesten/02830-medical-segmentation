@@ -1,0 +1,5 @@
+case_id,original_g1_split,model_diff_mean_region,rank,dice,in_top_budget,bad,missed_bad,status
+case_00236,dev,0.1333467960357666,23,0.8023,False,True,True,exploratory; all kits100 cases are development data for this follow-up
+case_00406,test,0.1117602065205574,42,0.8004,False,True,True,exploratory; all kits100 cases are development data for this follow-up
+case_00040,dev,0.1095619797706604,46,0.6607,False,True,True,exploratory; all kits100 cases are development data for this follow-up
+case_00184,test,0.1054800599813461,56,0.8176,False,True,True,exploratory; all kits100 cases are development data for this follow-up
