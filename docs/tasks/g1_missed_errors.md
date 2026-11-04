@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
-| **Status** | Steps 1–5 complete (2026-11-04); neither fresh primary comparison meets the improvement criterion; step 6 figure/summary next |
+| **Status** | Steps 1–5 complete; step 6 figure, short summary and speaking notes ready (2026-11-04); Otto's group presentation pending |
 | **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
@@ -376,12 +376,36 @@ A few starting ideas (try them, drop them, or find better ones):
     [Full fresh summary](../../results/kits_missed_fresh/fresh_summary.md), `fresh_verification.json`,
     `fresh_tests.txt`. Step 5 is complete; a positive primary result was not required for completion.
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
-  *Notes:*
+  *Written materials complete (2026-11-04); actual group presentation pending:*
+  - One two-panel aggregate-only figure in PDF/PNG: primary paired intervals alongside the 20-case budget.
+    `results/kits_missed_fresh/report/fig_missed_fresh_summary.{pdf,png}`. Caption, 8-line summary and
+    five-minute speaking/exam guide in the same folder. No fresh CT, model or GT arrays read for reporting.
+  - Reproduce with `scripts/plot_missed_fresh.py --config configs/kits_missed_fresh.yaml`. The script checks
+    published source hashes and uses only the two locked primary comparisons. Three synthetic tests prevent
+    swapping in a secondary bad rule/control, using modified source tables or silently replacing a missing
+    primary interval. No metric rerun. **196 passed, 36 skipped, 8 existing warnings, 3.43 s**.
+  - PDF page count/text labels and plotted values checked; PNG visually inspected. Source values, figure
+    machine/config/code hashes and all report hashes are saved. `report_verification.json` passed.
+    Figure generation **0.56 s**, CPU, seed 42, Matplotlib 3.11.2, baseline `402dd91` with dirty state.
+  - Keep this checkbox open until Otto actually gives the five-minute group presentation; the assistant
+    prepared materials and has not delivered or sent a group message.
 
 ## 5. Results summary
 
-Fresh step 5 results: [full summary](../../results/kits_missed_fresh/fresh_summary.md).
-Step 6 adds the one report figure, 5–10 line summary and group presentation.
+[Figure PDF](../../results/kits_missed_fresh/report/fig_missed_fresh_summary.pdf),
+[PNG](../../results/kits_missed_fresh/report/fig_missed_fresh_summary.png),
+[caption](../../results/kits_missed_fresh/report/caption.md),
+[five-minute speaking notes](../../results/kits_missed_fresh/report/presentation_notes.md).
+Full step 5 results: [fresh summary](../../results/kits_missed_fresh/fresh_summary.md).
+
+1. Four threshold-bad cases outside the original first-20 queue motivated GT-free missing-side and hull checks on 100 development scans.
+2. Six fixed combinations were compared; mean ranks of G1 + missing-side + hull were locked before one joint fresh test with the far-disagreement question.
+3. On the next 100 seeded scans, 10 are below Dice 0.83: G1 review-AUC is 0.921; the combination is 0.907, difference -0.014 (95% paired CI [-0.090, 0.043]).
+4. Far disagreement reaches 0.936, difference +0.015 [-0.010, 0.050]; neither candidate meets the predeclared primary improvement criterion.
+5. At 20 reviews, G1/combination/far find 9/9/10 bad cases, with 11/11/10 false alarms; the two bad rules identify the same 10 cases here.
+6. The combination promotes case_00527 (Dice 0.778522, rank 23 → 11) but displaces case_00560 (0.777604, rank 4 → 39); raw counts alone hide this swap.
+7. Its secondary quality-AUC gain is +0.001075 [0.000079, 0.001878], unadjusted; this broader quality signal does not replace the primary result or measure human effort.
+8. All scores preceded GT and both questions were evaluated once; preserve G1 and the complete fresh results, with the disclosed prior G3 smoke exposure, without tuning on this pool.
 
 ## 6. Decisions and dropped ideas
 
@@ -472,6 +496,9 @@ Step 6 adds the one report figure, 5–10 line summary and group presentation.
 - **2026-11-04 — Drop further tuning/reopening of this fresh pool.** No changed weights, thresholds,
   alternative candidate selection or sample extension to chase a positive result. The next practical work
   is the step 6 figure/summary using saved outputs; that fits the deadlines and preserves the one-time test.
+- **2026-11-04 — Use one paired-interval/budget figure.** Drop a budget-only figure: the 10/10 far-score
+  point would hide the uncertainty of its primary difference. Show both locked intervals and all three
+  budget points; keep the secondary quality-AUC nuance in the caption/summary. No extra analysis or GT access.
 
 ## 7. Where we are
 
@@ -496,10 +523,10 @@ and ideas for what could make the result better.)*
   match. Preflight has passed (**ready: true**) for all 100 cases/600 files; headers/affines/encoding/hashes
   agree. Score/evaluation completed in **713.23 / 168.11 s**. Aggregate-only verification passed;
   193 tests passed (36 skipped), all locked source outputs unchanged. No further input handoff is needed.
-- **Next concrete action: step 6.** Make one figure from saved review/quality curves and budget outputs,
-  write the 5–10 line summary here/in the log, and prepare Otto's 5-minute group presentation. Explain
-  why the positive secondary quality-AUC signal does not change the primary null result. Do not reopen GT
-  or retune on this pool. No new download/inference is needed.
+- **Step 6 written work is ready.** One verified PDF/PNG figure, caption, eight-line summary and five-minute
+  speaking/exam notes are in `results/kits_missed_fresh/report/` and section 5. **196 tests pass, 36 skipped**;
+  saved scientific outputs/lock are unchanged. Only Otto's actual group presentation remains; keep step 6 open
+  until it happens. Next: deliver the five-minute presentation and record its date/group feedback here/in the log.
 - **Practical improvements:** (1) show primary intervals alongside the 20-case budget in the figure;
   (2) use case_00527/case_00560 to explain the gained/lost-error tradeoff. These fit the reporting deadline.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
@@ -517,5 +544,6 @@ and ideas for what could make the result better.)*
   The November 4 checkpoint verification/three-issue preflight and updated guide are committed as
   **`2304af2`** and confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records both exact hash
   matches and the three remaining confirmations.
-  The completed joint test and final notes are ready for commit/push; record confirmed publication before
-  ending the session. Step 6 remains open.
+  The completed joint test is committed as **`402dd91`**, confirmed pushed; draft PR #2 now describes both
+  primary null findings and the secondary nuance. Step 6 report materials are ready for commit/push;
+  record confirmed publication before ending the session. Actual presentation remains pending.

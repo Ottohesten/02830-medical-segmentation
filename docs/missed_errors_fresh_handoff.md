@@ -97,5 +97,5 @@ Its reference hashes alone do not confirm provenance or notification. Do not fil
 unless the communication happened. The runner refuses fresh inputs while these facts are pending.
 
 Use the saved tables for the report. The retained `evaluation_started.json` records the one outcome
-opening and guards against a repeated fresh evaluation. Next work is the step 6 figure/summary, using
-the saved aggregate outputs.
+opening and guards against a repeated fresh evaluation. Step 6 figure/summary and speaking notes are
+ready in `results/kits_missed_fresh/report/`, generated from saved aggregates. Otto's group presentation remains.

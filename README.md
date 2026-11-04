@@ -230,6 +230,16 @@ with the frozen cohort before listing CT/label URLs. Download executes that revi
 files, never rewrites the source case list, and stops between files at the configured 30-minute cap.
 It performs no inference, score calculation or GT evaluation. Shared source and the scientific lock stay unchanged.
 
+The completed fresh test's report figure uses only verified aggregate tables (no local scans or weights needed):
+
+```bash
+uv run python scripts/plot_missed_fresh.py --config configs/kits_missed_fresh.yaml
+```
+
+It verifies the saved outcome/input hashes and selects the two locked primary comparisons rather than
+choosing a method from its results. The PDF/PNG, source values, caption, eight-line summary and five-minute
+presentation notes are in `results/kits_missed_fresh/report/`. Plotting does not rerun ranking evaluation.
+
 Questions from the supervisor meeting of 2026-10-07, asked after the G1 choices were locked, so they are
 **exploratory** and report the dev and test sets separately. Both scripts only read saved predictions (no inference)
 and never change the locked G1 files. Settings: `exploratory:` in `configs/kits100.yaml`.

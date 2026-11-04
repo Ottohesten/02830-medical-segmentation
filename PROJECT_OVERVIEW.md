@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-11-04 (missed-errors fresh test complete; neither primary comparison establishes improvement).*
+*Last updated: 2026-11-04 (missed-errors fresh test and report materials complete; group presentation pending).*
 
 | | |
 |---|---|
@@ -97,7 +97,8 @@ The usual trick (ask several copies of the same model) is impossible because onl
   does not replace the primary criterion. Both bad rules identify the same 10 cases here.
   Full fresh results/verification: `results/kits_missed_fresh/{fresh_summary.md,fresh_verification.json}`.
   All scores were frozen before GT, both questions ran together once, and locked G1 outputs remain unchanged.
-  Next: step 6 figure/short summary and group presentation; preserve the fresh results without retuning.
+  Step 6 figure/short summary and five-minute speaking notes are ready in
+  `results/kits_missed_fresh/report/`; actual group presentation is pending. Preserve the fresh results without retuning.
   Full development comparison:
   `results/kits_missed_combinations/exploratory_combination_summary.md`.
   Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).

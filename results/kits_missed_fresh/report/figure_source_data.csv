@@ -1,0 +1,4 @@
+method,label,review_auc,difference,ci_low,ci_high,criterion_met,bad_capture,review_budget,false_alarms,quality_after_correction
+model_diff_mean_region,G1,0.921,0.0,0.0,0.0,,9.0,20,11.0,0.9315454284086964
+g1_missing_hull_mean,Combination,0.907,-0.014,-0.0899999999999999,0.0428571428571427,False,9.0,20,11.0,0.932528427695773
+far_disagree_per_volume,Far disagreement,0.936,0.0149999999999999,-0.0100208333333334,0.05,False,10.0,20,10.0,0.9325239008054448

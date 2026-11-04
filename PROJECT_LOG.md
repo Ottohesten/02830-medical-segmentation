@@ -1396,6 +1396,38 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
 - `[admin]` Marked step 5 complete and updated task/decisions/"Where we are", overview and confirmed
   handoff guide. All raw outcomes and score/provenance/guard files are preserved. Step 6 remains open;
   publication outcome follows. No direct group message sent.
+- `[admin]` Completed joint test and final step 5 notes committed as **`402dd91`** and confirmed pushed
+  to `origin/otto/missed-errors`. Draft PR #2 is now titled "Evaluate missed-error checks on 100 fresh
+  scans" and reports both primary null findings, the descriptive budget result and secondary nuance.
+
+## 2026-11-04: missed-errors step 6, report materials and presentation preparation
+
+- `[decision]` Use one two-panel figure: paired primary intervals alongside all three fixed-budget
+  captures. Drop a budget-only figure because it would hide the uncertainty around the far score's 10/10
+  point. Keep the secondary quality-AUC nuance in the caption/summary rather than change the primary claim.
+- `[experiment]` Added `scripts/plot_missed_fresh.py`, which reads only verified saved aggregate tables,
+  binds config/lock/source hashes, and uses the two locked decisions. No CT/model/GT arrays or new metrics.
+  Exported PDF/PNG plus `figure_source_data.csv` in `results/kits_missed_fresh/report/`. Generation
+  **0.56 s**, Matplotlib **3.11.2**, CPU, seed 42; `figure_machine.json` records Linux 7.3.1-1-cachyos,
+  Python 3.12.15, torch 2.2.2+cu121, baseline `402dd91`, dirty state and all code/config/input/output hashes.
+- `[result]` Figure verification passed: **1-page PDF**, extracted numeric labels, **2220×1110 PNG**
+  visually inspected by the assistant, plotted values match verified primary/budget tables. All frozen
+  outcome hashes and scientific lock unchanged. `report_verification.json`; no repeated fresh evaluation.
+- `[result]` **3 new source-binding tests passed**, covering primary-rule/locked-method selection, changed
+  verified data and a missing primary interval. Full suite **196 passed, 36 skipped, 8 existing warnings,
+  3.43 s**, `results/kits_missed_fresh/report/report_tests.txt`. Updated README with the regeneration command.
+- `[admin]` Caption, eight-line summary and five-minute speaking/exam guide are ready in the report folder;
+  figure/summary are also linked in task section 5. Written step 6 materials are complete; the checkbox
+  remains open until Otto actually presents to the group. No group message or presentation was performed
+  by the assistant. Next: present the figure, explain the primary/secondary distinction and log group feedback.
+- `[result]` 1/8 — Four threshold-bad cases outside the original first-20 queue motivated GT-free missing-side and hull checks on 100 development scans.
+- `[result]` 2/8 — Six fixed combinations were compared; mean ranks of G1 + missing-side + hull were locked before one joint fresh test with the far-disagreement question.
+- `[result]` 3/8 — On the next 100 seeded scans, 10 are below Dice 0.83: G1 review-AUC is 0.921; the combination is 0.907, difference -0.014 (95% paired CI [-0.090, 0.043]).
+- `[result]` 4/8 — Far disagreement reaches 0.936, difference +0.015 [-0.010, 0.050]; neither candidate meets the predeclared primary improvement criterion.
+- `[result]` 5/8 — At 20 reviews, G1/combination/far find 9/9/10 bad cases, with 11/11/10 false alarms; the two bad rules identify the same 10 cases here.
+- `[result]` 6/8 — The combination promotes case_00527 (Dice 0.778522, rank 23 → 11) but displaces case_00560 (0.777604, rank 4 → 39); raw counts alone hide this swap.
+- `[result]` 7/8 — Its secondary quality-AUC gain is +0.001075 [0.000079, 0.001878], unadjusted; this broader quality signal does not replace the primary result or measure human effort.
+- `[result]` 8/8 — All scores preceded GT and both questions were evaluated once; preserve G1 and the complete fresh results, with the disclosed prior G3 smoke exposure, without tuning on this pool.
 
 ## Open questions (update when answered, with the date)
 
