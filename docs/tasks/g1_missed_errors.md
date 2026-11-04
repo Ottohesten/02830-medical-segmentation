@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
-| **Status** | Steps 1–4 complete; step 5 checkpoint identities verified (2026-11-04), fresh evaluation pending coordination/preflight |
+| **Status** | Steps 1–5 complete (2026-11-04); neither fresh primary comparison meets the improvement criterion; step 6 figure/summary next |
 | **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
@@ -239,7 +239,7 @@ A few starting ideas (try them, drop them, or find better ones):
     600 case-change rows**. Standalone metrics/CIs reproduce step 3; rank/tie/budget/displacement identities
     pass. All **61 locked results / 600 source maps / 23 earlier-stage output fingerprints** are unchanged.
     Sources: `exploratory_tests.txt` and `exploratory_verification.json` in the combination result folder.
-- [ ] **5. Lock and test once on the fresh scans** (see section 3).
+- [x] **5. Lock and test once on the fresh scans** (see section 3).
   *Notes (2026-11-02; lock complete, actual fresh test pending):*
   - Prospective recipe: [missed_errors_fresh_protocol.md](../missed_errors_fresh_protocol.md) and
     `configs/kits_missed_fresh.yaml`. Only `g1_missing_hull_mean` is added to the already locked far-score
@@ -335,12 +335,53 @@ A few starting ideas (try them, drop them, or find better ones):
   - Updated the handoff draft to remove the already completed hash/upload request. Next: record the three
     actual coordination facts, then run header/probability checks and project runtime. Keep step 5 unchecked.
     Full suite **193 passed, 36 skipped, 8 existing warnings, 3.84 s**; `checkpoint_tests.txt`.
+  *Confirmed handoff and fresh run (2026-11-04):*
+  - Otto relayed Bjørn's explicit confirmation of original pool models, no earlier joint ranking test,
+    and review/approval of `g1_missing_hull_mean`. All remaining coordination facts are resolved by this
+    project-lead attestation. `coordination_confirmation.json` records its source/date and that there is
+    no direct Frederik reply or original message timestamp; none has been invented.
+  - Frozen preflight passed: **100 cases / 600 input files**, canonical shapes/affines, standard probability
+    encoding and file hashes. **ready: true**. Headers/bytes only at this point; no GT voxel arrays read.
+    `preflight.json`, `input_inventory.csv`; earlier pending stage preserved in
+    `preflight_history/2026-11-04_pending/`.
+  - Runtime projection for **4,864,341,504 grid voxels**: score **1,511.40 s / 25.19 min**, evaluation
+    **295.34 s / 4.92 min**, safety factor 2; both below the per-stage 30-minute cap. `runtime_projection.json`.
+    Started unchanged GT-free scoring; all scores will be frozen before the single joint outcome stage.
+  *Final fresh result (2026-11-04):*
+  - Completed one joint outcome stage after freezing all 100 scores. **10/100** cases have Dice < 0.83;
+    these are exactly the worst 10, so the two bad rules are identical in this cohort. **2,000/2,000**
+    primary bootstrap resamples are finite. Both named comparisons are reported, with no familywise claim.
+  - Primary review-AUC: **G1 0.9210**, selected combination **0.9070**, paired difference
+    **-0.0140 [-0.0900, 0.0429]**; far disagreement **0.9360**, difference
+    **+0.0150 [-0.0100, 0.0500]**. **Neither lower CI bound is above zero**, so neither meets the
+    predeclared improvement criterion. This is not evidence of equivalence or a reason to change the lock.
+  - First 20: **G1 9/10 bad + 11 false alarms; combination 9/10 + 11; far 10/10 + 10**.
+    Combination gains case_00527 (Dice **0.778522**, rank **23 → 11**) and loses case_00560
+    (Dice **0.777604**, rank **4 → 39**), plus nonbad swaps. Far promotes case_00527 to rank **11**
+    and keeps case_00560 at **9**. `queue_changes.csv`, `far_queue_changes.csv`, `case_rankings.csv`.
+  - Prespecified secondary combination quality-AUC **0.957772 vs 0.956697**, difference
+    **+0.001075 [0.000079, 0.001878]**; rho **-0.706779 vs -0.524740**, difference
+    **-0.182039 [-0.290077, -0.089880]**. These unadjusted secondary signals do not replace the
+    primary criterion. Simulated quality after 20: combination **0.932528 vs G1 0.931545**, difference
+    **+0.000983 [-0.002274, 0.005166]**; far **0.932524**, difference
+    **+0.000978 [-0.001145, 0.004858]**. No measured human correction-time claim.
+  - CPU resource-wrapper wall times: score **713.23 s**, evaluation **168.11 s**; peaks **9,224,491,008 /
+    2,744,385,536 bytes**. Machine metadata: AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15,
+    torch 2.2.2+cu121 / CUDA build 12.1, 6 threads, seed 42, no GPU computation. Source baseline `d7bea17`,
+    dirty state and all scientific/input hashes are recorded. Both stages completed below 30 minutes.
+  - Verification passed using saved aggregates only: **100 cases, 14 metric rows, 16 paired rows,
+    1,414 curve rows**, independent rank-AUC/curve/budget identities, both fixed decisions and all queue
+    changes. No GT arrays reopened for verification. All **20 science fingerprints / 61 locked G1 result
+    files / 600 kits100 maps** unchanged. **193 passed, 36 skipped, 8 existing warnings, 4.24 s**.
+    [Full fresh summary](../../results/kits_missed_fresh/fresh_summary.md), `fresh_verification.json`,
+    `fresh_tests.txt`. Step 5 is complete; a positive primary result was not required for completion.
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
   *Notes:*
 
 ## 5. Results summary
 
-*(Filled in at step 6.)*
+Fresh step 5 results: [full summary](../../results/kits_missed_fresh/fresh_summary.md).
+Step 6 adds the one report figure, 5–10 line summary and group presentation.
 
 ## 6. Decisions and dropped ideas
 
@@ -425,36 +466,42 @@ A few starting ideas (try them, drop them, or find better ones):
   unambiguous and both files match the locked references. No move, overwrite, new model download or inference
   is needed. Record byte identity separately from confirmation that those weights produced the shared pool maps.
 
+- **2026-11-04 — Report both fresh primary null findings and retain the secondary distinction.** Neither
+  candidate clears the locked primary CI criterion. Keep G1 as the project's locked reference and report
+  the small unadjusted secondary quality-AUC/rho signals without promoting them to the primary outcome.
+- **2026-11-04 — Drop further tuning/reopening of this fresh pool.** No changed weights, thresholds,
+  alternative candidate selection or sample extension to chase a positive result. The next practical work
+  is the step 6 figure/summary using saved outputs; that fits the deadlines and preserves the one-time test.
+
 ## 7. Where we are
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
 
-- **2026-11-04 — Last fully finished step: 4. Step 5 scientific lock/preparation is complete; its fresh
-  evaluation is not.** Recipe/code, next 100 IDs and baseline checkpoint hashes are pinned in
-  `results/kits_missed_fresh/lock.json`; protocol and tested runner are ready. No fresh model/label arrays,
-  scores, ranking metrics or outcome marker have been opened/created. Prior G3 smoke exposure is disclosed.
-  Development result remains weak: AUC +0.030 [-0.032, 0.086], no top-20 gain and worse quality at 20.
+- **2026-11-04 — Last fully finished step: 5. The single joint fresh test is complete and verified.**
+  All 100 GT-free scores were saved before GT; both locked questions ran in one guarded outcome stage.
+  Preserve the score/output hashes and exclusive outcome marker. Prior G3 smoke exposure is disclosed.
+  Primary result: G1 **0.921**, combination **0.907**, difference **-0.014 [-0.090, 0.043]**;
+  far **0.936**, difference **+0.015 [-0.010, 0.050]**. Neither meets the improvement criterion.
+  First 20 find **9 / 9 / 10 of 10 bad cases**, respectively. Full report: `fresh_summary.md`.
 - **Current inputs/dependency:** all 600 expected model maps are local at `data/predictions/g3_pool/clean`;
   all 100 CTs and 100 labels are now local at `data/raw/kits23/{images,segmentations}/` after Otto's approved
   download. Exact plan coverage and 200 byte fingerprints verified; `download_verification.json`.
   `handoff_inputs.csv` lists the 100 cases and existing paths. Bjørn's reuse/config/lock instruction
   was relayed by Otto; source config and G3 preparation-machine metadata are retrieved. Both checkpoint files
   now supplied by Frederik match the locked reference hashes (`source_checkpoint_verification.json`).
-  Confirmation that they generated the shared pool maps remains pending.
+  Bjørn has now explicitly confirmed original pool models, no previous joint ranking evaluation and
+  review of the exact locked check, via Otto. `coordination_confirmation.json` records this attestation.
   Follow-up confirms all three relevant config sections equal kits100 and all 20 scientific fingerprints
-  match. Preflight was run with an honest pending handoff and remains **ready: false**, before header access.
-- **Next concrete action:** Otto supplies actual group replies for the three issues in `preflight.json`:
-  Bjørn informed of the exact check, Frederik confirms baseline archive provenance, no prior joint ranking
-  evaluation. The checkpoint hashes have already been computed and recorded. The updated message draft is in
-  [the handoff guide](../missed_errors_fresh_handoff.md). Fill `data/handoffs/kits_missed_fresh.pending.json`
-  with only confirmed facts, then rerun preflight, verify headers/hashes and project full runtime.
-  The path manifest is ready; no more CT/label transfer or inference is needed for the frozen cohort.
-  Ask before downloads or any projected >30-minute stage. Then freeze all GT-free scores and run both
-  questions together in one outcome stage by 2026-11-18. Keep step 5 unchecked until real results exist.
-- **Practical improvements:** (1) use the short updated confirmation request and existing handoff to finish
-  provenance without extra data transfer; (2) preserve the prespecified quality-at-20/displaced-error
-  outputs so an apparent AUC gain cannot hide a worse practical budget. No weights/criteria changes planned.
+  match. Preflight has passed (**ready: true**) for all 100 cases/600 files; headers/affines/encoding/hashes
+  agree. Score/evaluation completed in **713.23 / 168.11 s**. Aggregate-only verification passed;
+  193 tests passed (36 skipped), all locked source outputs unchanged. No further input handoff is needed.
+- **Next concrete action: step 6.** Make one figure from saved review/quality curves and budget outputs,
+  write the 5–10 line summary here/in the log, and prepare Otto's 5-minute group presentation. Explain
+  why the positive secondary quality-AUC signal does not change the primary null result. Do not reopen GT
+  or retune on this pool. No new download/inference is needed.
+- **Practical improvements:** (1) show primary intervals alongside the 20-case budget in the figure;
+  (2) use case_00527/case_00560 to explain the gained/lost-error tradeoff. These fit the reporting deadline.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
   the ongoing task. The prospective lock/preparation is committed as **`7703fac`** and confirmed pushed to
   `origin/otto/missed-errors`; the PR title/body now describe the final lock and pending evaluation.
@@ -470,3 +517,5 @@ and ideas for what could make the result better.)*
   The November 4 checkpoint verification/three-issue preflight and updated guide are committed as
   **`2304af2`** and confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records both exact hash
   matches and the three remaining confirmations.
+  The completed joint test and final notes are ready for commit/push; record confirmed publication before
+  ending the session. Step 6 remains open.

@@ -1336,6 +1336,67 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   and confirmed pushed to `origin/otto/missed-errors`. Updated draft PR #2 and "Where we are" with the
   two exact hash matches and remaining coordination facts. No fresh header/array access or outcome run.
 
+## 2026-11-04: missed-errors step 5, confirmed handoff and joint fresh test
+
+- `[admin]` Otto relayed Bjørn's explicit reply: Frederik's pool outputs use the original 3 mm/6 mm
+  models via `configs/g3_pool.yaml`, not fine-tuned G3 models; the joint ranking test has not run; Bjørn
+  has seen and approved the exact locked `g1_missing_hull_mean` check. Recorded on 2026-11-04; original
+  message timestamp was not supplied. This is project-lead attestation via Otto, not a direct Frederik
+  reply. `results/kits_missed_fresh/coordination_confirmation.json` and the private handoff preserve that
+  distinction. All handoff facts are now resolved; no scientific recipe/cohort changes.
+- `[result]` Frozen preflight passed for **100 cases / 600 required input files**: canonical CT/GT
+  geometry, model-map shapes/affines, uint8 1/255 probability representation and input hashes checked.
+  **ready: true**, headers/compressed bytes only; no voxel arrays, scores or fresh outcomes read yet.
+  `input_inventory.csv`, `preflight.json`, `preflight_machine.json`; earlier pending stage preserved in
+  `preflight_history/2026-11-04_pending/`. All 20 scientific fingerprints remain unchanged.
+- `[experiment]` Measured old-data benchmark scaled to **4,864,341,504 grid voxels** across the frozen
+  cohort: score projection **1,511.40 s / 25.19 min**, evaluation projection **295.34 s / 4.92 min**, both
+  including safety factor **2**, below the per-stage 1,800 s cap. `runtime_projection.json`. Proceed with
+  unchanged GT-free scoring, then both locked comparisons in one outcome stage; no new permission needed.
+- `[result]` All **100 GT-free scores** are frozen before GT access. Scoring finished in **713.23 s**
+  (resource-wrapper wall time), peak resident memory **9,224,491,008 bytes**. `score_machine.json`,
+  `score_resources.json`, `score_run.txt`, `scores_provenance.json`; score-table SHA-256
+  `2e40f88ea65fde5bd32c2833c361d3ba78acf6678a04a6ef45bd615f0efaae0e`.
+- `[result]` Pre-outcome verification passed: exact 100-case coverage, finite scores, no GT columns,
+  independently checked mean-rank formula, unchanged lock/input hashes and no prior outcome marker/Dice
+  table. `pre_outcome_verification.json`. No fresh GT voxels have been read yet. Proceeding with the
+  unchanged one-time joint outcome stage; no new choices or thresholds. Independent aggregate-only
+  verification will check rank-AUC identities, curve areas, fixed-budget totals and queue changes.
+- `[result]` One joint outcome stage completed for **100 cases / 10 bad (Dice < 0.83)**, with
+  **2,000/2,000** finite primary resamples. Threshold-bad and worst10 identify exactly the same cases here.
+  Primary review-AUC: G1 **0.9210**, selected combination **0.9070**, difference **-0.0140 [-0.0900,
+  0.0429]**; far disagreement **0.9360**, difference **+0.0150 [-0.0100, 0.0500]**. Neither primary
+  improvement criterion is met. These are named per-comparison 95% CIs, with no familywise claim.
+  `evaluation_completed.json`, `metrics.csv`, `paired.csv` in `results/kits_missed_fresh/`.
+- `[result]` Prespecified first-20 budget: G1/combination/far capture **9 / 9 / 10 of 10 bad cases**, with
+  **11 / 11 / 10 false alarms**. Combination gains case_00527 (**Dice 0.778522, rank 23 → 11**) but loses
+  case_00560 (**0.777604, rank 4 → 39**); far ranks them **11 / 9** and loses no bad case. Nonbad changes
+  and fair tie probabilities are saved. `budget_statistics.csv`, `queue_changes.csv`, `tradeoffs.csv`,
+  `far_queue_changes.csv`, `far_tradeoffs.csv`, `case_rankings.csv`. Far case diagnostics were exported
+  from the saved fixed scores/Dice for the already prespecified comparison, with no extra outcome opening.
+- `[result]` Secondary combination quality-AUC **0.957772 vs G1 0.956697**, difference **+0.001075
+  [0.000079, 0.001878]**; Spearman rho **-0.706779 vs -0.524740**, difference **-0.182039
+  [-0.290077, -0.089880]**. These unadjusted prespecified signals do not replace the primary criterion.
+  Simulated mean Dice after 20: combination **0.932528 vs 0.931545**, difference **+0.000983 [-0.002274,
+  0.005166]**; far **0.932524**, difference **+0.000978 [-0.001145, 0.004858]**. No actual human-time or
+  correction-performance claim. Full interpretation: `results/kits_missed_fresh/fresh_summary.md`.
+- `[result]` Outcome-stage wall time **168.11 s**, peak resident memory **2,744,385,536 bytes**.
+  Score/evaluate metadata and resource logs record AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python
+  3.12.15, torch 2.2.2+cu121 / CUDA build 12.1, 6 threads, seed 42, no GPU computation; baseline `d7bea17`
+  and dirty state. Both stages completed below 30 minutes. Config and all scientific hashes unchanged.
+- `[result]` Independent saved-aggregate audit passed: **100 cases / 14 metric rows / 16 paired rows /
+  1,414 curve rows**, rank-AUC/curve/budget identities, both locked decisions, frozen-before-GT order and
+  queue changes. No fresh GT arrays reopened. All **20 science fingerprints / 61 locked G1 result files /
+  600 kits100 saved maps** unchanged. `fresh_verification.json`. Full suite **193 passed, 36 skipped,
+  8 existing warnings, 4.24 s**, `fresh_tests.txt`.
+- `[decision]` Report both null primary findings and retain G1 as the project's locked reference. Preserve
+  the secondary quality/rho nuance without changing the primary outcome. Drop further score/weight tuning,
+  case replacement, sample extension or pool reopening to obtain a positive result. The practical next
+  work is the step 6 figure, short summary and group presentation using saved aggregates.
+- `[admin]` Marked step 5 complete and updated task/decisions/"Where we are", overview and confirmed
+  handoff guide. All raw outcomes and score/provenance/guard files are preserved. Step 6 remains open;
+  publication outcome follows. No direct group message sent.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

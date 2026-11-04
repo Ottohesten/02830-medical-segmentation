@@ -11,15 +11,18 @@
   "coordination": {
     "source": "Otto relayed Bj\u00f8rn's instructions in this conversation on 2026-11-03; original message date not supplied",
     "summary": "Use Frederik's g3_pool.zip in data/predictions/g3_pool; retrieve configs/g3_pool.yaml from frederik/g3; lock the check in the log before opening pool outcomes",
-    "direct_messages_sent_by_assistant": false
+    "direct_messages_sent_by_assistant": false,
+    "current_status": "Bjorn explicitly confirmed all remaining facts via Otto on 2026-11-04"
   },
   "limitations": [
     "Upstream config declares baseline released tasks/fold 0 and no ranking evaluation; declarations are not an independent output provenance audit",
-    "Upstream prepare metadata has no hashes; the two files now supplied by Frederik match the locked references. Their linkage to pool inference still needs confirmation.",
-    "Inputs and supplied checkpoint identities are verified; exact-check notification, pool-run linkage and prior-ranking status remain pending; no fresh headers or voxel arrays opened"
+    "Original prepare metadata has no checkpoint hashes; two supplied checkpoints match locked references and Bjorn attests original baseline pool provenance",
+    "Original message timestamp not supplied; confirmation is by project lead Bjorn via Otto, not a direct Frederik reply. Preflight passed; scoring in progress."
   ],
   "rechecked_on": "2026-11-03",
   "current_status_audit": "handoff_provenance_audit.json",
   "checkpoint_files_received_on": "2026-11-04",
-  "checkpoint_verification": "source_checkpoint_verification.json"
+  "checkpoint_verification": "source_checkpoint_verification.json",
+  "coordination_confirmed_on": "2026-11-04",
+  "coordination_confirmation": "coordination_confirmation.json"
 }

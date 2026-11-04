@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-11-04 (supplied 3 mm/6 mm checkpoints match; coordination/preflight pending).*
+*Last updated: 2026-11-04 (missed-errors fresh test complete; neither primary comparison establishes improvement).*
 
 | | |
 |---|---|
@@ -75,7 +75,7 @@ The usual trick (ask several copies of the same model) is impossible because onl
   Full dev/test, both-model, both-rule results: `results/kits_robustness_eval/`. The report figure (PDF/PNG),
   caption, and eight-line summary are ready in `results/kits_robustness_eval/report/`; group presentation is next.
 
-- Confident-error follow-up (Otto, 2026-11-02): steps 1–4 are complete on `otto/missed-errors`. In a pooled
+- Confident-error follow-up (Otto, 2026-11-04): steps 1–5 are complete on `otto/missed-errors`. In a pooled
   exploratory queue of all 100 kits100 cases, 4/15 cases below Dice 0.83 lie outside the first 20:
   case_00236, case_00406, case_00040 and case_00184. Multiple-slice review shows a missed pelvic kidney and
   shared tumor/cyst omissions. Among missed voxels, 59.6–89.1% have saved p <= 0.10 across these cases.
@@ -88,15 +88,16 @@ The usual trick (ask several copies of the same model) is impossible because onl
   (11/15 each) and worse simulated quality after 20 corrections. It promotes one original miss but displaces
   a more severe bad case. No established superiority. The fresh recipe, 100 next-draw IDs and baseline
   checkpoint hashes are now locked (`docs/missed_errors_fresh_protocol.md`, `results/kits_missed_fresh/`).
-  Step 5 evaluation remains pending: all 600 expected fresh-pool model maps are now local and Frederik's
-  config is retrieved. All 100 CTs and 100 labels are now downloaded (8,262,473,787 bytes; exact plan coverage
-  and 200 byte fingerprints verified). `results/kits_missed_fresh/download_verification.json` and
-  `handoff_inputs.csv` document the completed transfer/paths. Source handoff/provenance and header/runtime
-  preflight still need completion. Declared model/uncertainty/plausibility settings match kits100;
-  Frederik's supplied 3 mm/6 mm checkpoint files now match the locked reference hashes exactly
-  (`source_checkpoint_verification.json`). Preflight remains pending three group facts: exact-check
-  notification, linkage of these weights to the pool archive, and no prior joint ranking evaluation.
-  No fresh headers, arrays or ranking outcomes have been opened.
+  The once-only fresh test is now complete on the next 100 seeded cases, after Bjørn's explicit coordination
+  confirmation and baseline checkpoint/input verification. **10 cases below Dice 0.83**; G1 review-AUC
+  **0.921**, selected combination **0.907**, paired difference **-0.014 [-0.090, 0.043]**; locked far score
+  **0.936**, difference **+0.015 [-0.010, 0.050]**. Neither meets the primary improvement criterion.
+  First 20 capture **9 / 9 / 10 bad cases**, respectively. The combination swaps one bad case for another;
+  its small positive secondary quality-AUC signal (difference **+0.001075 [0.000079, 0.001878]**, unadjusted)
+  does not replace the primary criterion. Both bad rules identify the same 10 cases here.
+  Full fresh results/verification: `results/kits_missed_fresh/{fresh_summary.md,fresh_verification.json}`.
+  All scores were frozen before GT, both questions ran together once, and locked G1 outputs remain unchanged.
+  Next: step 6 figure/short summary and group presentation; preserve the fresh results without retuning.
   Full development comparison:
   `results/kits_missed_combinations/exploratory_combination_summary.md`.
   Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).

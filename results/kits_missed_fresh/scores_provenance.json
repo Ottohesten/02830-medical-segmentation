@@ -1,0 +1,8 @@
+{
+  "scores_sha256": "2e40f88ea65fde5bd32c2833c361d3ba78acf6678a04a6ef45bd615f0efaae0e",
+  "lock_sha256": "a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84",
+  "input_inventory_sha256": "c707b906bbc7da5c3cccb0e51bad36ae46a05d2cc8b6bc739885144ab1078314",
+  "label_voxels_read": false,
+  "n_cases": 100,
+  "saved_at": "2026-11-04T17:52:13+01:00"
+}

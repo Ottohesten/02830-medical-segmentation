@@ -1,0 +1,10 @@
+{
+  "stage": "evaluate",
+  "exit_code": 0,
+  "seconds": 168.11277877099928,
+  "peak_resident_bytes": 2744385536,
+  "user_cpu_seconds": 160.756832,
+  "system_cpu_seconds": 5.369554,
+  "measurement": "Linux RUSAGE_SELF around the unchanged frozen CLI via runpy",
+  "max_wall_seconds": 1800
+}

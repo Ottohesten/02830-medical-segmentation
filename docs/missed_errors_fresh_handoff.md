@@ -1,25 +1,31 @@
-# Fresh ranking test: coordination draft and input handoff
+# Fresh ranking test: confirmed coordination and input handoff
 
-**Draft only — not sent by the assistant.** On 2026-11-03 Otto relayed Bjørn's instruction to use Frederik's
+**Coordination complete — confirmed by Bjørn via Otto on 2026-11-04.** No direct group message was sent by
+the assistant. On 2026-11-03 Otto relayed Bjørn's instruction to use Frederik's
 `g3_pool.zip` and pool config; maps are now local. Source metadata and current gaps are recorded in
 `results/kits_missed_fresh/handoff_sources.json`. Otto approved the download and all 100 CTs/labels are now
 local. `results/kits_missed_fresh/handoff_inputs.csv` contains their paths and the four required model maps;
 byte/presence verification passed. On 2026-11-04 the two checkpoint files supplied by Frederik were
-verified byte-identical to the locked references. Pool-run linkage/coordination and header/runtime preflight remain pending.
+verified byte-identical to the locked references. Bjørn subsequently confirmed original pool-model
+provenance, no previous joint ranking test and review of the exact locked check. Header/runtime preflight passed.
 The scientific recipe is [locked separately](missed_errors_fresh_protocol.md); input paths are logistics.
 
-## Remaining confirmations before preflight
+## Confirmed source handoff
 
 The November 3 follow-up audit verifies that the model, uncertainty and plausibility settings in
 `configs/g3_pool.yaml` equal kits100's settings, all 600 required input paths exist, and the 20 scientific
 fingerprints are unchanged. This checks the intended setup; it does not establish which weights produced
 the shared maps. Latest upstream preparation metadata still contains no checkpoint hashes.
 
-Three facts remain pending in the current `results/kits_missed_fresh/preflight.json`:
+Before execution, Otto relayed Bjørn's explicit confirmation of all three facts on 2026-11-04:
 
-- Bjørn was informed of the exact frozen combination and its joint test.
-- Frederik confirms the archive contains the original baseline predictions used for this pool.
-- These two ranking comparisons have not already been evaluated on the pool.
+- Bjørn has seen and approved the exact frozen `g1_missing_hull_mean` check.
+- Frederik's pool archive uses the original 3 mm/6 mm models via `configs/g3_pool.yaml`, not fine-tuned G3 models.
+- The joint ranking test had not yet run on the pool.
+
+`results/kits_missed_fresh/coordination_confirmation.json` records the project-lead attestation and
+its receipt via Otto. Original message time was not supplied, and no direct Frederik reply is claimed.
+The handoff fields preserve these distinctions rather than inventing dates or communications.
 
 The supplied files passed SHA-256 comparison on 2026-11-04:
 
@@ -29,11 +35,11 @@ The supplied files passed SHA-256 comparison on 2026-11-04:
 | 6 mm | `models/g3_pool_source_6mm/6mm_checkpoint_final.pth` | Byte-identical to locked task 298 reference |
 
 `results/kits_missed_fresh/source_checkpoint_verification.json` contains file sizes, hashes, timings and
-machine details. This establishes the identity of the supplied files; confirmation that they produced
-the shared pool maps is still needed. No more checkpoint upload or hash calculation is currently needed.
+machine details. The supplied-file identity and Bjørn's separate pool-provenance confirmation resolve
+the model handoff. No more checkpoint upload or hash calculation is currently needed.
 
-Otto can relay the short request below. The assistant has not sent it. Use actual reply dates/evidence;
-do not replace missing confirmations with the config declaration or a branch push.
+The earlier coordination request is resolved. Preserve the recorded source evidence and verification
+alongside the one joint outcome stage.
 
 For reference, these PowerShell commands reproduce the hash check from the original repository root
 (adjust the model root if installed elsewhere). The current comparison is already complete:
@@ -50,36 +56,27 @@ Locked reference hashes, now also verified on the supplied files:
 | 3 mm / task 297 / fold 0 | `1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac` |
 | 6 mm / task 298 / fold 0 | `3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270` |
 
-An explicitly pending handoff is prepared at `data/handoffs/kits_missed_fresh.pending.json` (ignored by Git).
+The completed private handoff is at `data/handoffs/kits_missed_fresh.pending.json` (ignored by Git; the
+filename is retained from preparation).
 Its checkpoint-hash field now contains the computed hashes of the supplied files, with verification
-evidence linked. The three outstanding confirmation fields remain null. The CT/model path manifest and
-source metadata are linked. Fill only the remaining facts supplied by the group, then run:
+evidence linked. Coordination fields now contain Bjørn's confirmation via Otto with explicit source/date
+qualifications. The CT/model path manifest and source metadata are linked. Preflight was run with:
 
 ```bash
 uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage preflight --handoff data/handoffs/kits_missed_fresh.pending.json
 ```
 
-While confirmations are missing, this must remain `ready: false` without opening fresh headers. Once
-complete, preflight checks shapes/affines, probability representation and file hashes. Project full score
-and evaluation runtimes before using arrays; ask Otto before any projected stage above 30 minutes.
+Preflight passed all 100 cases / 600 files: canonical CT/GT shape/affine, model-map grids, probability
+representation and input hashes. Its **ready: true** result is in `preflight.json` with `input_inventory.csv`.
+It pins the private handoff, input manifest and source metadata; preserve them through scoring/evaluation.
 
-Suggested message:
+## Execution status
 
-> I have frozen one missed-errors candidate: mean suspicion ranks of locked G1, missing-side score and
-> convex-hull deficit. Its development result is weak (+0.030 review-AUC, CI includes zero; no top-20
-> count gain and worse quality at 20). I will report these limitations.
->
-> Please keep its test together with the already locked `far_disagree_per_volume` comparison, so the G3
-> pool's ranking outcomes are opened once. The pool is the fixed next 100 seed-42 cases after kits100;
-> `results/kits_missed_fresh/cohort.csv` lists the exact IDs. The two prior G3 smoke-test cases remain included.
->
-> Frederik: the shared 3 mm/6 mm maps and downloaded CTs/labels are now local, with a 100-case path manifest.
-> The two checkpoint files you supplied match our locked references. Please confirm they were used to
-> generate the shared pool maps, that these are the same pool IDs,
-> and that no ranking metrics for these comparisons have already been evaluated. No new inference is needed.
->
-> Bjørn: the exact protocol/config and checkpoint hashes are on draft PR #2. Let us coordinate the single
-> joint evaluation by November 18. I have not opened fresh model output or GT.
+Runtime projection (`runtime_projection.json`), with safety factor 2: **25.19 min** scoring, **4.92 min**
+evaluation. Both were below the per-stage 30-minute cap. The **joint test is complete**: all 100 GT-free
+scores were frozen before GT (713.23 s scoring), followed by one outcome stage (168.11 s) for both questions.
+Neither candidate meets the primary improvement criterion. See `results/kits_missed_fresh/fresh_summary.md`
+and `fresh_verification.json` for all results, secondary findings and the aggregate-only audit.
 
 ## Input manifest
 
@@ -99,6 +96,6 @@ for actual coordination evidence and the input/inference-metadata locations. Cop
 Its reference hashes alone do not confirm provenance or notification. Do not fill dates/confirmations
 unless the communication happened. The runner refuses fresh inputs while these facts are pending.
 
-Once paths/coordination are available, follow README's preflight/score/evaluate stages. First check the
-runtime projection; ask Otto before downloads or a projected stage above 30 minutes. The outcome stage
-must contain both predeclared comparisons, with no new candidate selection.
+Use the saved tables for the report. The retained `evaluation_started.json` records the one outcome
+opening and guards against a repeated fresh evaluation. Next work is the step 6 figure/summary, using
+the saved aggregate outputs.

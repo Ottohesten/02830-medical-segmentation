@@ -1,0 +1,50 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collected 229 items
+
+tests/test_disagreement_scores.py .........                              [  3%]
+tests/test_evaluation.py ..............                                  [ 10%]
+tests/test_followup.py .............                                     [ 15%]
+tests/test_fresh_download.py .......                                     [ 18%]
+tests/test_fresh_missed_errors.py ...................                    [ 27%]
+tests/test_heatmap_display.py ............                               [ 32%]
+tests/test_metrics.py .....                                              [ 34%]
+tests/test_missed_checks.py ...............                              [ 41%]
+tests/test_missed_combinations.py .............                          [ 46%]
+tests/test_missed_errors.py ................                             [ 53%]
+tests/test_power.py ..                                                   [ 54%]
+tests/test_robustness_evaluation.py ..........                           [ 58%]
+tests/test_robustness_selection.py ...........                           [ 63%]
+tests/test_robustness_test_run.py .....................                  [ 72%]
+tests/test_robustness_timing.py .........                                [ 76%]
+tests/test_study.py ..........s.ss                                       [ 82%]
+tests/test_study_analysis.py sssss..s...s                                [ 88%]
+tests/test_ui_browser.py ssssss                                          [ 90%]
+tests/test_ui_server.py sssssssssssssss.sssss                            [100%]
+
+=============================== warnings summary ===============================
+tests/test_robustness_evaluation.py::test_mixed_queue_uses_existing_engine_and_tie_fair_top_k
+tests/test_robustness_evaluation.py::test_mixed_queue_uses_existing_engine_and_tie_fair_top_k
+  /home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/src/segreview/evaluation.py:159: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+    r_sv = spearmanr(score, volume).statistic
+
+tests/test_robustness_evaluation.py::test_mixed_queue_uses_existing_engine_and_tie_fair_top_k
+tests/test_robustness_evaluation.py::test_mixed_queue_uses_existing_engine_and_tie_fair_top_k
+  /home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/src/segreview/evaluation.py:160: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+    r_dv = spearmanr(dice, volume).statistic
+
+tests/test_robustness_evaluation.py::test_mixed_queue_uses_existing_engine_and_tie_fair_top_k
+tests/test_robustness_evaluation.py::test_mixed_queue_uses_existing_engine_and_tie_fair_top_k
+  /home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/src/segreview/evaluation.py:240: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+    rho = spearmanr(s, dice)
+
+tests/test_robustness_evaluation.py::test_mixed_queue_uses_existing_engine_and_tie_fair_top_k
+tests/test_robustness_evaluation.py::test_mixed_queue_uses_existing_engine_and_tie_fair_top_k
+  /home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/src/segreview/evaluation.py:158: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+    r_sd = spearmanr(score, dice).statistic
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 193 passed, 36 skipped, 8 warnings in 4.24s ==================
