@@ -1,0 +1,59 @@
+{
+  "checked_at": "2026-11-04T17:29:32+01:00",
+  "client_date": "2026-11-04",
+  "reported_source": "Otto reports these are the 3 mm and 6 mm pth files supplied by Frederik",
+  "checkpoints": {
+    "model_3mm": {
+      "provided_path": "models/g3_pool_source_3mm/3mm_checkpoint_final.pth",
+      "bytes": 164939235,
+      "sha256": "1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac",
+      "reference_path": "models/totalsegmentator/nnunet/results/Dataset297_TotalSegmentator_total_3mm_1559subj/nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres/fold_0/checkpoint_final.pth",
+      "expected_sha256": "1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac",
+      "byte_identical_to_reference": true
+    },
+    "model_6mm": {
+      "provided_path": "models/g3_pool_source_6mm/6mm_checkpoint_final.pth",
+      "bytes": 164951587,
+      "sha256": "3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270",
+      "reference_path": "models/totalsegmentator/nnunet/results/Dataset298_TotalSegmentator_total_6mm_1559subj/nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres/fold_0/checkpoint_final.pth",
+      "expected_sha256": "3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270",
+      "byte_identical_to_reference": true
+    }
+  },
+  "all_match": true,
+  "scientific_lock_sha256": "a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84",
+  "scientific_lock_unchanged": true,
+  "pinned_scientific_files_verified": 20,
+  "method": "Streaming SHA-256 over file bytes; checkpoints were not deserialized or executed",
+  "verification_scope": "Identity of supplied checkpoint files; linkage to pool inference and prior-ranking/notification facts are separate",
+  "fresh_headers_read": false,
+  "fresh_voxel_arrays_read": false,
+  "fresh_scores_or_outcomes_created": false,
+  "execution_device": "cpu",
+  "seed": 42,
+  "seconds": 0.4840731459989911,
+  "machine": {
+    "date": "2026-11-04T17:29:32",
+    "platform": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+    "cpu": "x86_64",
+    "cpu_count": 12,
+    "python": "3.12.15",
+    "torch": "2.2.2+cu121",
+    "numpy": "1.26.4",
+    "cuda": "12.1",
+    "gpu": null,
+    "mps_available": false,
+    "git_commit": "4de7c52de012e52244f7f0c917d83628bdd68d01",
+    "git_uncommitted_changes": false,
+    "os": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+    "cpu_model": "AMD Ryzen 5 7500F 6-Core Processor"
+  },
+  "handoff_updated_at": "2026-11-04T17:30:48+01:00",
+  "verified_checkpoint_hashes_recorded_in_private_handoff": true,
+  "remaining_handoff_issues": [
+    "Missing bjorn_notified_at",
+    "Missing frederik_confirmed_at",
+    "Fresh ranking-metric status not confirmed"
+  ],
+  "ready_for_fresh_header_preflight": false
+}

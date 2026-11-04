@@ -1305,6 +1305,34 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   **`84aaf8a`** and confirmed pushed to `origin/otto/missed-errors`. Updated draft PR #2 and "Where we are"
   with this publication and the four pending group facts. No header/array access or joint test execution.
 
+## 2026-11-04: missed-errors step 5, supplied checkpoint verification
+
+- `[admin]` Read "Where we are", overview and contributing rules. Pull on `otto/missed-errors` was up to
+  date at `4de7c52`; offline locked sync checked 133 packages. Otto reports Frederik supplied the two
+  checkpoint files, now local at `models/g3_pool_source_3mm/3mm_checkpoint_final.pth` and
+  `models/g3_pool_source_6mm/6mm_checkpoint_final.pth`. No model download or inference performed.
+- `[result]` Both supplied checkpoints are **byte-identical by SHA-256 to the locked references**:
+  3 mm/task 297 **164,939,235 bytes**; 6 mm/task 298 **164,951,587 bytes**. Exact paths/hashes and machine
+  in `results/kits_missed_fresh/source_checkpoint_verification.json`. CPU streaming hash verification
+  took **0.48 s**; files were not deserialized or executed. Scientific lock and all 20 pinned files unchanged.
+- `[decision]` Keep the supplied paths/names and locked references. No rename, overwrite, new checkpoint
+  download or inference is needed. Verified file identity resolves the hash item; it does not itself
+  establish that those weights generated the shared pool predictions.
+- `[experiment]` Recorded the computed supplied-file hashes and linked verification in the private pending
+  handoff. Reran the unchanged frozen preflight: **ready: false, 3 remaining issues** (exact-check
+  notification to Bjørn, Frederik confirms baseline archive linkage, no prior joint ranking evaluation).
+  No dates or communications invented. Earlier four-issue preflight preserved in
+  `results/kits_missed_fresh/preflight_history/2026-11-03_pending/`. No fresh NIfTI headers, voxel arrays,
+  scores, Dice or outcome markers opened/created.
+- `[result]` Full suite **193 passed, 36 skipped, 8 existing warnings, 3.84 s**;
+  `results/kits_missed_fresh/checkpoint_tests.txt`. AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python
+  3.12.15, torch 2.2.2+cu121 / CUDA build 12.1, seed 42, no GPU computation. Metadata record baseline
+  `4de7c52`, code/lock hashes, dirty state and machine details.
+- `[admin]` Updated task/decisions/"Where we are", overview, handoff sources and message draft to mark the
+  hash/upload request complete. Remaining action: record the three actual group facts, rerun header
+  preflight and project runtime before the single joint outcome stage. Step 5 remains unchecked. No direct
+  group message sent; model weights remain outside Git.
+
 ## Open questions (update when answered, with the date)
 
 - Does G3 become core in response to Kristine's training question? Which cases to correct for training: top of the

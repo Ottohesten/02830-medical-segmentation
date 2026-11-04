@@ -15,9 +15,11 @@
   },
   "limitations": [
     "Upstream config declares baseline released tasks/fold 0 and no ranking evaluation; declarations are not an independent output provenance audit",
-    "G3 prepare metadata reports dirty source state and does not contain checkpoint hashes",
-    "CT/label download is complete; original-run hashes and coordination confirmations remain pending; no fresh headers or voxel arrays opened"
+    "Upstream prepare metadata has no hashes; the two files now supplied by Frederik match the locked references. Their linkage to pool inference still needs confirmation.",
+    "Inputs and supplied checkpoint identities are verified; exact-check notification, pool-run linkage and prior-ranking status remain pending; no fresh headers or voxel arrays opened"
   ],
   "rechecked_on": "2026-11-03",
-  "current_status_audit": "handoff_provenance_audit.json"
+  "current_status_audit": "handoff_provenance_audit.json",
+  "checkpoint_files_received_on": "2026-11-04",
+  "checkpoint_verification": "source_checkpoint_verification.json"
 }

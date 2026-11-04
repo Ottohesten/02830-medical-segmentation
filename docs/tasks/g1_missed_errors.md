@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
-| **Status** | Steps 1–4 complete; step 5 recipe locked and inputs local (2026-11-03), fresh evaluation pending handoff/preflight |
+| **Status** | Steps 1–4 complete; step 5 checkpoint identities verified (2026-11-04), fresh evaluation pending coordination/preflight |
 | **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
@@ -322,6 +322,19 @@ A few starting ideas (try them, drop them, or find better ones):
     commands and expected hashes for comparison. Otto has been asked for actual group replies; the
     assistant has sent no direct group message. Header checks and runtime projection remain pending.
     Full suite **193 passed, 36 skipped, 8 existing warnings, 3.20 s**; `handoff_tests.txt`.
+  *Received checkpoint verification (2026-11-04):*
+  - Found Frederik's supplied files at `models/g3_pool_source_3mm/3mm_checkpoint_final.pth` and
+    `models/g3_pool_source_6mm/6mm_checkpoint_final.pth`. Both SHA-256 values **exactly match the locked
+    references** (task 297 / 3 mm and task 298 / 6 mm). Checks took **0.48 s**; file bytes only, no model
+    deserialization/execution. `source_checkpoint_verification.json` records the full hashes/paths/machine.
+  - Recorded the computed hashes in the private pending handoff and reran the unchanged preflight.
+    It now lists **3 remaining facts**, with **ready: false**: exact-check notification to Bjørn,
+    Frederik confirms these checkpoints generated the shared pool archive, and no prior joint ranking
+    evaluation. No fresh headers/arrays/scores/outcomes opened. Earlier four-issue preflight preserved in
+    `preflight_history/2026-11-03_pending/`. All 20 scientific fingerprints remain unchanged.
+  - Updated the handoff draft to remove the already completed hash/upload request. Next: record the three
+    actual coordination facts, then run header/probability checks and project runtime. Keep step 5 unchecked.
+    Full suite **193 passed, 36 skipped, 8 existing warnings, 3.84 s**; `checkpoint_tests.txt`.
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
   *Notes:*
 
@@ -408,12 +421,16 @@ A few starting ideas (try them, drop them, or find better ones):
   gate; do not fill missing dates/hash confirmations from local reference values. The private handoff now
   separates expected hashes from its still-null confirmed hashes. No scientific amendment or new inference.
 
+- **2026-11-04 — Preserve received checkpoint paths and reference files.** The supplied names/locations are
+  unambiguous and both files match the locked references. No move, overwrite, new model download or inference
+  is needed. Record byte identity separately from confirmation that those weights produced the shared pool maps.
+
 ## 7. Where we are
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
 
-- **2026-11-03 — Last fully finished step: 4. Step 5 scientific lock/preparation is complete; its fresh
+- **2026-11-04 — Last fully finished step: 4. Step 5 scientific lock/preparation is complete; its fresh
   evaluation is not.** Recipe/code, next 100 IDs and baseline checkpoint hashes are pinned in
   `results/kits_missed_fresh/lock.json`; protocol and tested runner are ready. No fresh model/label arrays,
   scores, ranking metrics or outcome marker have been opened/created. Prior G3 smoke exposure is disclosed.
@@ -422,19 +439,20 @@ and ideas for what could make the result better.)*
   all 100 CTs and 100 labels are now local at `data/raw/kits23/{images,segmentations}/` after Otto's approved
   download. Exact plan coverage and 200 byte fingerprints verified; `download_verification.json`.
   `handoff_inputs.csv` lists the 100 cases and existing paths. Bjørn's reuse/config/lock instruction
-  was relayed by Otto; source config and G3 preparation-machine metadata are retrieved. Run-specific weight
-  hashes are absent from that metadata; do not fabricate confirmation.
+  was relayed by Otto; source config and G3 preparation-machine metadata are retrieved. Both checkpoint files
+  now supplied by Frederik match the locked reference hashes (`source_checkpoint_verification.json`).
+  Confirmation that they generated the shared pool maps remains pending.
   Follow-up confirms all three relevant config sections equal kits100 and all 20 scientific fingerprints
   match. Preflight was run with an honest pending handoff and remains **ready: false**, before header access.
-- **Next concrete action:** Otto supplies actual group replies for the four issues in `preflight.json`:
+- **Next concrete action:** Otto supplies actual group replies for the three issues in `preflight.json`:
   Bjørn informed of the exact check, Frederik confirms baseline archive provenance, no prior joint ranking
-  evaluation, and the original-run checkpoint hashes. Hash commands/message draft are in
+  evaluation. The checkpoint hashes have already been computed and recorded. The updated message draft is in
   [the handoff guide](../missed_errors_fresh_handoff.md). Fill `data/handoffs/kits_missed_fresh.pending.json`
   with only confirmed facts, then rerun preflight, verify headers/hashes and project full runtime.
   The path manifest is ready; no more CT/label transfer or inference is needed for the frozen cohort.
   Ask before downloads or any projected >30-minute stage. Then freeze all GT-free scores and run both
   questions together in one outcome stage by 2026-11-18. Keep step 5 unchecked until real results exist.
-- **Practical improvements:** (1) use the ready two-command hash request and single handoff to finish
+- **Practical improvements:** (1) use the short updated confirmation request and existing handoff to finish
   provenance without extra data transfer; (2) preserve the prespecified quality-at-20/displaced-error
   outputs so an apparent AUC gain cannot hide a worse practical budget. No weights/criteria changes planned.
 - **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
@@ -449,3 +467,5 @@ and ideas for what could make the result better.)*
   No direct message to Bjørn/Frederik has been sent.
   The source-handoff comparison/pending preflight and updated guide are committed as **`84aaf8a`** and
   confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records the four pending confirmations.
+  The November 4 checkpoint verification/three-issue preflight and updated guide are ready for commit/push;
+  record confirmed publication before ending the session.

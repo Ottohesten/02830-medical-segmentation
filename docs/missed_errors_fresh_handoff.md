@@ -4,7 +4,8 @@
 `g3_pool.zip` and pool config; maps are now local. Source metadata and current gaps are recorded in
 `results/kits_missed_fresh/handoff_sources.json`. Otto approved the download and all 100 CTs/labels are now
 local. `results/kits_missed_fresh/handoff_inputs.csv` contains their paths and the four required model maps;
-byte/presence verification passed. Source provenance/coordination fields and header/runtime preflight remain pending.
+byte/presence verification passed. On 2026-11-04 the two checkpoint files supplied by Frederik were
+verified byte-identical to the locked references. Pool-run linkage/coordination and header/runtime preflight remain pending.
 The scientific recipe is [locked separately](missed_errors_fresh_protocol.md); input paths are logistics.
 
 ## Remaining confirmations before preflight
@@ -14,26 +15,35 @@ The November 3 follow-up audit verifies that the model, uncertainty and plausibi
 fingerprints are unchanged. This checks the intended setup; it does not establish which weights produced
 the shared maps. Latest upstream preparation metadata still contains no checkpoint hashes.
 
-Four facts are pending in `results/kits_missed_fresh/handoff_provenance_audit.json`:
+Three facts remain pending in the current `results/kits_missed_fresh/preflight.json`:
 
 - Bjørn was informed of the exact frozen combination and its joint test.
 - Frederik confirms the archive contains the original baseline predictions used for this pool.
 - These two ranking comparisons have not already been evaluated on the pool.
-- The two checkpoint hashes from that original run match the locked reference hashes.
+
+The supplied files passed SHA-256 comparison on 2026-11-04:
+
+| Supplied model | Local path | Result |
+|---|---|---|
+| 3 mm | `models/g3_pool_source_3mm/3mm_checkpoint_final.pth` | Byte-identical to locked task 297 reference |
+| 6 mm | `models/g3_pool_source_6mm/6mm_checkpoint_final.pth` | Byte-identical to locked task 298 reference |
+
+`results/kits_missed_fresh/source_checkpoint_verification.json` contains file sizes, hashes, timings and
+machine details. This establishes the identity of the supplied files; confirmation that they produced
+the shared pool maps is still needed. No more checkpoint upload or hash calculation is currently needed.
 
 Otto can relay the short request below. The assistant has not sent it. Use actual reply dates/evidence;
 do not replace missing confirmations with the config declaration or a branch push.
 
-Frederik can compute hashes from his repository root in PowerShell (adjust the model root if installed
-elsewhere). Hash the original files used to make `g3_pool.zip`, with their provenance, rather than a
-fine-tuned copy or replacement downloaded later:
+For reference, these PowerShell commands reproduce the hash check from the original repository root
+(adjust the model root if installed elsewhere). The current comparison is already complete:
 
 ```powershell
 Get-FileHash -Algorithm SHA256 -LiteralPath "models\totalsegmentator\nnunet\results\Dataset297_TotalSegmentator_total_3mm_1559subj\nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres\fold_0\checkpoint_final.pth"
 Get-FileHash -Algorithm SHA256 -LiteralPath "models\totalsegmentator\nnunet\results\Dataset298_TotalSegmentator_total_6mm_1559subj\nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres\fold_0\checkpoint_final.pth"
 ```
 
-Expected hashes, **for comparison only**:
+Locked reference hashes, now also verified on the supplied files:
 
 | Original model | SHA-256 |
 |---|---|
@@ -41,8 +51,9 @@ Expected hashes, **for comparison only**:
 | 6 mm / task 298 / fold 0 | `3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270` |
 
 An explicitly pending handoff is prepared at `data/handoffs/kits_missed_fresh.pending.json` (ignored by Git).
-Its confirmed-hash field is null; expected reference hashes are stored separately. The CT/model path
-manifest and source metadata are already linked. Fill only facts supplied by the group, then run:
+Its checkpoint-hash field now contains the computed hashes of the supplied files, with verification
+evidence linked. The three outstanding confirmation fields remain null. The CT/model path manifest and
+source metadata are linked. Fill only the remaining facts supplied by the group, then run:
 
 ```bash
 uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage preflight --handoff data/handoffs/kits_missed_fresh.pending.json
@@ -63,17 +74,17 @@ Suggested message:
 > `results/kits_missed_fresh/cohort.csv` lists the exact IDs. The two prior G3 smoke-test cases remain included.
 >
 > Frederik: the shared 3 mm/6 mm maps and downloaded CTs/labels are now local, with a 100-case path manifest.
-> Please supply the original inference provenance/checkpoint hashes and confirm the baseline models were used
-> (not fine-tuned weights), that these are the same pool IDs,
+> The two checkpoint files you supplied match our locked references. Please confirm they were used to
+> generate the shared pool maps, that these are the same pool IDs,
 > and that no ranking metrics for these comparisons have already been evaluated. No new inference is needed.
 >
 > Bjørn: the exact protocol/config and checkpoint hashes are on draft PR #2. Let us coordinate the single
 > joint evaluation by November 18. I have not opened fresh model output or GT.
 
-## Files to provide
+## Input manifest
 
-The assistant can build the manifest from the shared folder paths when they are known. No one needs to
-manually enter per-case scores or inspect labels. Expected columns:
+`results/kits_missed_fresh/handoff_inputs.csv` already lists all 100 cases with existing paths. No one needs
+to enter per-case scores or inspect labels. Its columns are:
 
 ```text
 case_id,ct,label,mask,prob,m2_mask,m2_prob

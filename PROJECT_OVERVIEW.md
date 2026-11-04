@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-11-03 (all fresh-pool inputs local; source handoff/preflight pending).*
+*Last updated: 2026-11-04 (supplied 3 mm/6 mm checkpoints match; coordination/preflight pending).*
 
 | | |
 |---|---|
@@ -93,7 +93,9 @@ The usual trick (ask several copies of the same model) is impossible because onl
   and 200 byte fingerprints verified). `results/kits_missed_fresh/download_verification.json` and
   `handoff_inputs.csv` document the completed transfer/paths. Source handoff/provenance and header/runtime
   preflight still need completion. Declared model/uncertainty/plausibility settings match kits100;
-  preflight remains pending four real group confirmations, including original-run checkpoint hashes.
+  Frederik's supplied 3 mm/6 mm checkpoint files now match the locked reference hashes exactly
+  (`source_checkpoint_verification.json`). Preflight remains pending three group facts: exact-check
+  notification, linkage of these weights to the pool archive, and no prior joint ranking evaluation.
   No fresh headers, arrays or ranking outcomes have been opened.
   Full development comparison:
   `results/kits_missed_combinations/exploratory_combination_summary.md`.
