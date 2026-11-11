@@ -74,3 +74,21 @@ and pushes. Coordinate only where work touches shared code, shared data or someo
   group can explain the code at the exam.
 - New code comes with tests in `tests/` (small synthetic examples are fine).
 - Update [README.md](README.md) when you add a script or change how something is run.
+
+## 7. Report notes
+
+Nobody writes report text in the repository. Each group member has one file in
+[docs/report_notes/](docs/report_notes/README.md) (Bjørn, Otto, Rasmus, Frederik) and collects there what their part
+of the project found: what was done, the results with intervals and file paths, what they mean and do not show,
+limitations, decisions and rejected alternatives, what went wrong, candidate figures, the three most important
+points, and the owner's own contribution. The headings are in each file; the rules are in the folder's README.
+
+- **The report is written from the four files together** and split into chapters. Each chapter gets an owner, who
+  checks it against the notes and the result files and is responsible for it, also at the exam.
+- **Whoever works on a part (with or without an assistant) keeps that part's file up to date:** when a step gives a
+  result or a decision, add it to the report notes in the same work session, next to the log entry and the task
+  document.
+- **Write only in your own file**, on your own branch, after getting `main` into it (`git merge main`). Then there
+  are no merge conflicts.
+- **Distill, do not copy the log.** The log has every number; the notes say what matters and why.
+- **Dates:** every file complete by 2026-11-20 for the work done by then; afterwards updated when new results arrive.

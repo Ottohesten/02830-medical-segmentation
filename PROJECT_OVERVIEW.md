@@ -101,6 +101,7 @@ trained, so there is no result yet.
 | **Dated log of everything tried, measured, decided or dropped** | [PROJECT_LOG.md](PROJECT_LOG.md) |
 | How to install and run each part | [README.md](README.md) |
 | Working rules (git, locked results, logging) | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| **Report notes: one file per group member; the report is written from them** | [docs/report_notes/](docs/report_notes/README.md) (complete by 2026-11-20, then kept up to date) |
 | Configurations (one per environment, one per dataset) | `configs/`, `configs/datasets/` |
 | Shared code | `src/segreview/` (inference, uncertainty, evaluation, heatmaps, plausibility, UI server, study analysis) |
 | Runnable steps | `scripts/` (`run_g1.py` runs all of G1; `run_ui.py` starts the interface; `analyze_study.py` after the study) |
@@ -132,6 +133,9 @@ The full working rules (git, branches, locked results, new experiments, what to 
 - Code, comments, docs and the report in English (American spelling).
 - **Log as you go:** every result, experiment, idea and decision gets a dated entry in [PROJECT_LOG.md](PROJECT_LOG.md),
   also when it is dropped (with the reason).
+- **Report notes instead of report text:** nobody writes report text in the repository. Each of us collects what
+  our part found in our own file in [docs/report_notes/](docs/report_notes/README.md); the report is written from
+  the four files (CONTRIBUTING.md, section 7).
 
 ## 5. Timeline
 
