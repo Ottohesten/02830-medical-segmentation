@@ -153,6 +153,94 @@ Sizes follow the ACM two-column template (3.33 in / 7 in), PDF with embedded fon
 
 ### Exploratory follow-up analyses (after the G1 lock)
 
+Otto's missed-errors inspection uses an independent config and only reads the saved kits100 inputs:
+
+```bash
+uv run python scripts/inspect_missed_errors.py --config configs/kits_missed_errors.yaml --stage queue
+uv run python scripts/inspect_missed_errors.py --config configs/kits_missed_errors.yaml --stage images
+```
+
+This pools all 100 cases as exploratory development data. It lists Dice < 0.83 cases outside the first 20%
+of the locked-score queue, then saves per-label error diagnostics and axial/coronal CT, mask, probability and
+entropy views in `results/kits_missed_errors/`. Ties use ascending case ID; GT selects diagnostic views only.
+Use `--case case_00236` with `--stage images` to time/inspect one missed case first. No inference or fresh-pool
+evaluation is performed. The original `show_case.py` binds input/output experiment names together; the isolated
+inspection script supports read-only kits100 inputs and separate outputs without changing shared code.
+CT-derived montages are local artifacts excluded from Git. Run the `--stage images` command above to recreate
+them from the shared inputs; the committed review guide links to these local images.
+
+Standalone size/shape checks (missed-errors step 3) have their own config and result folder:
+
+```bash
+uv run python scripts/check_missed_errors.py --config configs/kits_missed_checks.yaml --stage benchmark
+uv run python scripts/check_missed_errors.py --config configs/kits_missed_checks.yaml --stage features
+uv run python scripts/check_missed_errors.py --config configs/kits_missed_checks.yaml --stage evaluate
+```
+
+The benchmark projects stage runtimes before the full run. The feature stage reads saved binary masks and
+GT-free source table columns; it uses no CT, label maps or Dice. The evaluation stage then attaches saved Dice,
+reuses both G1 bad rules/paired bootstrap, and reports fair top-20% finds, false alarms and ranks for the four
+original misses in `results/kits_missed_checks/`. Binary ties count by expected inclusion, not file order.
+No combinations, fresh scans, shared-code changes or inference. Shape uses large connected components as
+kidney proxies; digital compactness can depend on voxel geometry and normal kidneys are naturally concave.
+
+Rank combinations (missed-errors step 4) reuse only committed aggregate tables, so no local scan files are needed:
+
+```bash
+uv run python scripts/combine_missed_errors.py --config configs/kits_missed_combinations.yaml --stage benchmark
+uv run python scripts/combine_missed_errors.py --config configs/kits_missed_combinations.yaml --stage evaluate
+```
+
+The config fixes six mean/max-rank alternatives and a development recommendation rule before evaluation.
+The script reuses the G1 combiner, preserves exact score ties, saves scores before attaching Dice, and reports
+both gained and displaced cases at the unchanged 20% budget. Results: `results/kits_missed_combinations/`.
+This does not lock or run the fresh-pool test. Completed inspection/standalone outputs remain unchanged.
+
+The prospective joint test (missed-errors step 5) has its own [protocol](docs/missed_errors_fresh_protocol.md):
+
+```bash
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage freeze
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage benchmark
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage preflight --handoff /path/to/handoff.json
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage score
+uv run python scripts/fresh_missed_errors.py --config configs/kits_missed_fresh.yaml --stage evaluate
+```
+
+Freeze pins the deterministic next-100 cohort, recipe, code and original checkpoint hashes. Benchmark uses
+old kits100 development cases and synthetic metrics only. Preflight without `--handoff` records pending
+coordination without opening fresh headers or voxels. Real group coordination and baseline provenance are
+required before using the fresh inputs. `handoff_template.json` and the protocol describe the CSV/metadata
+needed from Frederik. Source arrays remain outside Git. No inference or download is performed by this script.
+
+Fresh scores are written before GT; an exclusive outcome marker prevents silent reopening. The combination
+and the already locked far score are evaluated together once. Keep completed results and log any technical
+failure/recovery without changing the scientific choices. Ask before downloads or projected stages >30 min.
+
+`configs/g3_pool.yaml` is copied unchanged from Frederik's `frederik/g3` branch. It selects positions
+101–200 with `dataset.offset: 100`. The older shared data selector on **this branch ignores offset**;
+therefore do not use `download_data.py --config configs/g3_pool.yaml` here. Use the isolated logistics helper:
+
+```bash
+uv run python scripts/prepare_fresh_download.py --config configs/kits_missed_fresh.yaml --pool-config configs/g3_pool.yaml --stage plan
+# Only after Otto approves the download:
+uv run python scripts/prepare_fresh_download.py --config configs/kits_missed_fresh.yaml --pool-config configs/g3_pool.yaml --stage download
+```
+
+Planning is offline and writes `results/kits_missed_fresh/download_plan.csv`. It verifies exact agreement
+with the frozen cohort before listing CT/label URLs. Download executes that reviewed plan, skips existing
+files, never rewrites the source case list, and stops between files at the configured 30-minute cap.
+It performs no inference, score calculation or GT evaluation. Shared source and the scientific lock stay unchanged.
+
+The completed fresh test's report figure uses only verified aggregate tables (no local scans or weights needed):
+
+```bash
+uv run python scripts/plot_missed_fresh.py --config configs/kits_missed_fresh.yaml
+```
+
+It verifies the saved outcome/input hashes and selects the two locked primary comparisons rather than
+choosing a method from its results. The PDF/PNG, source values, caption, eight-line summary and five-minute
+presentation notes are in `results/kits_missed_fresh/report/`. Plotting does not rerun ranking evaluation.
+
 Questions from the supervisor meeting of 2026-10-07, asked after the G1 choices were locked, so they are
 **exploratory** and report the dev and test sets separately. Both scripts only read saved predictions (no inference)
 and never change the locked G1 files. Settings: `exploratory:` in `configs/kits100.yaml`.

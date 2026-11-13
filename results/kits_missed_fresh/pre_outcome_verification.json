@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "verified_at": "2026-11-04T17:52:47+01:00",
+  "cases": 100,
+  "scores_sha256": "2e40f88ea65fde5bd32c2833c361d3ba78acf6678a04a6ef45bd615f0efaae0e",
+  "scores_have_no_GT_columns": true,
+  "score_provenance_says_GT_unread": true,
+  "independent_mean_rank_formula_matches": true,
+  "scientific_lock_unchanged": true,
+  "outcome_stage_not_started": true,
+  "raw_GT_arrays_read_by_verification": false
+}

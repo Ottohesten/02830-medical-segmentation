@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-21 (robustness step 6 complete; report figure/summary ready; group presentation next).*
+*Last updated: 2026-11-04 (missed-errors fresh test and report materials complete; group presentation pending).*
 
 | | |
 |---|---|
@@ -74,6 +74,34 @@ The usual trick (ask several copies of the same model) is impossible because onl
   with a limitation in detecting the degradation itself; it does not establish general domain-shift robustness.
   Full dev/test, both-model, both-rule results: `results/kits_robustness_eval/`. The report figure (PDF/PNG),
   caption, and eight-line summary are ready in `results/kits_robustness_eval/report/`; group presentation is next.
+
+- Confident-error follow-up (Otto, 2026-11-04): steps 1–5 are complete on `otto/missed-errors`. In a pooled
+  exploratory queue of all 100 kits100 cases, 4/15 cases below Dice 0.83 lie outside the first 20:
+  case_00236, case_00406, case_00040 and case_00184. Multiple-slice review shows a missed pelvic kidney and
+  shared tumor/cyst omissions. Among missed voxels, 59.6–89.1% have saved p <= 0.10 across these cases.
+  Review, diagnostics and evidence: `results/kits_missed_errors/exploratory_review.md` and
+  `exploratory_inspection_summary.json`. Standalone checks now tested on all 100: hull deficit moves
+  case_00236 from rank 23 to 9, but finds 9 bad cases / 11 false alarms in its first 20 versus G1's 11 / 9.
+  The existing missing-side flag catches the pelvic case and flags two nonbad cases. Six combinations now
+  tested: the predeclared rule selects mean ranks of G1 + missing-side + hull provisionally. Threshold
+  review-AUC **0.847 vs. 0.817**, paired difference **+0.030 [-0.032, 0.086]**, with no top-20 count gain
+  (11/15 each) and worse simulated quality after 20 corrections. It promotes one original miss but displaces
+  a more severe bad case. No established superiority. The fresh recipe, 100 next-draw IDs and baseline
+  checkpoint hashes are now locked (`docs/missed_errors_fresh_protocol.md`, `results/kits_missed_fresh/`).
+  The once-only fresh test is now complete on the next 100 seeded cases, after Bjørn's explicit coordination
+  confirmation and baseline checkpoint/input verification. **10 cases below Dice 0.83**; G1 review-AUC
+  **0.921**, selected combination **0.907**, paired difference **-0.014 [-0.090, 0.043]**; locked far score
+  **0.936**, difference **+0.015 [-0.010, 0.050]**. Neither meets the primary improvement criterion.
+  First 20 capture **9 / 9 / 10 bad cases**, respectively. The combination swaps one bad case for another;
+  its small positive secondary quality-AUC signal (difference **+0.001075 [0.000079, 0.001878]**, unadjusted)
+  does not replace the primary criterion. Both bad rules identify the same 10 cases here.
+  Full fresh results/verification: `results/kits_missed_fresh/{fresh_summary.md,fresh_verification.json}`.
+  All scores were frozen before GT, both questions ran together once, and locked G1 outputs remain unchanged.
+  Step 6 figure/short summary and five-minute speaking notes are ready in
+  `results/kits_missed_fresh/report/`; actual group presentation is pending. Preserve the fresh results without retuning.
+  Full development comparison:
+  `results/kits_missed_combinations/exploratory_combination_summary.md`.
+  Task/working notes: [g1_missed_errors.md](docs/tasks/g1_missed_errors.md).
 
 ### G2 — interface and user study
 
@@ -148,12 +176,13 @@ The full working rules (git, branches, locked results, new experiments, what to 
 | 2026-12-02 | Report hand-in (ACM two-column, max 5 pages for 4 people, plus contribution appendix and declaration of generative-AI use) |
 | 2026-12-18 | Defense |
 
-## 6. Next steps (2026-10-20)
+## 6. Next steps (updated 2026-11-02)
 
 1. Send Kristine the three follow-up results (6 mm alone, where 3 mm and 6 mm differ, simulated voxel correction;
    see the log of 2026-10-19) and decide with the group what goes into the report (as exploratory results).
-2. Decide with the group which disagreement score (if any) to test once on the G3 pool: the pre-registered choice
-   (`far_6mm_drops_ml`) or a different one, logged with date and reason before the pool is opened (log 2026-10-20).
+2. The 2026-10-21 log locks `far_disagree_per_volume` for one fresh G3-pool evaluation against the locked G1
+   score. Otto develops confident-error checks on kits100, locks one or two before that joint evaluation,
+   tells Bjørn, and coordinates prediction reuse with Frederik. Open the pool once, latest 2026-11-18.
 3. Everyone installs the project and tries the demo (`README.md` → Quick start).
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
 5. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.

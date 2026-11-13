@@ -1,0 +1,24 @@
+Missed-errors step 1: setup and test command/result record (2026-11-02).
+This is a summary of captured terminal results, not a full pytest transcript.
+
+Command: git pull --ff-only
+Result: Already up to date. Baseline commit: 0fe9216da97a3ed0fd6ad6bd57c7cc1a36a8a508.
+
+Command: git switch -c otto/missed-errors
+Result: Switched to a new branch 'otto/missed-errors'.
+
+Command: UV_CACHE_DIR=/tmp/otto-missed-errors-uv-cache uv sync --locked --offline
+Output:
+Resolved 133 packages in 2ms
+Checked 133 packages in 1ms
+
+Command: UV_CACHE_DIR=/tmp/otto-missed-errors-uv-cache uv run --locked --offline pytest
+Captured result:
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0
+collected 159 items
+123 passed, 36 skipped, 8 warnings in 3.32s
+
+Skip conditions in existing tests: prepared study is absent, or Google Chrome is not installed.
+Warnings: ConstantInputWarning from tiny synthetic robustness-evaluation correlation tests.
+Machine and source hashes: setup_machine.json.
+No new pipeline code or tests were added in this setup step.

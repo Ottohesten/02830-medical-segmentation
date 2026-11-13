@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-02T04:48:42+01:00",
+  "platform": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "cpu": "x86_64",
+  "cpu_count": 12,
+  "python": "3.12.15",
+  "torch": "2.2.2+cu121",
+  "numpy": "1.26.4",
+  "cuda": "12.1",
+  "gpu": null,
+  "mps_available": false,
+  "git_commit": "a9bf46b682c56c8f3ebe1fef6f60c3335ec2e0a0",
+  "git_uncommitted_changes": true,
+  "os": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "execution_device": "cpu",
+  "seed": 42,
+  "threads": 6,
+  "stage": "benchmark",
+  "seconds": 42.54369859399958,
+  "scientific_lock_sha256": "7e01121c93096f7f8d1a214586ec213198d48ae5d6f64199705e16a20ec892f9",
+  "fresh_label_voxels_read": false,
+  "cpu_model": "AMD Ryzen 5 7500F 6-Core Processor"
+}

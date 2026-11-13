@@ -1,0 +1,39 @@
+{
+  "created_at": "2026-11-02T04:46:58+01:00",
+  "state_at_lock": "scientific recipe frozen; coordination/data may still be pending",
+  "config": "configs/kits_missed_fresh.yaml",
+  "seed": 42,
+  "n_cases": 100,
+  "kits100_overlap": 0,
+  "cohort_sha256": "53bd4caeee140917dd2449b9cb7aea950c2470b5463e8c1454d4e96dfc3db458",
+  "scientific_hashes": {
+    "configs/kits_missed_fresh.yaml": "71039b06673efcc487445ef10f07777c1ae8c59e2818f32380ba57b176333f81",
+    "docs/missed_errors_fresh_protocol.md": "e876b4a57aaa412f2467b37cd678e0e67d811663ee8d14033a3bc11a1ae38e63",
+    "configs/kits100.yaml": "e95284456a6fb9624d2727051b6bdd407aa511a8bf80836c9b39160b2c06d71b",
+    "data/raw/kits23/case_list.txt": "c1b62b4d9043cdfc87fd48a6d1c9e89b83295bc5224bb6b1eadb95ef73fcfca5",
+    "scripts/fresh_missed_errors.py": "82470746690a1417682fef299f640aba2c226ae24541d9adca230bc8bb3a2240",
+    "scripts/check_missed_errors.py": "c5a18cfa2fff4c00e1660c6b5bbf9e019a81daaf1cc4bfd8c1b8c0a7f765a2d3",
+    "scripts/combine_missed_errors.py": "f8550eb86da2414d4206f7bdd7c119ab32c5374175a473ead4eef7a03a601fb1",
+    "src/segreview/config.py": "16fe0fef41f659e9f6ea21ef33e933e6aed35c7bbee8dcac34fa7b71ac9c08b3",
+    "src/segreview/data.py": "ab5768d57fb36e7de26109408c47c4bfa486c1ae8339acf85eb277f51b1ea227",
+    "src/segreview/io.py": "b877b164d818c5d9add29e2aa452177f56e6a2a2f029e57b737a62bfe11beb81",
+    "src/segreview/uncertainty.py": "52ad830dc30f5b4ded3ca8fb74541c4dbc58964663a9efbbc64e72a6816bc637",
+    "src/segreview/plausibility.py": "33fc5cb86f8126db61242801147997b1191b489ada1553a429612798ff48a15c",
+    "src/segreview/model_comparison.py": "c0adea95d4e143b61bad4b22d5bae418268b922f60b176628af126b7bf09b6fd",
+    "src/segreview/disagreement_scores.py": "4e30f780e178942da5de054b08d12183711752d9d224f47875406ae1ebb68987",
+    "src/segreview/evaluation.py": "e5ed44abfb5330093c514a802348196ca47da8ae9c4e234cf9dce7abb554197e",
+    "src/segreview/metrics.py": "86c4a2b00cd4953ae3bf75890888a5c8bae51bffdfe0e0337e6a5df5a4516bec",
+    "uv.lock": "96e52f25c8a315a7af81cf7ec23b19a79d018c5f07331ae46755b05560b4376c",
+    "models/totalsegmentator/nnunet/results/Dataset297_TotalSegmentator_total_3mm_1559subj/nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres/fold_0/checkpoint_final.pth": "1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac",
+    "models/totalsegmentator/nnunet/results/Dataset298_TotalSegmentator_total_6mm_1559subj/nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres/fold_0/checkpoint_final.pth": "3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270"
+  },
+  "checkpoint_sha256": {
+    "model_3mm": "1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac",
+    "model_6mm": "3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270"
+  },
+  "prior_g3_smoke_cases": [
+    "case_00183",
+    "case_00002"
+  ],
+  "fresh_outcomes_accessed_before_lock": false
+}

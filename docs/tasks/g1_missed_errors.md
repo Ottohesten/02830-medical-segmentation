@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `otto/missed-errors` |
 | **Created** | 2026-10-21 |
-| **Status** | Not started |
+| **Status** | Steps 1–5 complete; step 6 figure, short summary and speaking notes ready (2026-11-04); Otto's group presentation pending |
 | **Way of working** | Independent. Explore, try ideas, keep what works. The task is large enough to keep going without waiting for new instructions; questions to Bjørn are welcome. Keep the group posted; coordinate where section 3 says so. |
 | **Target** | First results by 2026-11-04; final check on fresh scans and a short summary by 2026-11-18 |
 
@@ -69,33 +69,481 @@ A few starting ideas (try them, drop them, or find better ones):
 
 ## 4. Suggested route (adjust as you go)
 
-- [ ] **1. Get started.** Install (`uv sync`, `uv run pytest`), get the data (section 2), read
+- [x] **1. Get started.** Install (`uv sync`, `uv run pytest`), get the data (section 2), read
   [PROJECT_OVERVIEW.md](../../PROJECT_OVERVIEW.md). Be able to explain G1 and "confident error" in two sentences.
-  *Notes:*
-- [ ] **2. Look at the misses.** Which bad scans (Dice < 0.83) does the locked queue rank low (outside its top 20 %)?
+  *Notes (2026-11-02):*
+  - Read the overview, contributing rules, this task and the relevant README instructions. Pulled `main`
+    (`0fe9216`, already up to date), then created `otto/missed-errors` before writing files.
+  - `uv sync --locked --offline` checked all 133 packages in the shared environment without downloading or
+    changing dependencies. `uv run --locked --offline pytest`: **123 passed, 36 skipped, 8 warnings in 3.32 s**.
+    Skips require the prepared study or Google Chrome; warnings are constant-input correlations in existing
+    synthetic robustness tests. Command/result record: `results/kits_missed_errors/setup_tests.txt`.
+  - All selected inputs are already local: **100 CT scans, 100 label maps and 600 prediction/heatmap files**
+    (349,419,984 prediction bytes). All **800** canonical header shapes/affines match their CT; the saved
+    Dice/score tables cover the expected 100 cases and the original 20/80 split without duplicate IDs.
+    Evidence: `results/kits_missed_errors/setup_audit.json` and `setup_inventory.csv`.
+    These are presence/header checks, not full voxel-data validation or proof of the archive's origin.
+  - Recorded SHA-256 fingerprints for the 600 maps and 61 locked result files; result hashes were unchanged
+    across the audit. No downloads, inference, new scores, Dice calculations or ranking evaluation were run;
+    label voxels and the G3 pool were not opened. No shared code was changed.
+  - Machine: AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121 (CUDA build 12.1),
+    NumPy 1.26.4; CPU-only audit, seed 42. GPU/driver query was unavailable in this session, and no GPU was used.
+    Exact versions, baseline commit and config/lock hashes: `results/kits_missed_errors/setup_machine.json`.
+  - **Two-sentence explanation:** G1 puts scans with greater disagreement between the 3 mm and 6 mm models
+    earlier in the review queue, using only model output. A confident error occurs when a model is wrong but
+    assigns a probability near zero or one; if both models miss the same kidney, their agreement can hide it,
+    which motivates independent checks of size, shape or nearby tissue.
+- [x] **2. Look at the misses.** Which bad scans (Dice < 0.83) does the locked queue rank low (outside its top 20 %)?
   Look at each one (`scripts/show_case.py`) and describe in words what the model got wrong.
-  *Notes:*
-- [ ] **3. Try checks.** Build GT-free checks from section 1 or your own ideas. For each: does it rank the missed bad
+  *Notes (2026-11-02):*
+  - Independent config `configs/kits_missed_errors.yaml` and isolated `scripts/inspect_missed_errors.py`;
+    saved score descending, case ID ascending for exact ties, pooled 100-case exploratory cohort,
+    bad = Dice < 0.83, outside the first 20 cases. No tie at the budget boundary. The first 20 contain
+    **11/15 bad cases** and 9 cases above/equal to the Dice threshold. **Four bad cases remain outside**:
+
+    | Case | Rank / 100 | Saved Dice | What the reviewed views show |
+    |---|---:|---:|---|
+    | case_00236 | 23 | 0.8023 | A large GT-labeled tumor is partly excluded, leaving a broad indentation/gap; some kidney tissue is also missing. Both models share much of the omission. |
+    | case_00406 | 42 | 0.8004 | An outward-projecting tumor next to the kidney is almost entirely absent from both masks; **99.2%** of GT tumor voxels are missed by 3 mm. |
+    | case_00040 | 46 | 0.6607 | The pelvic kidney is absent from both masks in the reviewed pelvic views; the other kidney is segmented higher in the abdomen. |
+    | case_00184 | 56 | 0.8176 | Multiple tumor/cyst regions are partly or completely omitted: **42.1%** of GT tumor and **77.2%** of cyst voxels are missed. The 6 mm Dice improves to **0.8547** but omissions remain. |
+
+  - Reviewed all four montages (**19 selected axial/coronal views**) using CT, label-specific GT contours,
+    both masks, 3 mm probability and entropy. This is assistant visual review; Otto's own review has not been
+    recorded. Full descriptions, images and reading guide:
+    [exploratory_review.md](../../results/kits_missed_errors/exploratory_review.md).
+    Machine-readable table: `results/kits_missed_errors/exploratory_missed_review.csv`.
+    CT-derived montages remain local and are excluded from Git; the script regenerates them from the
+    shared inputs. The guide's image links work after local regeneration.
+  - Within each case, **98.5–99.9%** of wrong voxels are omissions. Among missed organ voxels,
+    **59.6–89.1%** have saved p <= 0.10, **48.8–86.8%** lie outside the predicted organ plus its 5 mm
+    uncertainty border, and the 6 mm mask recovers only **2.0–26.8%**. These diagnostics support the
+    confident-error mechanism; a low queue rank alone would not prove confidence. A saved zero is quantized
+    (1/255 precision), not proof of exact zero before storage. Sources: `exploratory_error_diagnostics.csv`
+    and `exploratory_inspection_summary.json` in `results/kits_missed_errors/`.
+  - `case_00516` is already rank **3**, Dice **0.0027**, in this pooled queue, so it is not a miss at this
+    budget. The pooled queue is exploratory and is not a replacement for the locked 80-case G1 result.
+  - CPU processing: **3.92 s** for the first timing case, then **5.43 / 14.71 / 9.63 s** for the remaining
+    cases (**33.69 s** summed per-case processing). Machine: AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos,
+    Python 3.12.15, torch 2.2.2+cu121 / CUDA build 12.1, 6 threads, seed 42; no GPU used.
+    `exploratory_images_machine.json` and `exploratory_inspection_evidence.json` record provenance/timing.
+  - **139 tests passed, 36 skipped, 8 existing constant-input warnings, 2.99 s**, including **16** new
+    synthetic checks. `results/kits_missed_errors/exploratory_tests.txt`. Verification passed: 100 queue
+    rows, exact four-case diagnostic/review coverage, saved 3 mm/6 mm Dice reproduced within rounding,
+    figure/input/config/code hashes, and all **61 locked result files / 600 prediction maps unchanged**.
+    `results/kits_missed_errors/exploratory_verification.json`. No inference, new scores, combinations,
+    fresh-pool access or shared-code edits.
+- [x] **3. Try checks.** Build GT-free checks from section 1 or your own ideas. For each: does it rank the missed bad
   scans higher, and how many false alarms does it give?
-  *Notes:*
-- [ ] **4. Combine.** Does the locked score + your best check find the bad scans faster than the locked score alone?
-  *Notes:*
-- [ ] **5. Lock and test once on the fresh scans** (see section 3).
-  *Notes:*
+  *Notes (2026-11-02):*
+  - Separate config `configs/kits_missed_checks.yaml` and output folder `results/kits_missed_checks/`;
+    isolated `scripts/check_missed_errors.py`, no shared-code edits. Candidate definitions were written down
+    before new outcome evaluation. Shape uses at most two largest 6-connected components >= 20 ml, matching
+    the existing plausibility threshold. These are predicted kidney proxies, not anatomical side labels.
+  - New calculations use masks and saved GT-free columns; no CT/label maps or Dice during feature extraction.
+    Saved side volumes originally came from the existing CT-body-midline check. All 100 feature rows were
+    saved before attaching outcomes. Reused unchanged G1 evaluation: both bad rules, review/quality AUC,
+    Spearman/partial rho, 2,000 case-bootstrap resamples and paired differences to locked G1, seed 42.
+  - At the fixed 20-case budget (bad = Dice < 0.83), standalone results are:
+
+    | Method | Expected bad found | Expected false alarms | Expected original misses included |
+    |---|---:|---:|---:|
+    | Locked G1 | 11.00 | 9.00 | 0.00 |
+    | Entropy (existing) | 13.00 | 7.00 | 2.00 |
+    | Small total volume | 3.00 | 17.00 | 2.00 |
+    | Missing-side flag | 4.17 | 15.83 | 1.50 |
+    | Side asymmetry | 6.00 | 14.00 | 2.00 |
+    | Small minimum side | 4.00 | 16.00 | 2.00 |
+    | Convex-hull deficit | 9.00 | 11.00 | 1.00 |
+    | Voxel-face compactness | 7.00 | 13.00 | 0.00 |
+    | Far disagreement (existing) | 12.00 | 8.00 | 1.00 |
+    | Far 6 mm additions (existing) | 12.00 | 8.00 | 2.00 |
+
+  - Ties use expected inclusion under random tie breaking, so fractional counts are expectations. The
+    missing-side flag identifies only **4 cases: 2 bad and 2 nonbad**. Its other 16 places are random among
+    96 unflagged cases; the 1.50 expected original misses is the flagged pelvic case plus 0.50 by chance.
+    Actual flag cases: case_00040 (Dice 0.6607), case_00516 (0.0027), case_00293 (0.9475, false alarm),
+    case_00563 (0.8779, false alarm). Source: `exploratory_flag_cases.csv`.
+  - Hull deficit = 1 - occupied voxel volume / convex hull of voxel boxes. It moves **case_00236 23 → 9**,
+    **case_00406 42 → 21** (still outside budget), **case_00184 56 → 36**, but **case_00040 46 → 95**.
+    The missing-side flag moves case_00040 to **average tied rank 3**. Shape of the remaining kidney cannot
+    detect an absent other kidney; these two checks therefore address different misses.
+  - Threshold review-AUC: locked **0.8170**, hull **0.7543**, compactness **0.6623**, minimum-side size
+    **0.4497**. Hull minus locked **-0.0627, 95% paired CI [-0.1905, 0.0556]**; worst10 AUC
+    **0.7500 vs. 0.8550**, difference **-0.1050 [-0.2857, 0.0543]**. This does not establish a better
+    standalone score. The existing far-disagreement threshold AUC is **0.8577**, difference
+    **+0.0407 [0.0000, 0.0967]** (lower bound exactly zero); the fresh lock is unchanged.
+    All comparisons are exploratory, without multiplicity correction or a claim of generalization.
+  - Carry **missing-side + hull deficit** to step 4 as complementary checks, retaining existing alternatives
+    as controls. Deprioritize this compactness version (no original miss in top 20) and minimum-side volume
+    as the main queue (16/20 false alarms). This does not disprove all shape/size ideas. No combinations
+    or fresh-pool checks have run. Readable interpretation:
+    [exploratory_checks_summary.md](../../results/kits_missed_checks/exploratory_checks_summary.md).
+  - CPU timings: benchmark **5.79 s**, features **84.10 s**, evaluation **50.30 s** (all below 30 min).
+    AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121 / CUDA build 12.1,
+    NumPy 1.26.4, SciPy 1.17.1, 6 threads, seed 42, no GPU. Config snapshot and stage metadata preserve
+    baseline `e9e63dc`, exact code/config/source hashes and the dirty run state.
+  - **154 tests passed, 36 skipped, 8 existing warnings, 3.08 s**, including 15 new geometry/tie/isolation
+    tests. Verification: **100 cases, 195 components, 24 metric rows, 36 paired rows, 2,424 curve rows,
+    40 original-miss rank rows**; independent rank-AUC and curve checks pass. All **61 locked results /
+    600 source maps** and the completed inspection config remain unchanged.
+    Files: `exploratory_{features,components,metrics,paired_vs_locked,budget,miss_ranks}.csv`,
+    `exploratory_verification.json` and `exploratory_tests.txt` in `results/kits_missed_checks/`.
+- [x] **4. Combine.** Does the locked score + your best check find the bad scans faster than the locked score alone?
+  *Notes (2026-11-02):*
+  - `configs/kits_missed_combinations.yaml` fixed six alternatives before outcome evaluation: G1 +
+    missing-side, G1 + hull, G1 + both, each by mean/max rank using the unchanged G1 combiner. The isolated
+    script reuses step 3 aggregate features and helpers, saves scores before attaching Dice, and preserves
+    true rank ties on an exact lattice. No image reads, fitted weights, shared-code edits or fresh scans.
+  - Fixed selection rule: highest threshold review-AUC among combinations with higher AUC and no fewer
+    top-20 bad cases than G1; ties use quality-AUC then config order. The rule provisionally selects
+    **`g1_missing_hull_mean`**. It is a development recommendation, not a prospective lock or proven gain.
+
+    | Method | Review-AUC (Dice < 0.83) | Bad / first 20 | False alarms / first 20 |
+    |---|---:|---:|---:|
+    | Locked G1 | 0.8170 | 11 | 9 |
+    | G1 + missing, mean | 0.8237 | 11 | 9 |
+    | G1 + missing, max | 0.8110 | 11 | 9 |
+    | G1 + hull, mean | 0.8277 | 11 | 9 |
+    | G1 + hull, max | 0.8190 | 10 | 10 |
+    | G1 + both, mean (selected) | 0.8470 | 11 | 9 |
+    | G1 + both, max | 0.8397 | 11 | 9 |
+
+  - Selected threshold difference to G1: **+0.0300, paired 95% case-bootstrap CI [-0.0320, 0.0864]**.
+    Worst10: **0.8690 vs. 0.8550**, difference **+0.0140 [-0.0685, 0.0883]**. All six threshold
+    difference CIs include zero. No combination improves expected top-20 bad capture. These are six
+    exploratory comparisons on all 100 development cases, without multiplicity correction.
+  - Selected combination gains case_00236 (**Dice 0.8023, rank 23 → 9**) but loses case_00582
+    (**Dice 0.4605, rank 17 → 45**) at the budget of 20. Seven nonbad cases enter while seven leave.
+    Thus there is no net bad-count gain, and the displaced bad case is more severe.
+    Simulated mean Dice after 20 perfect corrections is **0.92248 vs. G1 0.92554** (worse).
+  - The selected candidate leaves the pelvic case outside budget (**46 → 43**); case_00184 moves
+    **56 → 45**, case_00406 **42 → 27**. The max-of-three alternative catches case_00040 and case_00236
+    but displaces case_00426 and case_00582: two new finds, two losses, still 11/15 in the first 20.
+  - Descriptively, the selected full curve finds **9/15 in the first 10 vs. G1 5/15**, but both find
+    11/15 by 20. The 10-case point was not a new selection rule. Full quality-AUC is **0.95398 vs. 0.95242**,
+    difference **+0.00157 [-0.00188, 0.00439]**. AUC gains can coexist with worse quality at a specific budget.
+    The selected threshold AUC difference vs. entropy is **+0.0060 [-0.0764, 0.0921]** and vs. existing
+    far disagreement **-0.0107 [-0.0800, 0.0440]**; superiority over either is not established.
+  - Earlier missing-side false alerts case_00293 and case_00563 are ranks **31 / 26** for the selected
+    candidate and consume no top-20 slots. No extra image review was needed for this aggregate comparison.
+  - Readable result/tradeoffs:
+    [exploratory_combination_summary.md](../../results/kits_missed_combinations/exploratory_combination_summary.md).
+    Complete outputs in `results/kits_missed_combinations/`: combined scores, both-rule metrics, paired
+    comparisons against G1/entropy/far, curves, per-case changes, original-miss ranks and recommendation.
+  - CPU benchmark **1.86 s**, fixed evaluation **65.14 s**. AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos,
+    Python 3.12.15, torch 2.2.2+cu121 / CUDA build 12.1, NumPy 1.26.4, SciPy 1.17.1, 6 threads, seed 42.
+    No GPU; stage metadata/config snapshot record baseline `29de99a`, dirty state and exact source hashes.
+  - **167 passed, 36 skipped, 8 existing warnings, 2.69 s**, including 13 new tests. Verification passed:
+    **100 cases, 6 combinations, 32 metric rows, 132 paired rows, 3,232 curve rows, 56 target-rank rows,
+    600 case-change rows**. Standalone metrics/CIs reproduce step 3; rank/tie/budget/displacement identities
+    pass. All **61 locked results / 600 source maps / 23 earlier-stage output fingerprints** are unchanged.
+    Sources: `exploratory_tests.txt` and `exploratory_verification.json` in the combination result folder.
+- [x] **5. Lock and test once on the fresh scans** (see section 3).
+  *Notes (2026-11-02; lock complete, actual fresh test pending):*
+  - Prospective recipe: [missed_errors_fresh_protocol.md](../missed_errors_fresh_protocol.md) and
+    `configs/kits_missed_fresh.yaml`. Only `g1_missing_hull_mean` is added to the already locked far-score
+    test. Both compare threshold review-AUC against G1 in one outcome stage: 2,000 case resamples, seed 42,
+    95% CI lower bound above numerical zero. Two named per-comparison tests, not familywise 5% evidence.
+    Top-20 capture/false alarms, simulated quality, displaced-case Dice and paired CIs are prespecified
+    secondary checks. An AUC gain with worse fixed-budget quality must be reported as a tradeoff.
+  - Froze **100 IDs at seeded positions 101–200, zero kits100 overlap**, **20 file fingerprints**, including
+    **2 original checkpoint hashes**. `results/kits_missed_fresh/{lock.json,cohort.csv,run_config.yaml}`.
+    Keep the 2 prior G3 smoke cases in the already agreed pool and disclose their earlier feasibility/GT
+    exposure. "No fresh outcomes" here means no new joint ranking outcomes, not that these two prior reports
+    never existed. The [official KiTS23 description](https://kits-challenge.org/kits23/) supports case-based
+    patient sampling; independence remains a stated inference, not a separate identity audit.
+  - The isolated runner has freeze/old-data-benchmark/preflight/GT-free-score/one-time-evaluate stages.
+    It refuses missing coordination, nonbaseline checkpoint provenance, changed scientific files, wrong
+    case coverage, misaligned grids and nonstandard probabilities. Scores are saved before GT, and an
+    exclusive marker prevents silent outcome reopening. No shared `src/segreview/` edits or new inference.
+  - **19 new synthetic tests** pass, including the complete synthetic joint outcome stage and its reopening
+    refusal. Full suite **186 passed, 36 skipped, 8 existing warnings, 3.15 s**;
+    `results/kits_missed_fresh/tests.txt`. Old-data benchmark **43.39 s**, reproducing saved scores and both
+    model Dice on case_00574, case_00563 and case_00135 (small/median/large development grids).
+    Metrics/secondary-bootstrap projection **67.76 s** with safety factor 2, plus actual Dice I/O scaling
+    when fresh header sizes are available; the total fresh stage duration is not yet known.
+  - Preparation audit passed: exact frozen cohort, source/checkpoint/config/code hashes, unchanged earlier
+    results, and no fresh headers/voxels/scores/outcome marker. `preparation_verification.json` in the result
+    folder. CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121 / CUDA build 12.1,
+    6 threads, seed 42, no GPU. Stage metadata records baseline `a9bf46b`, dirty state and library versions.
+  - **Actual test still pending.** No G3 prediction directory exists locally; the expected
+    `configs/g3_kits.yaml` was not found on the available Frederik branch. Otto replied that he will check
+    coordination and file location and return. Preflight deliberately reports `ready: false` without
+    opening fresh headers. No notification or confirmation has been invented, and no direct message sent.
+    [Handoff/message draft](../missed_errors_fresh_handoff.md) and `handoff_template.json` are ready.
+  *Input handoff update (2026-11-03):*
+  - Otto supplied the model maps at `data/predictions/g3_pool/clean`: **600 NIfTI files, 283,184,552 bytes**,
+    exactly **100 frozen IDs × 6 map kinds**, with no missing or unexpected map filenames. This is a
+    filename/presence audit only; fresh headers, voxel arrays, scores and outcomes remain unopened.
+  - All **100 CTs and 100 labels are absent** locally. Otto relayed Bjørn's instruction to reuse Frederik's
+    `g3_pool.zip`, retrieve `configs/g3_pool.yaml` from `frederik/g3`, and lock before opening the pool.
+    Copied that config unchanged. It declares the original model settings and no pool ranking evaluation.
+    Also retrieved G3's `prepare_machine.json` (RTX 4090, Windows 11, torch 2.2.2+cu121); it has no checkpoint
+    hashes. `handoff_sources.json` records sources and the limits of this provenance evidence.
+  - The upstream config reproduces the frozen IDs, but the **local shared selector ignores its offset**:
+    using the generic download command here selects 100 kits100 IDs and 0 pool IDs. Use isolated
+    `scripts/prepare_fresh_download.py`; it verifies the frozen cohort and preserves existing files/list.
+    No shared code or scientific recipe change. Offline `download_plan.csv` lists the exact 200 missing files.
+  - **7 new logistics tests passed; full suite 193 passed, 36 skipped, 8 existing warnings, 4.10 s**.
+    `upload_tests.txt`, `upload_audit.json` and `upload_inventory.csv` record this handoff check separately
+    from the preserved 2026-11-02 preparation snapshot. All 20 pinned scientific files remain unchanged.
+  - Download approval has been requested under Otto's standing rule; no CT/label download has started.
+    Complete the source handoff/provenance and data/header/runtime checks before the joint test.
+  *Approved download result (2026-11-03):*
+  - Otto approved the download. All **100 CTs and 100 labels**, **8,262,473,787 bytes**, are now local
+    under `data/raw/kits23/{images,segmentations}/`. Exact plan coverage, nonempty files, **200 SHA-256
+    fingerprints** and no remaining planned `.part` files verified. `download_inventory.csv` and
+    `download_verification.json` record the result. These are byte/presence checks, not header/geometry checks.
+  - A remote connection reset stopped attempt 1 after **195 files**; the identical retry preserved those
+    files and fetched the last **5 in 12.85 s**. All files were local **368 s after approval was recorded**,
+    within the original 1,800 s budget. Approval, both attempt logs and retry machine/result metadata saved.
+  - `handoff_inputs.csv` now lists all 100 cases with existing CT, label and four required model-map paths.
+    All **20 scientific fingerprints, 61 locked G1 result files and 600 kits100 maps** are unchanged.
+    No fresh headers/voxel arrays, scores, Dice or outcome stage opened. No inference or shared-code edits.
+  - Full suite **193 passed, 36 skipped, 8 existing warnings, 3.86 s**, `download_tests.txt`.
+    CPU AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15, torch 2.2.2+cu121, no GPU used;
+    machine/code/lock details are saved in the download metadata/verification. Seed remains 42.
+    Next: complete baseline provenance/coordination evidence, then header and full-runtime preflight.
+  *Source-handoff/preflight follow-up (2026-11-03):*
+  - Verified that **model, uncertainty and plausibility config sections are identical** between kits100
+    and the retrieved G3 pool config. All **100 frozen IDs / 600 required input paths** exist and all
+    **20 scientific fingerprints** remain unchanged. `handoff_provenance_audit.json` records this setup
+    check; a matching config does not prove which weights generated the uploaded maps.
+  - Rechecked upstream metadata: the preparation record is unchanged and still has no checkpoint hashes.
+    Listed only the three filenames in upstream `results/g3_pool/`; did not read source score/GT tables.
+    The private pending handoff is at `data/handoffs/kits_missed_fresh.pending.json` (ignored by Git).
+    Actual hashes are null; expected reference hashes are explicitly separate.
+  - Ran the unchanged preflight with that honest pending handoff: **ready: false**, no fresh headers or
+    voxel arrays opened. Four missing facts: exact-score notification to Bjørn; Frederik's baseline-output
+    confirmation; no prior joint ranking evaluation; checkpoint hashes from Frederik's original run.
+    Previous preflight evidence is preserved in `preflight_history/2026-11-02_pending/`.
+  - [Updated handoff/message draft](../missed_errors_fresh_handoff.md) supplies exact PowerShell hash
+    commands and expected hashes for comparison. Otto has been asked for actual group replies; the
+    assistant has sent no direct group message. Header checks and runtime projection remain pending.
+    Full suite **193 passed, 36 skipped, 8 existing warnings, 3.20 s**; `handoff_tests.txt`.
+  *Received checkpoint verification (2026-11-04):*
+  - Found Frederik's supplied files at `models/g3_pool_source_3mm/3mm_checkpoint_final.pth` and
+    `models/g3_pool_source_6mm/6mm_checkpoint_final.pth`. Both SHA-256 values **exactly match the locked
+    references** (task 297 / 3 mm and task 298 / 6 mm). Checks took **0.48 s**; file bytes only, no model
+    deserialization/execution. `source_checkpoint_verification.json` records the full hashes/paths/machine.
+  - Recorded the computed hashes in the private pending handoff and reran the unchanged preflight.
+    It now lists **3 remaining facts**, with **ready: false**: exact-check notification to Bjørn,
+    Frederik confirms these checkpoints generated the shared pool archive, and no prior joint ranking
+    evaluation. No fresh headers/arrays/scores/outcomes opened. Earlier four-issue preflight preserved in
+    `preflight_history/2026-11-03_pending/`. All 20 scientific fingerprints remain unchanged.
+  - Updated the handoff draft to remove the already completed hash/upload request. Next: record the three
+    actual coordination facts, then run header/probability checks and project runtime. Keep step 5 unchecked.
+    Full suite **193 passed, 36 skipped, 8 existing warnings, 3.84 s**; `checkpoint_tests.txt`.
+  *Confirmed handoff and fresh run (2026-11-04):*
+  - Otto relayed Bjørn's explicit confirmation of original pool models, no earlier joint ranking test,
+    and review/approval of `g1_missing_hull_mean`. All remaining coordination facts are resolved by this
+    project-lead attestation. `coordination_confirmation.json` records its source/date and that there is
+    no direct Frederik reply or original message timestamp; none has been invented.
+  - Frozen preflight passed: **100 cases / 600 input files**, canonical shapes/affines, standard probability
+    encoding and file hashes. **ready: true**. Headers/bytes only at this point; no GT voxel arrays read.
+    `preflight.json`, `input_inventory.csv`; earlier pending stage preserved in
+    `preflight_history/2026-11-04_pending/`.
+  - Runtime projection for **4,864,341,504 grid voxels**: score **1,511.40 s / 25.19 min**, evaluation
+    **295.34 s / 4.92 min**, safety factor 2; both below the per-stage 30-minute cap. `runtime_projection.json`.
+    Started unchanged GT-free scoring; all scores will be frozen before the single joint outcome stage.
+  *Final fresh result (2026-11-04):*
+  - Completed one joint outcome stage after freezing all 100 scores. **10/100** cases have Dice < 0.83;
+    these are exactly the worst 10, so the two bad rules are identical in this cohort. **2,000/2,000**
+    primary bootstrap resamples are finite. Both named comparisons are reported, with no familywise claim.
+  - Primary review-AUC: **G1 0.9210**, selected combination **0.9070**, paired difference
+    **-0.0140 [-0.0900, 0.0429]**; far disagreement **0.9360**, difference
+    **+0.0150 [-0.0100, 0.0500]**. **Neither lower CI bound is above zero**, so neither meets the
+    predeclared improvement criterion. This is not evidence of equivalence or a reason to change the lock.
+  - First 20: **G1 9/10 bad + 11 false alarms; combination 9/10 + 11; far 10/10 + 10**.
+    Combination gains case_00527 (Dice **0.778522**, rank **23 → 11**) and loses case_00560
+    (Dice **0.777604**, rank **4 → 39**), plus nonbad swaps. Far promotes case_00527 to rank **11**
+    and keeps case_00560 at **9**. `queue_changes.csv`, `far_queue_changes.csv`, `case_rankings.csv`.
+  - Prespecified secondary combination quality-AUC **0.957772 vs 0.956697**, difference
+    **+0.001075 [0.000079, 0.001878]**; rho **-0.706779 vs -0.524740**, difference
+    **-0.182039 [-0.290077, -0.089880]**. These unadjusted secondary signals do not replace the
+    primary criterion. Simulated quality after 20: combination **0.932528 vs G1 0.931545**, difference
+    **+0.000983 [-0.002274, 0.005166]**; far **0.932524**, difference
+    **+0.000978 [-0.001145, 0.004858]**. No measured human correction-time claim.
+  - CPU resource-wrapper wall times: score **713.23 s**, evaluation **168.11 s**; peaks **9,224,491,008 /
+    2,744,385,536 bytes**. Machine metadata: AMD Ryzen 5 7500F, Linux 7.3.1-1-cachyos, Python 3.12.15,
+    torch 2.2.2+cu121 / CUDA build 12.1, 6 threads, seed 42, no GPU computation. Source baseline `d7bea17`,
+    dirty state and all scientific/input hashes are recorded. Both stages completed below 30 minutes.
+  - Verification passed using saved aggregates only: **100 cases, 14 metric rows, 16 paired rows,
+    1,414 curve rows**, independent rank-AUC/curve/budget identities, both fixed decisions and all queue
+    changes. No GT arrays reopened for verification. All **20 science fingerprints / 61 locked G1 result
+    files / 600 kits100 maps** unchanged. **193 passed, 36 skipped, 8 existing warnings, 4.24 s**.
+    [Full fresh summary](../../results/kits_missed_fresh/fresh_summary.md), `fresh_verification.json`,
+    `fresh_tests.txt`. Step 5 is complete; a positive primary result was not required for completion.
 - [ ] **6. One figure and a 5–10 line summary** in section 5 and in the log. Present it to the group (5 minutes).
-  *Notes:*
+  *Written materials complete (2026-11-04); actual group presentation pending:*
+  - One two-panel aggregate-only figure in PDF/PNG: primary paired intervals alongside the 20-case budget.
+    `results/kits_missed_fresh/report/fig_missed_fresh_summary.{pdf,png}`. Caption, 8-line summary and
+    five-minute speaking/exam guide in the same folder. No fresh CT, model or GT arrays read for reporting.
+  - Reproduce with `scripts/plot_missed_fresh.py --config configs/kits_missed_fresh.yaml`. The script checks
+    published source hashes and uses only the two locked primary comparisons. Three synthetic tests prevent
+    swapping in a secondary bad rule/control, using modified source tables or silently replacing a missing
+    primary interval. No metric rerun. **196 passed, 36 skipped, 8 existing warnings, 3.43 s**.
+  - PDF page count/text labels and plotted values checked; PNG visually inspected. Source values, figure
+    machine/config/code hashes and all report hashes are saved. `report_verification.json` passed.
+    Figure generation **0.56 s**, CPU, seed 42, Matplotlib 3.11.2, baseline `402dd91` with dirty state.
+  - Keep this checkbox open until Otto actually gives the five-minute group presentation; the assistant
+    prepared materials and has not delivered or sent a group message.
 
 ## 5. Results summary
 
-*(Filled in at step 6.)*
+[Figure PDF](../../results/kits_missed_fresh/report/fig_missed_fresh_summary.pdf),
+[PNG](../../results/kits_missed_fresh/report/fig_missed_fresh_summary.png),
+[caption](../../results/kits_missed_fresh/report/caption.md),
+[five-minute speaking notes](../../results/kits_missed_fresh/report/presentation_notes.md).
+Full step 5 results: [fresh summary](../../results/kits_missed_fresh/fresh_summary.md).
+
+1. Four threshold-bad cases outside the original first-20 queue motivated GT-free missing-side and hull checks on 100 development scans.
+2. Six fixed combinations were compared; mean ranks of G1 + missing-side + hull were locked before one joint fresh test with the far-disagreement question.
+3. On the next 100 seeded scans, 10 are below Dice 0.83: G1 review-AUC is 0.921; the combination is 0.907, difference -0.014 (95% paired CI [-0.090, 0.043]).
+4. Far disagreement reaches 0.936, difference +0.015 [-0.010, 0.050]; neither candidate meets the predeclared primary improvement criterion.
+5. At 20 reviews, G1/combination/far find 9/9/10 bad cases, with 11/11/10 false alarms; the two bad rules identify the same 10 cases here.
+6. The combination promotes case_00527 (Dice 0.778522, rank 23 → 11) but displaces case_00560 (0.777604, rank 4 → 39); raw counts alone hide this swap.
+7. Its secondary quality-AUC gain is +0.001075 [0.000079, 0.001878], unadjusted; this broader quality signal does not replace the primary result or measure human effort.
+8. All scores preceded GT and both questions were evaluated once; preserve G1 and the complete fresh results, with the disclosed prior G3 smoke exposure, without tuning on this pool.
 
 ## 6. Decisions and dropped ideas
 
-*(Date — what — why. Also in PROJECT_LOG.md.)*
+- **2026-11-02 — Reuse the existing shared environment and saved kits100 predictions.** Step 1 needs CPU
+  file/header checks only. A GPU-environment change is deferred because it would not help this step; no new
+  kits100 inference is permitted. No detector ideas have been tested or rejected yet.
+- **2026-11-02 — Keep setup evidence separate from locked inputs.** Setup files go to
+  `results/kits_missed_errors/`. The audit only reads `configs/kits100.yaml` to reproduce the exact selected
+  cohort; an analysis config with its own name/output paths will be added in step 2 before generating figures
+  or analysis results. All 100 kits100 cases are development data for this task, with original G1 split labels
+  retained for traceability. This does not change the locked G1 analysis.
+- **2026-11-02 — Fresh-pool coordination remains required.** The 2026-10-21 log already locks
+  `far_disagree_per_volume` for a single joint G3-pool evaluation. Lock our one or two checks and evaluation
+  rules before that evaluation, tell Bjørn, and coordinate prediction reuse with Frederik by 2026-11-18.
+  No external messages have been sent in this session.
+- **2026-11-02 — Use one pooled exploratory queue for the missed-case inventory.** The 100 cases are all
+  development data for this task. Keep their original G1 split labels, attach saved Dice only after sorting
+  the locked score, and break score ties by case ID. This defines the four-case target list reproducibly.
+- **2026-11-02 — Drop single-slice-only inspection.** A maximal-organ slice can show the correctly segmented
+  kidney while hiding the pelvic kidney. Use label-specific error peaks plus a coronal view instead; the
+  selected views complement whole-volume counts and do not claim to inspect every slice.
+- **2026-11-02 — Start step 3 with cheap size and shape checks.** First assess missing-side/per-side size,
+  then shape deficits, on all 100 cases including false alarms. The observations motivate these ideas but
+  do not establish that they work: a normal kidney is concave, and a completely absent mass can leave a
+  plausible-looking contour. Keep CT-intensity checks as a later option if these simple checks are insufficient.
+- **2026-11-02 — Keep CT-derived montages outside Git.** Automatic approval rejected the first step 2 commit
+  attempt because its four CT/mask/probability montages conflicted with CONTRIBUTING's data prohibition.
+  The commit did not run. Removed the PNGs from staging and added an explicit ignore rule; keep the images
+  locally, and commit only code, tables, hashes and notes. Group members can regenerate the figures.
+- **2026-11-02 — Keep step 3 separate from completed inspection.** New name/config `kits_missed_checks`
+  preserves step 2's settings and hashes. Reuse the existing G1 functions without changing shared code;
+  shape uses masks only, with GT outcomes joined only after saving all features.
+- **2026-11-02 — Carry missing-side and hull deficit to combination testing.** The flag promotes the pelvic
+  case to tied rank 3 with two nonbad alerts; hull promotes case_00236 to 9, but has 11 false alarms at the
+  20-case budget and misses the pelvic case. Neither replaces G1; whether their combination helps is step 4.
+  Existing asymmetry, entropy and directional disagreement remain controls, not discarded competitors.
+- **2026-11-02 — Deprioritize current compactness and minimum-side-volume queues.** Compactness finds
+  7 bad / 13 false alarms and no original miss in its first 20. Minimum-side volume finds 4 bad / 16 false
+  alarms; its targeted catches do not justify replacing uncertainty with organ size. Save results instead
+  of tuning many variants before the deadline. CT-intensity and alternative shape estimators remain later
+  options if the simple combinations fail; no claim that these broader ideas cannot work.
+- **2026-11-02 — Follow the predeclared step 4 selection rule.** Recommend `g1_missing_hull_mean`
+  provisionally by full-cohort threshold AUC and the unchanged budget gate. Its +0.0300 AUC difference
+  has a CI including zero; top-20 bad capture does not increase and quality at 20 worsens. Step 5 must
+  state these limits, lock exact rules and coordinate the one fresh evaluation before opening the pool.
+- **2026-11-02 — Deprioritize G1+hull maximum and post-outcome tuning.** G1+hull max finds only 10/15
+  bad cases in 20, failing the budget gate. Do not switch the primary rule to first-10 performance or
+  worst10, add example-specific weights, or select extra fresh candidates after seeing these outcomes.
+  Keep all six results and the severe displaced case visible instead of optimizing away this finding.
+- **2026-11-02 — Do not open extra CT montages for the two earlier side false alerts in step 4.** Both
+  remain outside the selected candidate's top 20. Aggregate rank/displacement accounting answers their
+  immediate budget cost; future image review remains an option if a later question requires it.
+- **2026-11-02 — Freeze one candidate and joint execution before fresh ranking outcomes.** Keep the
+  selected mean-of-three definition, 5/6 mm borders, 20 ml components, exact rank ties and original weights.
+  Pin the next 100 IDs and both checkpoint hashes. Preserve the 2026-10-21 far test and report both named
+  per-comparison CIs openly; no claim about a familywise 5% error rate. Do not switch scores after viewing the pool.
+- **2026-11-02 — Do not substitute smoke tests or new inference for the pending joint evaluation.** Two
+  earlier G3 smoke cases are not a 100-case ranking validation. Keep and disclose them rather than replace
+  them after prior GT exposure. Frederik's baseline outputs must be reused once their location/provenance
+  is confirmed; no download or >30-minute stage starts without Otto's go-ahead.
+
+- **2026-11-02 — Pin the dataset definition before publication.** Final review found that the dataset YAML
+  (organ label definition) also needs a fingerprint. Added it and archived the unpublished 19-file draft in
+  `results/kits_missed_fresh/prepublication_draft/`. The final 20-file lock, benchmark and pending preflight
+  are regenerated; cohort, scientific settings, code and checkpoints are unchanged. No fresh outcomes opened.
+
+- **2026-11-03 — Preserve the lock while adapting input logistics.** Retrieve Frederik's pool config unchanged,
+  but do not cherry-pick changes to the shared data selector: that would change a pinned scientific dependency
+  and requires coordination. The isolated download helper implements only the frozen cohort's file transfer.
+  No new model inference, pool replacement, score change or outcome access is needed.
+- **2026-11-03 — Resume only missing transfers after a connection reset.** Reuse the approved identical plan,
+  preserve its 195 complete files and retrieve only the last five within the original total time budget.
+  Reject restarting the whole download: it adds transfer time without improving the agreed input set.
+  No source-list rewrite or new model inference is needed to recover a transfer error.
+
+- **2026-11-03 — Keep source confirmation separate from a matching config.** Identical declared settings
+  and filenames do not identify the weights that actually produced an archive. Keep the existing preflight
+  gate; do not fill missing dates/hash confirmations from local reference values. The private handoff now
+  separates expected hashes from its still-null confirmed hashes. No scientific amendment or new inference.
+
+- **2026-11-04 — Preserve received checkpoint paths and reference files.** The supplied names/locations are
+  unambiguous and both files match the locked references. No move, overwrite, new model download or inference
+  is needed. Record byte identity separately from confirmation that those weights produced the shared pool maps.
+
+- **2026-11-04 — Report both fresh primary null findings and retain the secondary distinction.** Neither
+  candidate clears the locked primary CI criterion. Keep G1 as the project's locked reference and report
+  the small unadjusted secondary quality-AUC/rho signals without promoting them to the primary outcome.
+- **2026-11-04 — Drop further tuning/reopening of this fresh pool.** No changed weights, thresholds,
+  alternative candidate selection or sample extension to chase a positive result. The next practical work
+  is the step 6 figure/summary using saved outputs; that fits the deadlines and preserves the one-time test.
+- **2026-11-04 — Use one paired-interval/budget figure.** Drop a budget-only figure: the 10/10 far-score
+  point would hide the uncertainty of its primary difference. Show both locked intervals and all three
+  budget points; keep the secondary quality-AUC nuance in the caption/summary. No extra analysis or GT access.
 
 ## 7. Where we are
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
 
-- 2026-10-21: Task created. Next action: step 1.
+- **2026-11-04 — Last fully finished step: 5. The single joint fresh test is complete and verified.**
+  All 100 GT-free scores were saved before GT; both locked questions ran in one guarded outcome stage.
+  Preserve the score/output hashes and exclusive outcome marker. Prior G3 smoke exposure is disclosed.
+  Primary result: G1 **0.921**, combination **0.907**, difference **-0.014 [-0.090, 0.043]**;
+  far **0.936**, difference **+0.015 [-0.010, 0.050]**. Neither meets the improvement criterion.
+  First 20 find **9 / 9 / 10 of 10 bad cases**, respectively. Full report: `fresh_summary.md`.
+- **Current inputs/dependency:** all 600 expected model maps are local at `data/predictions/g3_pool/clean`;
+  all 100 CTs and 100 labels are now local at `data/raw/kits23/{images,segmentations}/` after Otto's approved
+  download. Exact plan coverage and 200 byte fingerprints verified; `download_verification.json`.
+  `handoff_inputs.csv` lists the 100 cases and existing paths. Bjørn's reuse/config/lock instruction
+  was relayed by Otto; source config and G3 preparation-machine metadata are retrieved. Both checkpoint files
+  now supplied by Frederik match the locked reference hashes (`source_checkpoint_verification.json`).
+  Bjørn has now explicitly confirmed original pool models, no previous joint ranking evaluation and
+  review of the exact locked check, via Otto. `coordination_confirmation.json` records this attestation.
+  Follow-up confirms all three relevant config sections equal kits100 and all 20 scientific fingerprints
+  match. Preflight has passed (**ready: true**) for all 100 cases/600 files; headers/affines/encoding/hashes
+  agree. Score/evaluation completed in **713.23 / 168.11 s**. Aggregate-only verification passed;
+  193 tests passed (36 skipped), all locked source outputs unchanged. No further input handoff is needed.
+- **Step 6 written work is ready.** One verified PDF/PNG figure, caption, eight-line summary and five-minute
+  speaking/exam notes are in `results/kits_missed_fresh/report/` and section 5. **196 tests pass, 36 skipped**;
+  saved scientific outputs/lock are unchanged. Only Otto's actual group presentation remains; keep step 6 open
+  until it happens. Next: deliver the five-minute presentation and record its date/group feedback here/in the log.
+- **Practical improvements:** (1) show primary intervals alongside the 20-case budget in the figure;
+  (2) use case_00527/case_00560 to explain the gained/lost-error tradeoff. These fit the reporting deadline.
+- **Publication:** [draft PR #2](https://github.com/Ottohesten/02830-medical-segmentation/pull/2) tracks
+  the ongoing task. The prospective lock/preparation is committed as **`7703fac`** and confirmed pushed to
+  `origin/otto/missed-errors`; the PR title/body now describe the final lock and pending evaluation.
+  The 2026-11-03 upload audit, source config and exact download helper/plan are published as **`a67a013`**;
+  the approved completed download, byte verification and input manifest are published as **`cb72790`**.
+  Both are confirmed pushed to `origin/otto/missed-errors`; draft PR #2 now records all inputs local and
+  the remaining source-provenance/header/runtime preflight. No fresh ranking evaluation has been run.
+  Step 4 remains published as `7648905`.
+  Step 2's CT-derived montages remain local/ignored. Group review remains required before merging.
+  No direct message to Bjørn/Frederik has been sent.
+  The source-handoff comparison/pending preflight and updated guide are committed as **`84aaf8a`** and
+  confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records the four pending confirmations.
+  The November 4 checkpoint verification/three-issue preflight and updated guide are committed as
+  **`2304af2`** and confirmed pushed to `origin/otto/missed-errors`; draft PR #2 records both exact hash
+  matches and the three remaining confirmations.
+  The completed joint test is committed as **`402dd91`** and step 6 report materials as **`3584a1b`**;
+  both are confirmed pushed to `origin/otto/missed-errors`. Draft PR #2 describes the two primary null
+  findings, secondary nuance and ready report materials. Only the actual presentation remains pending.

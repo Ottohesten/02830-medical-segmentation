@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-02T01:31:30+01:00",
+  "stage": "step_1_setup",
+  "analysis_status": "setup only; no scientific outcomes computed",
+  "source_config": "configs/kits100.yaml",
+  "seed": 42,
+  "all_kits100_cases_are_development_for_this_task": true,
+  "selected_cases": 100,
+  "original_g1_split_counts": {
+    "test": 80,
+    "dev": 20
+  },
+  "file_counts": {
+    "ct": 100,
+    "entropy": 100,
+    "label": 100,
+    "m2_diff": 100,
+    "m2_mask": 100,
+    "m2_prob": 100,
+    "mask": 100,
+    "prob": 100
+  },
+  "prediction_bytes": 349419984,
+  "header_geometry_checks_passed": 800,
+  "geometry_comparison": "Canonical shapes and affines, absolute tolerance 1e-4; headers only.",
+  "voxel_data_validation": "Not performed; presence/header alignment is not a full payload-integrity check.",
+  "prediction_hashes": "setup_inventory.csv (local fingerprints; no external reference hash supplied)",
+  "csv_coverage": {
+    "dice.csv": {
+      "clean_rows": 100,
+      "unique_case_ids": 100,
+      "expected_coverage_and_unique_ids": true
+    },
+    "scores.csv": {
+      "clean_rows": 100,
+      "unique_case_ids": 100,
+      "expected_coverage_and_unique_ids": true
+    },
+    "g1_scores_clean_dev.csv": {
+      "clean_rows": 20,
+      "unique_case_ids": 20,
+      "expected_coverage_and_unique_ids": true
+    },
+    "g1_scores_clean_test.csv": {
+      "clean_rows": 80,
+      "unique_case_ids": 80,
+      "expected_coverage_and_unique_ids": true
+    }
+  },
+  "locked_result_files_hashed": 61,
+  "locked_result_hashes_unchanged_during_audit": true,
+  "ground_truth_usage": "Label headers and saved CSV case IDs only; no label voxels or outcome values inspected.",
+  "downloads_or_inference": false,
+  "g3_pool_accessed": false,
+  "issues": [],
+  "passed": true
+}

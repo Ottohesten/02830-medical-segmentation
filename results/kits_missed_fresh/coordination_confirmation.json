@@ -1,0 +1,19 @@
+{
+  "reported_at": "2026-11-04T17:37:47+01:00",
+  "source": "Otto relayed Bjorn reply in this conversation",
+  "original_message_timestamp": null,
+  "confirmation_authority": "Bjorn, project contact/lead",
+  "baseline_pool_output_confirmed": true,
+  "original_models": [
+    "3mm task297 fold0",
+    "6mm task298 fold0"
+  ],
+  "prior_joint_ranking_test_not_run_confirmed": true,
+  "exact_locked_check_seen": "g1_missing_hull_mean",
+  "direct_frederik_reply_received": false,
+  "supplied_checkpoint_hashes_previously_verified": true,
+  "handoff_issues": [],
+  "scientific_lock_sha256": "a0aec5eeba9f2bf0b1ea1324b606b303abf844b6c4ecd6e0daf91e9171132f84",
+  "scientific_choices_changed": false,
+  "fresh_outcomes_opened_at_confirmation": false
+}

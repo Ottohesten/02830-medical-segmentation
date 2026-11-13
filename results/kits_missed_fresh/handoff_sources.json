@@ -1,0 +1,28 @@
+{
+  "retrieved_on": "2026-11-03",
+  "config": {
+    "url": "https://github.com/Ottohesten/02830-medical-segmentation/blob/frederik/g3/configs/g3_pool.yaml",
+    "git_blob_sha": "5086b7356820b02e5f41a6373fce1c2281366835"
+  },
+  "prepare_machine": {
+    "url": "https://github.com/Ottohesten/02830-medical-segmentation/blob/frederik/g3/results/g3_kits/prepare_machine.json",
+    "git_blob_sha": "516fddba6516e5b1b20d1d178d24e89cf29171f8"
+  },
+  "coordination": {
+    "source": "Otto relayed Bj\u00f8rn's instructions in this conversation on 2026-11-03; original message date not supplied",
+    "summary": "Use Frederik's g3_pool.zip in data/predictions/g3_pool; retrieve configs/g3_pool.yaml from frederik/g3; lock the check in the log before opening pool outcomes",
+    "direct_messages_sent_by_assistant": false,
+    "current_status": "Bjorn explicitly confirmed all remaining facts via Otto on 2026-11-04"
+  },
+  "limitations": [
+    "Upstream config declares baseline released tasks/fold 0 and no ranking evaluation; declarations are not an independent output provenance audit",
+    "Original prepare metadata has no checkpoint hashes; two supplied checkpoints match locked references and Bjorn attests original baseline pool provenance",
+    "Original message timestamp not supplied; confirmation is by project lead Bjorn via Otto, not a direct Frederik reply. Preflight passed; scoring in progress."
+  ],
+  "rechecked_on": "2026-11-03",
+  "current_status_audit": "handoff_provenance_audit.json",
+  "checkpoint_files_received_on": "2026-11-04",
+  "checkpoint_verification": "source_checkpoint_verification.json",
+  "coordination_confirmed_on": "2026-11-04",
+  "coordination_confirmation": "coordination_confirmation.json"
+}

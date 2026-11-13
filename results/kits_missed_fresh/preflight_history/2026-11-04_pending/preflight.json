@@ -1,0 +1,10 @@
+{
+  "ready": false,
+  "issues": [
+    "Missing bjorn_notified_at",
+    "Missing frederik_confirmed_at",
+    "Fresh ranking-metric status not confirmed"
+  ],
+  "fresh_headers_or_voxels_read": false,
+  "checked_at": "2026-11-04T17:30:49+01:00"
+}

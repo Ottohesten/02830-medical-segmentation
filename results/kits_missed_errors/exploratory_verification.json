@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "queue_rows": 100,
+  "review_budget": 20,
+  "n_bad": 15,
+  "n_bad_in_budget": 11,
+  "missed_case_ids": [
+    "case_00236",
+    "case_00406",
+    "case_00040",
+    "case_00184"
+  ],
+  "dice_3mm_and_6mm_match_saved_rounding": true,
+  "source_result_files_unchanged": 61,
+  "source_prediction_files_unchanged": 600,
+  "input_config_code_and_lock_hashes_match_run": true,
+  "all_inspected_input_hashes_match": true,
+  "figures": {
+    "case_00236": {
+      "pixels": [
+        1760,
+        1584
+      ],
+      "bytes": 2246457,
+      "slices": 4
+    },
+    "case_00406": {
+      "pixels": [
+        1760,
+        1584
+      ],
+      "bytes": 1663182,
+      "slices": 4
+    },
+    "case_00040": {
+      "pixels": [
+        1760,
+        1980
+      ],
+      "bytes": 2050036,
+      "slices": 5
+    },
+    "case_00184": {
+      "pixels": [
+        1760,
+        2376
+      ],
+      "bytes": 3279220,
+      "slices": 6
+    }
+  },
+  "figures_visually_inspected_by": "Codex (AI assistant)",
+  "selected_slice_count": 19,
+  "fresh_pool_used": false,
+  "new_ranking_scores_computed": false,
+  "publication": {
+    "ct_montages": "local only, excluded from Git",
+    "ignored_untracked_ct_montages": 4,
+    "tracked_ct_montages": 0
+  }
+}

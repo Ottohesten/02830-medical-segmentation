@@ -1,0 +1,17 @@
+method,reference,measure,bad_rule,diff,diff_ci_low,diff_ci_high,share_boot_better
+g1_missing_hull_mean,model_diff_mean_region,spearman_rho,,-0.18203895281573979,-0.2900772995077868,-0.08988043563404258,1.0
+g1_missing_hull_mean,model_diff_mean_region,quality_auc,,0.0010746883152552567,7.91427647661995e-05,0.0018777702460492757,0.9805
+g1_missing_hull_mean,model_diff_mean_region,review_auc,dice_below_083,-0.014000000000000012,-0.08999999999999997,0.04285714285714271,0.376
+g1_missing_hull_mean,model_diff_mean_region,review_auc,worst10,-0.014000000000000012,-0.08999999999999997,0.04285714285714271,0.376
+far_disagree_per_volume,model_diff_mean_region,spearman_rho,,-0.016045995567499638,-0.15109018470981783,0.12536959548720852,0.596
+far_disagree_per_volume,model_diff_mean_region,quality_auc,,0.00031220598846826153,-0.0007755290369706702,0.0013667931388376571,0.7105
+far_disagree_per_volume,model_diff_mean_region,review_auc,dice_below_083,0.014999999999999902,-0.010020833333333415,0.050000000000000044,0.8455
+far_disagree_per_volume,model_diff_mean_region,review_auc,worst10,0.014999999999999902,-0.010020833333333415,0.050000000000000044,0.8455
+entropy_mean_region,model_diff_mean_region,spearman_rho,,-0.19447944794479455,-0.35895730642626217,-0.03628549680423967,0.994
+entropy_mean_region,model_diff_mean_region,quality_auc,,0.0009189884563868267,-0.000657935642035231,0.0023396714250866,0.8765
+entropy_mean_region,model_diff_mean_region,review_auc,dice_below_083,-0.027000000000000135,-0.13707499999999986,0.05499999999999994,0.3305
+entropy_mean_region,model_diff_mean_region,review_auc,worst10,-0.027000000000000135,-0.13707499999999986,0.05499999999999994,0.3305
+neg_volume_ml,model_diff_mean_region,spearman_rho,,0.7670327032703269,0.4854140972478993,1.0172973317531737,0.0
+neg_volume_ml,model_diff_mean_region,quality_auc,,-0.01759239640200827,-0.02560242354675415,-0.009733751510799832,0.0
+neg_volume_ml,model_diff_mean_region,review_auc,dice_below_083,-0.516,-0.6850249999999999,-0.33713928571428586,0.0
+neg_volume_ml,model_diff_mean_region,review_auc,worst10,-0.516,-0.6850249999999999,-0.33713928571428586,0.0
