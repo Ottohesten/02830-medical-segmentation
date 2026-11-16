@@ -135,6 +135,11 @@ reused). In total about 15–25 h of GPU time, mostly overnight, with other prog
 
 ## Phase 3: the first ten scans (pre-specified follow-up, 2026-11-16)
 
+**Status: dropped on 2026-11-16, before any run** (PROJECT_LOG.md 2026-11-16). Phase 3 was optional for the group,
+and Frederik chose not to spend another 14 h of training on the PC. Nothing of phase 3 was trained or evaluated, so
+it has no results. Its code (commit `f26c5ee`) was removed again. The design below is kept as it was written. The
+optional random seeds 45 and 46 ("Design: learning curve") were not run either.
+
 Written before any phase 3 run (PROJECT_LOG.md 2026-11-16). This is a **pre-specified follow-up, not a new locked
 test**: the test set already drew the phase 2 curves, and the results of phase 2 and of task B are known (the queue's
 lead on the bad test scans at *k* = 10, its absence with the tumor left out, and the very large tumors among the

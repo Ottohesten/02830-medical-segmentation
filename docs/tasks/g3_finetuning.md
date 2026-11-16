@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn |
 | **Branch** | `frederik/g3` |
 | **Created** | 2026-10-20 |
-| **Status** | Phase 1 done 2026-10-21. Phase 2 (learning curve) started 2026-10-27: design written; **blocked**: Windows Smart App Control blocks torch on this PC |
+| **Status** | **Done** (2026-11-16). Phase 1 done 2026-10-21; phase 2 (learning curve) done 2026-11-02, closed 2026-11-16; task B done 2026-11-16; phase 3 dropped 2026-11-16 before any run |
 | **Machine** | Frederik's PC: NVIDIA RTX 4090 (24 GB), Intel i9-14900K (24 cores, 32 threads), 32 GB RAM, Windows 11 Home; the project runs natively on Windows (section 3) |
 
 This document is the task description **and** the working notes. Whoever works on the task (with or without an
@@ -173,6 +173,9 @@ Tick each box when done and write the date and a short note (numbers + file path
 
 ### Phase 3 — the first ten scans (task list from the group 2026-11-16; design: [docs/g3_plan.md](../g3_plan.md), "Phase 3")
 
+**Dropped on 2026-11-16, before any run** (section 6). Steps 1 (task B) and 2 (the design) are done; steps 3–4 were
+not done.
+
 - [x] **1. Task B (no GPU): what the queue's first pool scans contain** (tumors, cysts, voxels changed), now allowed
   after the joint locked test on the pool (2026-11-04).
   *Notes:* 2026-11-16: `scripts/g3_queue_content.py`. The queue's first 10 scans have a median tumor of 527 ml
@@ -182,11 +185,11 @@ Tick each box when done and write the date and a short note (numbers + file path
   *Notes:* 2026-11-16: g3_plan.md "Phase 3" and the log. Code: `phase3` in `configs/g3_kits.yaml`,
   `finetune.phase3_runs`, stage `phase3` in `scripts/g3_run.py`, `scripts/g3_phase3.py`,
   `g3_analysis.arm_difference_with_ci`; tests. Planned: 30 new runs (the 12 phase 2 runs at *k* = 10–30 are reused).
-- [ ] **3. Run phase 3** (30 runs, about 14 h): `frederik\g3_start.ps1` (its default stage is now `phase3`), after
-  Frederik's go.
-  *Notes:*
-- [ ] **4. Analysis:** `scripts/g3_phase3.py`; results in section 5, the log and the report notes.
-  *Notes:*
+  Later that day phase 3 was dropped and this code removed again (it is in commit `f26c5ee`).
+- [ ] ~~**3. Run phase 3** (30 runs, about 14 h)~~
+  *Notes:* 2026-11-16: dropped before any run (section 6). Nothing was trained.
+- [ ] ~~**4. Analysis**~~
+  *Notes:* 2026-11-16: dropped with step 3.
 
 ## 5. Results summary
 
@@ -243,6 +246,9 @@ Tick each box when done and write the date and a short note (numbers + file path
 - So the queue's early lead on the bad test scans fits the model learning from large-tumor scans that the whole tumor
   counts as kidney (our label definition), as foreseen in docs/g3_plan.md; with the tumor left out the lead is gone.
 
+**Phase 3:** dropped on 2026-11-16 before any run, so no results (section 6). There are no points below *k* = 10, and
+the queue has one training seed.
+
 ## 6. Decisions made in this task
 
 *(Date — decision — why. Also add each one to PROJECT_LOG.md.)*
@@ -278,6 +284,10 @@ Tick each box when done and write the date and a short note (numbers + file path
   *k* = 10, 20, 30; the phase 2 setting). Chosen details: the primary number averages over *k* = 1, 2, 3, 5, 10 (the
   first ten scans; *k* = 20 and 30 are secondary); the training noise enters through a two-stage bootstrap (scans,
   and each arm's three runs); the development and test scans are predicted as in phase 2.
+- 2026-11-16 — Phase 3 dropped, before any run — it was optional for the group (task C), and Frederik chose not to
+  spend another 14 h of training on the PC. Phase 2 and task B answer the main question. Its code was removed again
+  (in the history: `f26c5ee`), so the run code is as it was for phase 2. What is lost (limitations in the report): no
+  points below *k* = 10, and one training seed for the queue.
 
 ## 7. Questions for Bjørn
 
@@ -334,3 +344,7 @@ A new chat starts by reading this section.)*
   passed, 7 skipped). **Next action:** Frederik pushes (GitHub Desktop), uploads the zip, opens the pull request,
   and gives the go for phase 3 (`frederik\g3_start.ps1`, about 14 h); then `scripts/g3_phase3.py`, section 5, the
   log and the report notes. Due 2026-11-18, at the latest 2026-11-20.
+- 2026-11-16 (later): **G3 done.** Phase 3 dropped before any run (section 6); its code removed again, the design
+  kept in g3_plan.md, marked as dropped. Report notes, the log and the overview updated. Tests 188 passed,
+  7 skipped. Nothing is left to train. **Next action:** Frederik pushes (GitHub Desktop), uploads
+  `g3_kits_predictions.zip` to the OneDrive folder and opens the pull request.

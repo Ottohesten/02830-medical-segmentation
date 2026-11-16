@@ -6,9 +6,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from segreview.finetune import (choose_setting, corrected_target, experiment_runs, kidney_only, order_seed,
-                                other_organs_changed, own_target, phase3_runs, plan_runs, pool_orders, queue_order,
-                                random_order, save_atomically, side_labeled_truth, training_keys)
+from segreview.finetune import (choose_setting, corrected_target, experiment_runs, kidney_only, other_organs_changed,
+                                own_target, plan_runs, pool_orders, queue_order, random_order, save_atomically,
+                                side_labeled_truth, training_keys)
 
 POOL = [f"case_{i:05d}" for i in range(100)]
 KIDNEY = [2, 3, 23, 24]                      # the 3 mm model's kidney_right, kidney_left, kidney cysts
@@ -62,26 +62,6 @@ def test_experiment_runs_by_stage_and_the_grid_run_is_reused_by_the_curve():
     assert len({r["run_id"] for r in runs}) == len(runs)
     queue50 = points.set_index(["order", "k"]).run_id[("queue", 50)]
     assert next(r for r in runs if r["run_id"] == queue50)["stage"] == "grid"
-
-
-def test_phase3_adds_small_k_and_queue_seeds_and_reuses_the_phase2_runs():
-    scores = pd.DataFrame({"case_id": POOL, "s": np.linspace(0, 1, 100)})
-    orders = pool_orders(scores, "s", [42, 43, 44])
-    choice = {"steps": 2500, "lr": 0.001}
-    g3 = {**G3, "phase3": {"k_values": [1, 2, 3, 5, 10, 20, 30], "queue_seeds": [43, 44]}}
-    runs, points = experiment_runs(g3, orders, choice)
-    phase2_runs, phase2_points = experiment_runs(G3, orders, choice)
-    assert [r for r in runs if r["stage"] != "phase3"] == phase2_runs and points.equals(phase2_points)
-    new = [r for r in runs if r["stage"] == "phase3"]
-    assert len(new) == 6 * 4 + 2 * 3              # all six arms at k = 1, 2, 3, 5; the queue's new seeds at 10-30
-    s43 = next(r for r in new if r["run_id"] == "queue_s43_k010_S2500_L0.001")
-    assert s43["seed"] == 43 and s43["cases"] == orders["queue"][:10] and s43["order"] == "queue_s43"
-    _, p3 = phase3_runs(g3, orders, choice)
-    by_point = p3.set_index(["order", "k"]).run_id
-    assert len(p3) == 6 * 7
-    assert by_point[("queue", 10)] == "queue_k010_S2500_L0.001"              # the phase 2 run
-    assert by_point[("random43", 1)] == "random43_k001_S2500_L0.001"
-    assert order_seed("queue_s44", 42) == 44 and order_seed("random43", 42) == 43 and order_seed("queue", 42) == 42
 
 
 def test_choose_setting_rule_and_fewer_steps_within_the_tie():

@@ -5,7 +5,7 @@
 | **Owner** | Frederik |
 | **Branch** | `frederik/g3` |
 | **Where the details are** | [docs/tasks/g3_finetuning.md](../tasks/g3_finetuning.md), [docs/g3_plan.md](../g3_plan.md), `results/g3_*/` (on the branch) |
-| **Last updated** | 2026-11-16 (phase 2 and task B complete; phase 3 designed, not run yet) |
+| **Last updated** | 2026-11-16 (G3 done: phase 2 and task B complete; phase 3 dropped before any run) |
 
 How to fill this in: [README.md](README.md). Notes, not report text. Every number with its interval and file path.
 
@@ -65,12 +65,15 @@ scans (2,000 resamples); they do not include training noise.
   scans are too, and with the tumor left out the lead shrinks to +0.007 (on all scans the queue is even behind at
   *k* = 10). Task B is descriptive: it cannot separate the definition from other features of large-tumor scans.
 - Not shown: real reviewers (the simulated one is perfect and instant), other organs, datasets or models.
+- Not shown either: whether the order matters for the first few corrected scans (*k* < 10), where most of the gain
+  is. Phase 3 would have tested this and was dropped (section 5).
 
 ## 4. Limitations
 
-- The queue has one training seed, the random order three; the intervals cover the test scans only (phase 3 adds
-  queue seeds).
-- No points below *k* = 10, where most of the gain happens (phase 3 adds *k* = 1, 2, 3, 5).
+- The queue has one training seed, the random orders three; the intervals cover the test scans only. So the queue's
+  lead on the bad test scans at *k* = 10 is not checked against training noise (phase 3 would have added two queue
+  seeds; dropped).
+- No points below *k* = 10, where most of the gain happens (phase 3 would have added *k* = 1, 2, 3, 5; dropped).
 - Perfect simulated corrections (the ground truth); real corrections are slower and noisier.
 - One setting (chosen at *k* = 50) for every *k*; small *k* means many passes over few scans.
 - 80 test scans, of which 11 bad; one dataset, one model, one machine. The Windows torch build has another cuDNN than
@@ -88,6 +91,9 @@ scans (2,000 resamples); they do not include training noise.
 - 2026-10-27: the 3 mm model for the curves; the 6 mm model only for a pipeline test.
 - 2026-10-20: Windows instead of Linux/WSL on Frederik's PC (owner's choice): a separate environment with the package
   versions of `uv.lock`; `uv.lock` and `pyproject.toml` unchanged.
+- 2026-11-16: phase 3 (*k* = 1, 2, 3, 5 and two more training seeds for the queue, about 14 h on the GPU) was designed,
+  then dropped before any run. It was optional for the group, and the owner chose not to train more. Hence the two
+  limitations in section 4: no points below *k* = 10, and one queue seed.
 
 ## 6. What went wrong, and surprises
 
@@ -134,8 +140,9 @@ scans (2,000 resamples); they do not include training noise.
   tumor; the definition explains part of it, not all (exploratory; the two Dice definitions are not on one scale, so
   no percentage). The order effect, though, is about the definition: the queue front-loads the large-tumor scans
   (task B, section 2).
-- **Phase 3 (designed 2026-11-16, not run yet):** *k* = 1, 2, 3, 5 and three training seeds for the queue, with an
-  interval that includes training noise (docs/g3_plan.md, "Phase 3"). A pre-specified follow-up, not a locked test.
+- **Phase 3 (designed and dropped 2026-11-16, before any run):** *k* = 1, 2, 3, 5 and three training seeds for the
+  queue, with an interval that includes training noise (docs/g3_plan.md, "Phase 3"). Nothing was run, so there are
+  no results; the design stays in the plan as a record.
 - **Training noise vs order:** the random seeds spread 0.001–0.017 per *k*; queue − random is +0.0019 on average and
   +0.0015 at *k* = 100, where all orders use the same scans.
 - **One Windows PC with one GPU:** one run at a time (40 runs in about 17 h); RAM was the limit, not GPU memory (at

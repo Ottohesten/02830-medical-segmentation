@@ -9,9 +9,6 @@ reported") before any G3 model was trained. Used by scripts/g3_curves.py.
 - Training noise: the spread of the random seeds' curves at each k (their max - min).
 - Task B (2026-11-16, after the joint locked test on the pool): what the first k pool scans of each order contain
   (tumor, cyst, size of the simulated correction). Used by scripts/g3_queue_content.py.
-- Phase 3 (docs/g3_plan.md, "Phase 3"): the queue arm (several training seeds) against the random arm (several random
-  orders), with an interval over the test scans and, in two stages, over the arms' runs too. Used by
-  scripts/g3_phase3.py.
 """
 
 import numpy as np
@@ -74,35 +71,6 @@ def seed_spread(curve: pd.DataFrame, random_orders: list[str]) -> pd.DataFrame:
     out = rand.groupby("k").mean_dice.agg(["min", "max", "mean"]).reset_index()
     out["spread"] = out["max"] - out["min"]
     return out
-
-
-def arm_difference_with_ci(matrix: pd.DataFrame, cells: list[tuple[list[str], list[str]]], n_bootstrap: int,
-                           seed: int, ci_level: float) -> dict:
-    """Phase 3's number: the mean over cells (one per k) of (mean of the queue arm's runs - mean of the random arm's
-    runs), each run's value being its mean Dice over the matrix's scans. cells: [(queue run_ids, random run_ids)].
-
-    Two percentile intervals from the same resamples of the scans (the same scans for every model): over the scans
-    only, as in phase 2 (ci_low_scans, ci_high_scans), and in two stages (ci_low, ci_high), where each resample also
-    draws, for each cell and arm, as many of the arm's runs as it has, with replacement: training noise included."""
-    col = {m: i for i, m in enumerate(matrix.columns)}
-    values = matrix.to_numpy().T                                    # models x scans
-    index = [(np.array([col[m] for m in q]), np.array([col[m] for m in r])) for q, r in cells]
-
-    def difference(run_means: np.ndarray, picks) -> float:
-        return float(np.mean([run_means[q].mean() - run_means[r].mean() for q, r in picks]))
-
-    rng = np.random.default_rng(seed)
-    scans_only, two_stage = [], []
-    for _ in range(n_bootstrap):
-        run_means = values[:, rng.integers(0, values.shape[1], values.shape[1])].mean(axis=1)
-        scans_only.append(difference(run_means, index))
-        two_stage.append(difference(run_means, [(rng.choice(q, len(q)), rng.choice(r, len(r))) for q, r in index]))
-    alpha = (1 - ci_level) / 2
-    return {"estimate": difference(values.mean(axis=1), index),
-            "ci_low": float(np.quantile(two_stage, alpha)), "ci_high": float(np.quantile(two_stage, 1 - alpha)),
-            "ci_low_scans": float(np.quantile(scans_only, alpha)),
-            "ci_high_scans": float(np.quantile(scans_only, 1 - alpha)),
-            "n_scans": values.shape[1], "n_bootstrap": n_bootstrap}
 
 
 def first_k_content(orders: dict[str, list[str]], per_scan: pd.DataFrame, ks: list[int],

@@ -1,6 +1,6 @@
 """G3: fine-tuning TotalSegmentator on corrected scans, as a learning curve (docs/g3_plan.md, "Design: learning
-curve" and "Phase 3"; task document docs/tasks/g3_finetuning.md). Used by scripts/g3_prepare.py, g3_train.py,
-g3_evaluate.py, g3_curves.py, g3_phase3.py and g3_run.py.
+curve"; task document docs/tasks/g3_finetuning.md). Used by scripts/g3_prepare.py, g3_train.py, g3_evaluate.py,
+g3_curves.py and g3_run.py.
 
 The pieces, in the order the G3 scripts use them:
 1. The orders of the pool: the queue (most uncertain first, by the locked G1 score; no ground truth) and random
@@ -67,13 +67,8 @@ def setting_name(steps: int, lr: float) -> str:
 
 
 def order_seed(order: str, queue_seed: int) -> int:
-    """The training seed of an order: the queue uses queue_seed, a random order its own seed (random43 -> 43), and
-    the queue with another training seed (phase 3) that seed (queue_s43 -> 43)."""
-    if order == QUEUE:
-        return queue_seed
-    if order.startswith(f"{QUEUE}_s"):
-        return int(order.removeprefix(f"{QUEUE}_s"))
-    return int(order.removeprefix("random"))
+    """The training seed of an order: the queue uses queue_seed, a random order its own seed (random43 -> 43)."""
+    return queue_seed if order == QUEUE else int(order.removeprefix("random"))
 
 
 def plan_runs(orders: dict[str, list[str]], k_values: list[int], setting: dict, queue_seed: int,
@@ -126,7 +121,6 @@ def experiment_runs(g3: dict, orders: dict[str, list[str]], choice: dict | None 
     - 'grid':  every setting of settings_grid at its k, in each of its orders (development set only).
     - 'curve': once a setting is chosen (choice = {"steps", "lr"}): every order at every k, and the control. A curve
                run that is the same as a grid run (the chosen setting at the grid's k) keeps its grid run.
-    - 'phase3': if the config has phase3 (phase3_runs), its runs that are not already curve runs.
     Output: (runs, points); points has one row per (order, k) of the curves with its run_id (empty before choice).
     """
     seed = g3["orders"]["queue_seed"]
@@ -146,25 +140,7 @@ def experiment_runs(g3: dict, orders: dict[str, list[str]], choice: dict | None 
                                        g3.get("control_k"))
         known = {r["run_id"] for r in runs}
         runs += [{**r, "stage": "curve"} for r in curve_runs if r["run_id"] not in known]
-        if "phase3" in g3:
-            known = {r["run_id"] for r in runs}
-            runs += [{**r, "stage": "phase3"} for r in phase3_runs(g3, orders, choice)[0] if r["run_id"] not in known]
     return runs, points
-
-
-def phase3_runs(g3: dict, orders: dict[str, list[str]], choice: dict) -> tuple[list[dict], pd.DataFrame]:
-    """Phase 3 (docs/g3_plan.md, "Phase 3"): the first ten scans, and more training seeds for the queue.
-
-    Each extra training seed of the queue is an order of its own with the queue's scans (queue_s43); every order gets
-    every k of phase3.k_values. Where the queue (seed 42) or a random order has a phase 2 run at the same k, plan_runs
-    gives the same run_id (same scans, seed and setting), so that run is reused.
-    Output: (runs, points) as plan_runs; the points of phase 3's curves.
-    """
-    phase3 = g3["phase3"]
-    arms = {QUEUE: orders[QUEUE], **{f"{QUEUE}_s{seed}": orders[QUEUE] for seed in phase3["queue_seeds"]},
-            **{name: cases for name, cases in orders.items() if name != QUEUE}}
-    return plan_runs(arms, phase3["k_values"], {"steps": choice["steps"], "lr": choice["lr"]},
-                     g3["orders"]["queue_seed"])
 
 
 def choose_setting(dev_dice: pd.DataFrame, grid_runs: list[dict], n_dev: int, tie: float) -> tuple[dict,

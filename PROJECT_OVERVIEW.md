@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-11-16 (G3: task B done, phase 3 designed). Before: 2026-11-02 (G3: learning curve done; the queue order is not clearly better than random order).*
+*Last updated: 2026-11-16 (G3 done: task B; phase 3 dropped before any run). Before: 2026-11-02 (G3: learning curve done; the queue order is not clearly better than random order).*
 
 | | |
 |---|---|
@@ -108,8 +108,8 @@ did worst (Dice below 0.83), the queue is ahead with few corrected scans (+0.07 
 (median 527 ml in the first 10, against 20–55 ml in the random orders), and so do those 11 test scans (596 ml against
 30 ml), so the model learns our tumor-counts-as-kidney definition faster; with the tumor left out the lead is gone.
 Figure: `results/g3_kits/figures/learning_curve_test.png`; details: PROJECT_LOG.md, 2026-11-02 and 2026-11-16.
-Phase 3 (designed 2026-11-16, not run yet): *k* = 1, 2, 3, 5 and three training seeds for the queue
-([docs/g3_plan.md](docs/g3_plan.md), "Phase 3").
+A phase 3 (*k* = 1, 2, 3, 5 and three training seeds for the queue) was designed on 2026-11-16 and dropped before
+any run ([docs/g3_plan.md](docs/g3_plan.md), "Phase 3"), so the curve has no points below *k* = 10.
 
 ## 3. Where things are
 
@@ -174,9 +174,9 @@ The full working rules (git, branches, locked results, new experiments, what to 
    model output for the pool exists, together with Otto's missed-errors check; latest 2026-11-18.
 3. Everyone installs the project and tries the demo (`README.md` → Quick start).
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
-5. G3 (Frederik): the learning curve is done (2026-11-02, section 2;
-   [docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)), task B too (2026-11-16); pull request to `main`.
-   Next: phase 3 (about 14 h of GPU time), due 2026-11-18, at the latest 2026-11-20. The predictions are in the
+5. G3 (Frederik): done. The learning curve (2026-11-02, section 2;
+   [docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)) and task B (2026-11-16); phase 3 dropped before any
+   run (2026-11-16). Pull request to `main`. The predictions are in the
    OneDrive folder "delte store filer" (`g3_pool.zip`, `g3_kits_predictions.zip`; not in git; SHA-256 in the log).
 6. Divide the report sections (the Trello board exists).
 

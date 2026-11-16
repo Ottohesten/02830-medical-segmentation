@@ -11,9 +11,6 @@ Stages:
   curves   needs settings_choice.json: the original model on the development and test scans, then every curve run
            (k ascending, all orders at each k, then the control), each followed by its predictions of the
            development and test scans. Interrupted curves are therefore filled from left to right.
-  phase3   needs settings_choice.json: phase 3's new runs (configs/g3_kits.yaml, phase3; docs/g3_plan.md, "Phase 3"),
-           k ascending, at each k the queue's training seeds first, then the random orders; each followed by its
-           predictions of the development and test scans. Then scripts/g3_phase3.py.
 The processes' output goes to work_dir/logs/<stage>.log.
 
 Usage: .venv\\Scripts\\python.exe scripts\\g3_run.py --config configs\\g3_kits.yaml --stage grid
@@ -29,7 +26,7 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-STAGES = ("prepare", "test", "grid", "curves", "phase3")
+STAGES = ("prepare", "test", "grid", "curves")
 
 
 def run_step(cmd: list[str], log_path: Path) -> None:
@@ -76,7 +73,7 @@ def main():
 
     import pandas as pd
 
-    from segreview.finetune import QUEUE, choose_setting, experiment_runs, read_orders
+    from segreview.finetune import choose_setting, experiment_runs, read_orders
 
     orders = read_orders(results / "orders.csv")
     choice_path = results / "settings_choice.json"
@@ -124,24 +121,11 @@ def main():
         print(f"[g3_run] chosen setting: {chosen} (original model: {original:.4f}) -> {choice_path}")
         return
 
+    # curves
     if choice is None:
         raise SystemExit("No settings_choice.json: run the grid stage first.")
     evaluate(["original"], ["dev", "test"])
     by_id = {r["run_id"]: r for r in runs}
-
-    if args.stage == "phase3":
-        # at each k: the queue's training seeds (queue, queue_s43, ...), then the random orders
-        phase3 = sorted((r for r in runs if r["stage"] == "phase3"),
-                        key=lambda r: (r["k"], not r["order"].startswith(QUEUE), r["order"]))
-        for run in phase3:
-            print(f"[g3_run] {run['run_id']} ({run['k']} scans, seed {run['seed']}); RAM in use before training: "
-                  f"{ram_in_use()}", flush=True)
-            train(run["run_id"])
-            evaluate([run["run_id"]], ["dev", "test"])
-        print("[g3_run] phase3 stage finished; next: scripts/g3_phase3.py", flush=True)
-        return
-
-    # curves
     rank = {name: i for i, name in enumerate(list(orders) + ["nocorr"])}     # at each k: queue, random..., control
     ordered = points.assign(rank=points.order.map(rank)).sort_values(["k", "rank"])
     curve_ids = list(dict.fromkeys(ordered.run_id))                          # a shared run (k = 100) once

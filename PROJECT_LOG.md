@@ -1206,7 +1206,7 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
 - `[admin]` Frederik cannot confirm that Bjørn knows the exact locked check: per the task document Otto tells Bjørn,
   so Otto or Bjørn confirms it.
 
-## 2026-11-16: G3 phase 2 closed (pull request, report notes, predictions shared)
+## 2026-11-16: G3 closed (pull request, report notes, predictions shared, task B; phase 3 dropped)
 
 - `[admin]` Task list from the group for closing G3: (A, due 2026-11-15) a pull request from `frederik/g3` to `main`,
   step 9 ticked, the report notes, the predictions on the OneDrive; (B) what the queue's first pool scans contain,
@@ -1253,6 +1253,18 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
   - Secondary: each *k*; the bad test scans; the development set; the spread of the queue's seeds next to the random
     orders' at *k* = 10, 20, 30; forgetting. Overfitting at *k* = 1 (many passes over one scan) is reported as a
     limitation: Dice against the original model and the share of test scans that get worse.
+- `[decision]` **G3 phase 3 dropped, before any run** (Frederik, the same day). Phase 3 was optional (task C), and
+  Frederik chose not to spend another 14 h of training on the PC. Nothing of phase 3 was trained or evaluated.
+  - Its code from `f26c5ee` was removed again: the `phase3` section of `configs/g3_kits.yaml`,
+    `finetune.phase3_runs`, the `phase3` stage of `scripts/g3_run.py`, `scripts/g3_phase3.py` and
+    `g3_analysis.arm_difference_with_ci`. The run code and the config are as they were for phase 2, and
+    `frederik/g3_start.ps1` starts the curves stage by default again, as before.
+  - The design stays in docs/g3_plan.md, "Phase 3", as written, marked as dropped. The optional random seeds 45 and
+    46 (2026-10-27) were not run either.
+  - Two limitations stay in the report. There are no points below *k* = 10, where over 80 % of the gain happens, so
+    it is open whether the order matters for the first few corrected scans. The queue has one training seed, so its
+    lead on the bad test scans at *k* = 10 (+0.071) is not checked against training noise.
+  - G3 is done: phase 2 and task B.
 
 ---
 
