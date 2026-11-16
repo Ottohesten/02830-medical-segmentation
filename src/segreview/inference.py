@@ -41,6 +41,8 @@ class OrganPrediction:
     mask: np.ndarray        # uint8, 1 where the model predicts the organ
     prob: np.ndarray        # float32 in [0, 1], softmax probability of the organ
     affine: np.ndarray      # voxel -> world coordinates (canonical orientation)
+    labels: np.ndarray | None = None   # optional (predict(..., labels=True)): the label of all structures on the
+                                       # network's grid, cropped by nnU-Net (G3 compares models' other organs)
 
 
 def reduce_logits(logits: torch.Tensor, organ_channels: list[int], chunk: int) -> np.ndarray:
@@ -101,12 +103,13 @@ class OrganSegmenter:
         self.predictor.initialize_from_trained_model_folder(str(folder), use_folds=folds,
                                                             checkpoint_name="checkpoint_final.pth")
 
-    def predict(self, image: nib.Nifti1Image, tta: TTAPass | None = None) -> OrganPrediction:
+    def predict(self, image: nib.Nifti1Image, tta: TTAPass | None = None, labels: bool = False) -> OrganPrediction:
         """Predict the organ for one canonical CT image.
 
         Input: a nibabel image in canonical orientation, and optionally one test-time augmentation
                (TTA) pass. The augmentation is applied to the resampled scan before the network, and
                any spatial shift is undone on the output maps, so the result lines up with the scan.
+               labels=True also keeps the label of every structure (argmax) on the network's grid.
         Output: an OrganPrediction on the same voxel grid as the input image.
         """
         from totalsegmentator.resampling import change_spacing
@@ -132,6 +135,7 @@ class OrganSegmenter:
         logits = p.predict_logits_from_preprocessed_data(torch.from_numpy(data_pp))
 
         # Step 4: keep only organ information, then free the big logits array.
+        all_labels = logits.argmax(0).to(torch.uint8).numpy() if labels else None
         maps = reduce_logits(logits, self.spec.organ_channels, self.cfg["compute"]["reduce_chunk_slices"])
         del logits
 
@@ -152,4 +156,4 @@ class OrganSegmenter:
         margin, prob = back
         return OrganPrediction(mask=(margin > 0).astype(np.uint8),
                                prob=np.clip(prob, 0.0, 1.0),
-                               affine=image.affine)
+                               affine=image.affine, labels=all_labels)

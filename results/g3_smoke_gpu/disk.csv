@@ -1,0 +1,7 @@
+what,count,gb_total,gb_each
+"KiTS files, kits100 (100 scans)",100,9.938,
+"KiTS files, G3 pool (draw positions 101-200)",100,8.262,
+"preprocessed training scans, 6 mm (measured per scan x pool)",100,0.068,0.001
+"checkpoints of fine-tuned 6 mm models (2 each), per model",1,0.33,0.33
+"preprocessed training scans, 3 mm (measured per scan x pool)",100,0.428,0.004
+checkpoints of fine-tuned 3 mm models (2 each) in the plan,11,3.629,0.33
