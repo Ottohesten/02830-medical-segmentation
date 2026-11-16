@@ -160,14 +160,16 @@ Tick each box when done and write the date and a short note (numbers + file path
   orders), because the PC was switched off with its power button (PROJECT_LOG.md 2026-11-02). 2026-11-02 11:19:
   continued (`frederik/g3_start.ps1`); 11 runs and the rest of one evaluation left, about 4 h 45 min. Done
   2026-11-02 17:05 (about 17.3 h in all), then `scripts/g3_curves.py`. Results in section 5.
-- [ ] **9. Log per run:** config, commit and machine; loss per epoch (training and validation), learning rate, time
+- [x] **9. Log per run:** config, commit and machine; loss per epoch (training and validation), learning rate, time
   per epoch; which scans were corrected and how many voxels changed (not compared with the queue order before the
   locked test); predictions and Dice per scan and per model; time and memory. Small files in `results/g3_*/`;
   trained models and predictions in `data/` (the log says where, for the OneDrive).
   *Notes:* 2026-11-02: all in place (PROJECT_LOG.md 2026-11-02): `results/g3_kits/training/` (config, commit,
   machine, loss, learning rate and time per epoch, corrected scans, peak memory), `results/g3_kits/targets_fast.csv`
   (voxels changed), `results/g3_kits/dice/` (Dice and forgetting per scan and model). Not in git: the models in
-  `data/g3_kits/runs/` (12 GB) and the predictions in `data/g3_kits/predictions/` (1.3 GB).
+  `data/g3_kits/runs/` (12 GB) and the predictions in `data/g3_kits/predictions/` (1.3 GB). 2026-11-16: the
+  predictions are shared as `g3_kits_predictions.zip` in the OneDrive folder "delte store filer" (PROJECT_LOG.md
+  2026-11-16).
 
 ### Phase 3 — more seeds, extra analyses
 

@@ -1206,6 +1206,22 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
 - `[admin]` Frederik cannot confirm that Bjørn knows the exact locked check: per the task document Otto tells Bjørn,
   so Otto or Bjørn confirms it.
 
+## 2026-11-16: G3 phase 2 closed (pull request, report notes, predictions shared)
+
+- `[admin]` Task list from the group for closing G3: (A, due 2026-11-15) a pull request from `frederik/g3` to `main`,
+  step 9 ticked, the report notes, the predictions on the OneDrive; (B) what the queue's first pool scans contain,
+  now allowed after the joint locked test on the pool (2026-11-04, on `otto/missed-errors`); (C) a phase 3 on the
+  first ten scans, Frederik's if wanted.
+- `[admin]` `main` merged into `frederik/g3` (`c8a23b7`, report-notes templates; no conflicts). Step 9 ticked (all
+  per-run logging was in place on 2026-11-02). Report notes filled in for phase 2:
+  `docs/report_notes/frederik_g3.md`.
+- `[admin]` The curves' predictions (`data/g3_kits/predictions/`: 4,222 files, the development and test predictions
+  of the original model, the 40 curve models, the 6 other grid models and the pipeline test) zipped as
+  `data/g3_kits_predictions.zip` for the OneDrive folder "delte store filer": 1,363.0 MB, entries under
+  `g3_kits/predictions/` (unzip into `data/`), SHA-256
+  `eebb99eef7eab4e3bd0df16b8960df800783fd465d9da66e4883e838457bb38c`. Frederik uploads it in the browser (the group
+  folder is not synced on this PC). The trained models (`data/g3_kits/runs/`, 12 GB) stay on this PC.
+
 ---
 
 ## Open questions (update when answered, with the date)

@@ -5,57 +5,129 @@
 | **Owner** | Frederik |
 | **Branch** | `frederik/g3` |
 | **Where the details are** | [docs/tasks/g3_finetuning.md](../tasks/g3_finetuning.md), [docs/g3_plan.md](../g3_plan.md), `results/g3_*/` (on the branch) |
-| **Last updated** | *(date)* |
+| **Last updated** | 2026-11-16 (phase 2 complete; phase 3 not run yet) |
 
 How to fill this in: [README.md](README.md). Notes, not report text. Every number with its interval and file path.
 
 ## 1. What was done
 
-*(The question in one sentence, then the design in about 5 lines: data, method, what was compared with what, what
-was fixed before the results were seen.)*
+Question (Kristine, 2026-10-06 and 2026-10-21): when a reviewer's corrections are used to fine-tune the model, do the
+scans the ranking puts first (most uncertain) help more than other scans?
+
+- Data: 100 fresh KiTS23 scans for training (the "pool": positions 101–200 of the seed-42 draw, never in kits100);
+  kits100's 20 development and 80 test scans for evaluation.
+- Method: TotalSegmentator's 3 mm model fine-tuned on the first *k* = 10, 20, …, 100 pool scans, each point from the
+  original weights. Simulated reviewer: the kidney label (with tumor and cyst) is replaced by the ground truth; all
+  other structures keep the model's own prediction.
+- Compared: the queue order (locked G1 score, most uncertain first) against three random orders (seeds 42–44), and a
+  control trained on all 100 scans with the model's own prediction (no correction).
+- Fixed beforehand ([docs/g3_plan.md](../g3_plan.md), 2026-10-27): design, primary summary, secondary analyses. The
+  training setting was chosen on the development set only (2,500 steps, learning rate 0.001;
+  `results/g3_kits/settings_choice.json`) and logged before any fine-tuned model predicted a test scan. The test set
+  was used only to draw the curves.
+- 40 runs, about 17 h on one RTX 4090 under Windows.
 
 ## 2. Results
 
-*(One line per result: the number, its interval, the file it comes from, and whether it is locked/fixed beforehand
-or exploratory.)*
+On the 80 test scans, Dice of kidney + tumor + cyst unless stated. Intervals: 95 % paired bootstrap over the test
+scans (2,000 resamples); they do not include training noise.
+
+- **Primary (fixed beforehand):** queue − random, mean over *k* = 10–90: **+0.0019 [−0.0009, +0.0058]**
+  (`results/g3_kits/summary.csv`).
+- Curves, both orders (descriptive): 0.870 originally, 0.94 at *k* = 10 (queue 0.941, random mean 0.939),
+  0.952–0.955 at *k* = 70–100 (`results/g3_kits/curves.csv`).
+- Control without correction (secondary, fixed beforehand): 0.877 (`results/g3_kits/models.csv`).
+- Training noise: the three random seeds spread 0.001–0.017 per *k* (`results/g3_kits/seed_spread.csv`). At
+  *k* = 100 all orders train on the same 100 scans, and queue − random is still +0.0015 (`curves.csv`).
+- Secondary, the 11 "bad" test scans (Dice < 0.83 originally; mean 0.608): queue ahead early, +0.071
+  [+0.037, +0.114] at *k* = 10, mean over *k* +0.023 [+0.009, +0.048], gone from *k* = 70 (`summary.csv`; nine *k*
+  values, not corrected for multiple comparisons).
+- Secondary, tumor left out (`kidney_cyst_ignore_tumor`): mean over *k* −0.0010 [−0.0025, +0.0010]; at *k* = 10 the
+  queue is behind, −0.0076 [−0.0165, −0.0009]; bad scans +0.0068 [−0.0009, +0.0185] (`summary.csv`).
+- Secondary, development set (20 scans): +0.0019 [−0.0017, +0.0067] (`summary.csv`).
+- Forgetting (secondary): every fine-tuned model relabels 1.7–2.2 % of the non-kidney voxels compared with the
+  original model; the control 1.6 % (`models.csv`).
 
 ## 3. What it means, and what it does not show
 
-*(Your reading of the results in plain words. Which conclusions do the numbers support, and which do they not?)*
+- Correcting is what helps: 10 corrected scans give over 80 % of the gain at *k* = 100, and the same kind of training
+  without correction gives almost nothing (0.877 against 0.870).
+- The order of correction did not matter measurably for fine-tuning: the queue's advantage is no larger than the
+  training noise (rule fixed beforehand: a difference smaller than the seeds' spread is not read as an effect). This
+  says nothing against the queue for reviewers: finding the bad scans is G1's question, and Otto's locked test on
+  the pool (2026-11-04).
+- The queue's early lead on the bad test scans may only be the model learning our tumor definition faster (a bias
+  foreseen in docs/g3_plan.md): with the tumor left out, the lead shrinks to +0.007, and on all scans the queue is
+  behind at *k* = 10. Being checked (task B, 2026-11-16).
+- Not shown: real reviewers (the simulated one is perfect and instant), other organs, datasets or models.
 
 ## 4. Limitations
 
-*(What could make the result wrong or narrower than it looks: sample size, one machine, one seed, simulated instead
-of real, choices that could have gone another way.)*
+- The queue has one training seed, the random order three; the intervals cover the test scans only (phase 3 adds
+  queue seeds).
+- No points below *k* = 10, where most of the gain happens (phase 3 adds *k* = 1, 2, 3, 5).
+- Perfect simulated corrections (the ground truth); real corrections are slower and noisier.
+- One setting (chosen at *k* = 50) for every *k*; small *k* means many passes over few scans.
+- 80 test scans, of which 11 bad; one dataset, one model, one machine. The Windows torch build has another cuDNN than
+  `uv.lock`, so the original model was evaluated again on this PC and nothing is compared with the locked kits100
+  numbers from the Mac.
+- Forgetting is change, not error: KiTS has no ground truth for other organs.
 
 ## 5. Decisions and rejected alternatives
 
-*(Date, what was chosen, what was rejected, why. Only the ones a reader of the report or an examiner would ask
-about.)*
+- 2026-10-21/27: a learning curve (queue vs random order) instead of one fine-tuned model (Kristine's advice); every
+  point trained from the original weights, so the points are independent.
+- 2026-10-28: settings chosen on the development set at *k* = 50 in both orders; within 0.001 Dice the fewer steps
+  win (2,500 steps 0.9372 against 6,250 steps 0.9374; `results/g3_kits/settings_grid.csv`). The final checkpoint is
+  evaluated, not nnU-Net's "best", which is chosen on the training scans.
+- 2026-10-27: the 3 mm model for the curves; the 6 mm model only for a pipeline test.
+- 2026-10-20: Windows instead of Linux/WSL on Frederik's PC (owner's choice): a separate environment with the package
+  versions of `uv.lock`; `uv.lock` and `pyproject.toml` unchanged.
 
 ## 6. What went wrong, and surprises
 
-*(Problems, dead ends and things that turned out differently than expected, and what was learned from them.)*
+- Windows Smart App Control blocked torch (2026-10-27); the owner turned it off.
+- The PC was switched off twice during runs (power button, 2026-10-27 and 2026-10-28). Since then runs save every
+  epoch and continue where they stopped (`frederik/g3_start.ps1`, `frederik/g3_stop.ps1`); nothing was lost.
+- The PC's RAM (34 GB), not the GPU, was the limit: with 16 data workers and other programs open it was full.
+- Otto's integrity checks failed on Windows only because git checked text files out with CRLF line endings.
+- Surprise: over 80 % of the gain comes before *k* = 10, so the planned curve has little resolution where the order
+  could matter.
+- On the development set the queue was ahead in all four grid settings at *k* = 50; on the test set this did not
+  hold up.
 
 ## 7. Figures and tables for the report
 
-*(Path of each candidate figure or table, one line on what it shows, and which one you would pick if there is room
-for only one.)*
+- **First choice:** `results/g3_kits/figures/learning_curve_test.png` (PDF next to it): test Dice against *k*, queue
+  against random (each seed thin, mean dashed), all test scans and the 11 bad ones; the primary summary in the title.
+- Table: the per-*k* table in PROJECT_LOG.md, 2026-11-02, or `results/g3_kits/summary.csv`.
 
 ## 8. Top 3 points for the report
 
-1.
-2.
-3.
+1. Ten corrected scans raise test Dice from 0.870 to about 0.94; training on the model's own predictions instead
+   gives 0.877. The corrections give the gain.
+2. Correcting in the queue's order (most uncertain first) was not clearly better for fine-tuning than random order:
+   +0.0019 [−0.0009, +0.0058], about the size of the training noise.
+3. On the 11 worst test scans the queue helps early (+0.07 at *k* = 10), but not with the tumor left out: probably
+   the model learning our tumor-counts-as-kidney definition faster (being checked).
 
 ## 9. Contribution
 
-*(What you did yourself: code, experiments, analyses, documents. Short list.)*
+- Frederik: the Windows/GPU setup (`frederik/`); the G3 pipeline (`scripts/g3_*.py`, `src/segreview/finetune.py`,
+  `src/segreview/g3_analysis.py`, their tests); the settings grid and the 40 curve runs (about 21 h on the GPU); the
+  analysis; the task document and log entries; the pool's model output for the group's locked test.
+- Made with an AI coding assistant (Claude Code), directed and checked by Frederik.
 
 ## 10. Specific to this part
 
-- How much of the gain comes from the model learning our label definition (tumor counts as kidney), and how much
-  from fixing errors: the curves with the tumor left out, and the control without correction.
-- Training noise: how large it is next to the difference between the queue order and random order.
-- What running on one Windows PC with one GPU meant for the design (RAM as the limit, stopping and continuing runs).
-- Forgetting: what the relabelled share of other structures does and does not tell us.
+- **Label definition vs fixing errors:** with the tumor counted, Dice rises from 0.870 to 0.953 (random mean,
+  *k* = 100); with the tumor left out from 0.893 to 0.945; the control without correction reaches 0.877 and 0.901
+  (`curves.csv`, `dice/original.csv`, `dice/nocorr_k100_S2500_L0.001.csv`). So most of the gain remains without the
+  tumor; the definition explains part of it, not all (exploratory; the two Dice definitions are not on one scale, so
+  no percentage).
+- **Training noise vs order:** the random seeds spread 0.001–0.017 per *k*; queue − random is +0.0019 on average and
+  +0.0015 at *k* = 100, where all orders use the same scans.
+- **One Windows PC with one GPU:** one run at a time (40 runs in about 17 h); RAM was the limit, not GPU memory (at
+  most 17.3 of 24 GB); runs that save every epoch and continue after a stop; models compared only within this PC.
+- **Forgetting:** 1.7–2.2 % of non-kidney voxels relabeled (the control 1.6 %): fine-tuning itself changes other
+  structures a little, with or without corrections. Whether these changes are errors cannot be checked.
