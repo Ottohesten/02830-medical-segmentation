@@ -2,6 +2,7 @@
 # fixed on 2026-10-27, before the pipeline was built and before any G3 model was trained (PROJECT_LOG.md 2026-10-27).
 # Frederik's PC (RTX 4090, Windows): run with .venv\Scripts\python.exe, e.g.
 #   .venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage prepare   (then grid, curves)
+# The section phase3 was added on 2026-11-16, before any phase 3 run (docs/g3_plan.md, "Phase 3").
 
 name: g3_kits                         # small results in results/g3_kits/ (git); big files in work_dir (not in git)
 seed: 42
@@ -56,3 +57,9 @@ evaluation:
   summary_k: [10, 20, 30, 40, 50, 60, 70, 80, 90]   # the primary summary averages (queue - random) over these k
   n_bootstrap: 2000                   # paired bootstrap over the test scans
   ci_level: 0.95
+
+phase3:                               # the first ten scans: a pre-specified follow-up (docs/g3_plan.md, "Phase 3")
+  k_values: [1, 2, 3, 5, 10, 20, 30]  # every order at these k; the queue (seed 42) and random orders at k >= 10 are
+                                      # their phase 2 runs
+  queue_seeds: [43, 44]               # more training seeds for the queue (its own is orders.queue_seed)
+  summary_k: [1, 2, 3, 5, 10]         # the primary number averages (queue arm - random arm) over these k

@@ -5,7 +5,7 @@
 | **Owner** | Frederik |
 | **Branch** | `frederik/g3` |
 | **Where the details are** | [docs/tasks/g3_finetuning.md](../tasks/g3_finetuning.md), [docs/g3_plan.md](../g3_plan.md), `results/g3_*/` (on the branch) |
-| **Last updated** | 2026-11-16 (phase 2 complete; phase 3 not run yet) |
+| **Last updated** | 2026-11-16 (phase 2 and task B complete; phase 3 designed, not run yet) |
 
 How to fill this in: [README.md](README.md). Notes, not report text. Every number with its interval and file path.
 
@@ -47,6 +47,10 @@ scans (2,000 resamples); they do not include training noise.
 - Secondary, development set (20 scans): +0.0019 [−0.0017, +0.0067] (`summary.csv`).
 - Forgetting (secondary): every fine-tuned model relabels 1.7–2.2 % of the non-kidney voxels compared with the
   original model; the control 1.6 % (`models.csv`).
+- Task B (exploratory, after the locked test on the pool): the queue's first 10 pool scans have a median tumor of
+  527 ml against 20–55 ml in the random orders, and their corrections change a median of 16,242 voxels against
+  2,368–3,352 (`results/g3_kits/queue_content.csv`). The 11 bad test scans have a median tumor of 596 ml against 30 ml
+  for the other 69 (`results/g3_kits/test_tumor_sizes.csv`).
 
 ## 3. What it means, and what it does not show
 
@@ -56,9 +60,10 @@ scans (2,000 resamples); they do not include training noise.
   training noise (rule fixed beforehand: a difference smaller than the seeds' spread is not read as an effect). This
   says nothing against the queue for reviewers: finding the bad scans is G1's question, and Otto's locked test on
   the pool (2026-11-04).
-- The queue's early lead on the bad test scans may only be the model learning our tumor definition faster (a bias
-  foreseen in docs/g3_plan.md): with the tumor left out, the lead shrinks to +0.007, and on all scans the queue is
-  behind at *k* = 10. Being checked (task B, 2026-11-16).
+- The queue's early lead on the bad test scans is most likely the model learning our tumor definition faster (a
+  bias foreseen in docs/g3_plan.md): the most uncertain pool scans are the ones with very large tumors, the bad test
+  scans are too, and with the tumor left out the lead shrinks to +0.007 (on all scans the queue is even behind at
+  *k* = 10). Task B is descriptive: it cannot separate the definition from other features of large-tumor scans.
 - Not shown: real reviewers (the simulated one is perfect and instant), other organs, datasets or models.
 
 ## 4. Limitations
@@ -101,6 +106,8 @@ scans (2,000 resamples); they do not include training noise.
 - **First choice:** `results/g3_kits/figures/learning_curve_test.png` (PDF next to it): test Dice against *k*, queue
   against random (each seed thin, mean dashed), all test scans and the 11 bad ones; the primary summary in the title.
 - Table: the per-*k* table in PROJECT_LOG.md, 2026-11-02, or `results/g3_kits/summary.csv`.
+- Table for the label-definition point: `results/g3_kits/queue_content.csv` (tumor size and correction size of the
+  first 10, 20, 30 scans of each order; a short version is in PROJECT_LOG.md, 2026-11-16).
 
 ## 8. Top 3 points for the report
 
@@ -108,8 +115,9 @@ scans (2,000 resamples); they do not include training noise.
    gives 0.877. The corrections give the gain.
 2. Correcting in the queue's order (most uncertain first) was not clearly better for fine-tuning than random order:
    +0.0019 [−0.0009, +0.0058], about the size of the training noise.
-3. On the 11 worst test scans the queue helps early (+0.07 at *k* = 10), but not with the tumor left out: probably
-   the model learning our tumor-counts-as-kidney definition faster (being checked).
+3. On the 11 worst test scans the queue helps early (+0.07 at *k* = 10), but not with the tumor left out: the queue
+   starts with the large-tumor scans (median tumor 527 ml against 20–55 ml), so the model learns our
+   tumor-counts-as-kidney definition faster, rather than fixing errors better.
 
 ## 9. Contribution
 
@@ -124,7 +132,10 @@ scans (2,000 resamples); they do not include training noise.
   *k* = 100); with the tumor left out from 0.893 to 0.945; the control without correction reaches 0.877 and 0.901
   (`curves.csv`, `dice/original.csv`, `dice/nocorr_k100_S2500_L0.001.csv`). So most of the gain remains without the
   tumor; the definition explains part of it, not all (exploratory; the two Dice definitions are not on one scale, so
-  no percentage).
+  no percentage). The order effect, though, is about the definition: the queue front-loads the large-tumor scans
+  (task B, section 2).
+- **Phase 3 (designed 2026-11-16, not run yet):** *k* = 1, 2, 3, 5 and three training seeds for the queue, with an
+  interval that includes training noise (docs/g3_plan.md, "Phase 3"). A pre-specified follow-up, not a locked test.
 - **Training noise vs order:** the random seeds spread 0.001–0.017 per *k*; queue − random is +0.0019 on average and
   +0.0015 at *k* = 100, where all orders use the same scans.
 - **One Windows PC with one GPU:** one run at a time (40 runs in about 17 h); RAM was the limit, not GPU memory (at

@@ -133,6 +133,49 @@ saved in G1's format (`data/predictions/g3_pool/`), so the locked test can use i
 predicting 100 scans with each of the ~41 models about 8 h at 7.5 s per scan (less if the prepared scans are
 reused). In total about 15–25 h of GPU time, mostly overnight, with other programs closed (RAM).
 
+## Phase 3: the first ten scans (pre-specified follow-up, 2026-11-16)
+
+Written before any phase 3 run (PROJECT_LOG.md 2026-11-16). This is a **pre-specified follow-up, not a new locked
+test**: the test set already drew the phase 2 curves, and the results of phase 2 and of task B are known (the queue's
+lead on the bad test scans at *k* = 10, its absence with the tumor left out, and the very large tumors among the
+queue's first pool scans).
+
+**Why:** over 80 % of the gain comes before *k* = 10, where the curve has no points; and the queue has one training
+seed, while the random orders spread 0.930–0.947 at *k* = 10 (phase 2).
+
+**Runs (30; the phase 2 setting unchanged: 2,500 steps, learning rate 0.001, the 3 mm model, the final checkpoint;
+no new tuning):**
+
+- *k* = 1, 2, 3, 5: the queue order with training seeds 42, 43 and 44, and the three random orders (each with its own
+  seed, as in phase 2): 24 runs.
+- *k* = 10, 20, 30: the queue order with training seeds 43 and 44: 6 runs. The queue with seed 42 and the random
+  orders at these *k* are the phase 2 runs.
+- Each model predicts the 20 development and 80 test scans, as in phase 2. The runs go by *k* ascending; at each *k*
+  the queue's seeds first, then the random orders.
+
+**Primary number:** on the 80 test scans, Dice of kidney + tumor + cyst, the mean over *k* = 1, 2, 3, 5, 10 of (the
+mean of the queue's three runs − the mean of the three random orders' runs). Positive: correcting the most uncertain
+scans first helps the model faster.
+
+**Uncertainty, including training noise:** a 95 % percentile interval from a two-stage bootstrap with 2,000 resamples
+(seed 42). Each resample draws the 80 test scans with replacement (the same scans for every model) and, for each arm
+(queue, random) and each *k*, the arm's three runs with replacement. The interval over the scans only (as in phase 2)
+is reported next to it.
+
+**Always reported with it:** the same number with the tumor left out (`kidney_cyst_ignore_tumor`). Fixed reading: a
+lead with the tumor that is not there with the tumor left out is read as the model learning our label definition from
+the queue's large-tumor scans (task B), not as better error fixing.
+
+**Secondary:** the difference at each *k* (1, 2, 3, 5, 10, 20, 30) with the same interval; the 11 bad test scans; the
+development set; the spread of the queue's three seeds next to that of the random orders at *k* = 10, 20, 30 (how much
+of phase 2's spread is training noise alone); forgetting.
+
+**Overfitting at small *k* (a limitation to report):** at *k* = 1 the 2,500 steps are many passes over one scan.
+Reported: each arm's mean test Dice at *k* = 1 against the original model, and the share of test scans that get worse
+than with the original model.
+
+**Compute:** about 14 h on the RTX 4090 (30 runs of 12–14 min training and 13–17 min prediction).
+
 ## Compute
 
 **Measured on Frederik's RTX 4090 (smoke test 2026-10-21, `results/g3_smoke_gpu/`, `results/g3_smoke_gpu_3mm/`):**

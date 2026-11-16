@@ -1221,6 +1221,38 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
   `g3_kits/predictions/` (unzip into `data/`), SHA-256
   `eebb99eef7eab4e3bd0df16b8960df800783fd465d9da66e4883e838457bb38c`. Frederik uploads it in the browser (the group
   folder is not synced on this PC). The trained models (`data/g3_kits/runs/`, 12 GB) stay on this PC.
+- `[result]` **Task B: the queue's first pool scans have very large tumors** (`scripts/g3_queue_content.py`;
+  `results/g3_kits/queue_content.csv`, `pool_scan_content.csv`, `test_tumor_sizes.csv`; allowed after the joint
+  locked test of 2026-11-04). Every pool scan has a tumor (KiTS has only tumor patients), so the size is what differs:
+
+  | First *k* pool scans | Queue | Random 42 / 43 / 44 | Random, pooled |
+  |---|---|---|---|
+  | Tumor volume, median (mean), *k* = 10 | 527 ml (656) | 55 / 20 / 24 ml | 35 ml (139) |
+  | *k* = 20 | 345 ml (462) | 63 / 33 / 45 ml | 47 ml (180) |
+  | *k* = 30 | 174 ml (344) | 58 / 44 / 57 ml | 51 ml (168) |
+  | Voxels changed by the correction, median (mean), *k* = 10 | 16,242 (24,601) | 3,352 / 2,368 / 2,481 | 2,721 (6,331) |
+  | *k* = 20 | 9,729 (16,726) | 3,362 / 2,652 / 3,637 | 3,266 (7,136) |
+  | *k* = 30 | 7,577 (12,674) | 3,362 / 2,914 / 3,356 | 3,260 (6,642) |
+
+  Voxels on the 3 mm model's grid. Cysts are about as common in the queue's first scans as in the random orders'
+  (4 of 10 against 4–6). The 11 bad test scans are also the large-tumor scans: median tumor 596 ml (mean 598) against
+  30 ml (mean 73) for the other 69. So the queue's early lead on the bad test scans (+0.071 at *k* = 10), which is gone
+  with the tumor left out, fits the model learning from the queue's large-tumor scans that the whole tumor counts as
+  kidney: our label definition, as foreseen in docs/g3_plan.md ("Label definition"). Descriptive; it does not
+  separate the definition from other features of large-tumor scans.
+- `[decision]` **G3 phase 3: the first ten scans, a pre-specified follow-up** (written before any phase 3 run;
+  details in docs/g3_plan.md, "Phase 3"). Not a new locked test: the test set already drew the phase 2 curves, and
+  the results above are known.
+  - Runs (30, the phase 2 setting unchanged: 2,500 steps, learning rate 0.001, no new tuning): *k* = 1, 2, 3, 5 in
+    queue order with training seeds 42, 43, 44 and in the three random orders (24 runs); the queue with seeds 43 and
+    44 at *k* = 10, 20, 30 (6 runs). Each model predicts the 20 development and 80 test scans. About 14 h.
+  - **Primary number:** test set, kidney + tumor + cyst, the mean over *k* = 1, 2, 3, 5, 10 of (queue's three runs −
+    the three random orders' runs), with a 95 % interval from a two-stage bootstrap over test scans and, within each
+    arm and *k*, over its three runs (2,000 resamples, seed 42). Always reported with the same number with the tumor
+    left out; a lead that is only there with the tumor counts as the label definition, not as better error fixing.
+  - Secondary: each *k*; the bad test scans; the development set; the spread of the queue's seeds next to the random
+    orders' at *k* = 10, 20, 30; forgetting. Overfitting at *k* = 1 (many passes over one scan) is reported as a
+    limitation: Dice against the original model and the share of test scans that get worse.
 
 ---
 

@@ -171,9 +171,22 @@ Tick each box when done and write the date and a short note (numbers + file path
   predictions are shared as `g3_kits_predictions.zip` in the OneDrive folder "delte store filer" (PROJECT_LOG.md
   2026-11-16).
 
-### Phase 3 — more seeds, extra analyses
+### Phase 3 — the first ten scans (task list from the group 2026-11-16; design: [docs/g3_plan.md](../g3_plan.md), "Phase 3")
 
-- [ ] Planned when phase 2 is done (e.g. seeds 45–46, more queue seeds, a more realistic reviewer).
+- [x] **1. Task B (no GPU): what the queue's first pool scans contain** (tumors, cysts, voxels changed), now allowed
+  after the joint locked test on the pool (2026-11-04).
+  *Notes:* 2026-11-16: `scripts/g3_queue_content.py`. The queue's first 10 scans have a median tumor of 527 ml
+  against 20–55 ml in the random orders, and the bad test scans are the large-tumor ones (section 5;
+  PROJECT_LOG.md 2026-11-16).
+- [x] **2. Design and primary number, written before any run** (a pre-specified follow-up, not a new locked test).
+  *Notes:* 2026-11-16: g3_plan.md "Phase 3" and the log. Code: `phase3` in `configs/g3_kits.yaml`,
+  `finetune.phase3_runs`, stage `phase3` in `scripts/g3_run.py`, `scripts/g3_phase3.py`,
+  `g3_analysis.arm_difference_with_ci`; tests. Planned: 30 new runs (the 12 phase 2 runs at *k* = 10–30 are reused).
+- [ ] **3. Run phase 3** (30 runs, about 14 h): `frederik\g3_start.ps1` (its default stage is now `phase3`), after
+  Frederik's go.
+  *Notes:*
+- [ ] **4. Analysis:** `scripts/g3_phase3.py`; results in section 5, the log and the report notes.
+  *Notes:*
 
 ## 5. Results summary
 
@@ -220,6 +233,16 @@ Tick each box when done and write the date and a short note (numbers + file path
 - **Time:** 40 runs in about 17.3 h (one 2,500-step run 11.5–14.3 min; predicting the 100 development and test
   scans 13–17 min).
 
+**Task B (2026-11-16), what the queue's first pool scans contain** (`results/g3_kits/queue_content.csv`,
+`test_tumor_sizes.csv`; descriptive):
+
+- Every pool scan has a tumor (KiTS has only tumor patients); the size differs. First 10 scans: median tumor 527 ml in
+  the queue against 20–55 ml in the random orders; the correction changes a median of 16,242 voxels against
+  2,368–3,352. At *k* = 30 still 174 ml against 44–58 ml.
+- The 11 bad test scans are the large-tumor scans: median tumor 596 ml against 30 ml for the other 69.
+- So the queue's early lead on the bad test scans fits the model learning from large-tumor scans that the whole tumor
+  counts as kidney (our label definition), as foreseen in docs/g3_plan.md; with the tumor left out the lead is gone.
+
 ## 6. Decisions made in this task
 
 *(Date — decision — why. Also add each one to PROJECT_LOG.md.)*
@@ -251,6 +274,10 @@ Tick each box when done and write the date and a short note (numbers + file path
 - 2026-10-20 — The smoke test checks the kits100 overlap from the dataset's full case list plus the locked kits100
   results, so the 100 kits100 scans need not be downloaded on this PC; it records the RAM of all processes and the
   GPU memory, writes `machine.json`, and runs on Windows (no Unix-only `resource` module).
+- 2026-11-16 — Phase 3 as the group proposed (*k* = 1, 2, 3, 5 in all six arms; the queue with seeds 43 and 44 at
+  *k* = 10, 20, 30; the phase 2 setting). Chosen details: the primary number averages over *k* = 1, 2, 3, 5, 10 (the
+  first ten scans; *k* = 20 and 30 are secondary); the training noise enters through a two-stage bootstrap (scans,
+  and each arm's three runs); the development and test scans are predicted as in phase 2.
 
 ## 7. Questions for Bjørn
 
@@ -300,3 +327,10 @@ A new chat starts by reading this section.)*
   phase 3 (e.g. more random and queue seeds, since training noise is as large as the difference). The pool's model
   output for the group's locked test exists since 2026-10-27 (`results/g3_pool/scores.csv`,
   `data/predictions/g3_pool/`).
+- 2026-11-16: **Phase 2 closed; task B done; phase 3 ready to run.** `main` merged (`c8a23b7`), step 9 ticked, report
+  notes filled in (`docs/report_notes/frederik_g3.md`), the predictions zipped for the OneDrive
+  (`data/g3_kits_predictions.zip`), the pull request text written (no `gh` on this PC). Task B: the queue's first
+  scans have very large tumors (section 5). Phase 3 designed and logged before any run; code and tests ready (190
+  passed, 7 skipped). **Next action:** Frederik pushes (GitHub Desktop), uploads the zip, opens the pull request,
+  and gives the go for phase 3 (`frederik\g3_start.ps1`, about 14 h); then `scripts/g3_phase3.py`, section 5, the
+  log and the report notes. Due 2026-11-18, at the latest 2026-11-20.

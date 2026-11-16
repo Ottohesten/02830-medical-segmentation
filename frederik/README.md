@@ -33,11 +33,11 @@ Git for Windows must be on PATH, so every run can record its git commit in `mach
 closed, and `g3_stop.ps1` stops it with everything it started.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File frederik\g3_start.ps1                   # start or continue (the curves)
+powershell -ExecutionPolicy Bypass -File frederik\g3_start.ps1                   # start or continue (phase 3)
 powershell -ExecutionPolicy Bypass -File frederik\g3_start.ps1 prepare test grid # other stages
 powershell -ExecutionPolicy Bypass -File frederik\g3_stop.ps1                    # stop
 Get-Content data\g3_kits\logs\chain_status.txt                                   # progress per stage
-Get-Content data\g3_kits\logs\chain_curves.out -Tail 5                            # the last steps
+Get-Content data\g3_kits\logs\chain_phase3.out -Tail 5                            # the last steps
 ```
 
 **Stop and continue at any time.** Stopping loses at most the training epoch in progress (about 1 min) or the scan

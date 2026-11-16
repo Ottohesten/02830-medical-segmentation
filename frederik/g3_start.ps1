@@ -1,12 +1,12 @@
 # Starts G3 stages (frederik/g3_chain.ps1) as a process of its own: it keeps running when this window, VS Code or a
 # Claude session is closed, but not when the PC is shut down. Every stage skips finished work, so this is also how a
-# stopped chain is continued. Without stages it runs the learning curves.
+# stopped chain is continued. Without stages it runs phase 3 (the curves of phase 2 are done).
 #
-#   powershell -ExecutionPolicy Bypass -File frederik\g3_start.ps1               # = curves
+#   powershell -ExecutionPolicy Bypass -File frederik\g3_start.ps1               # = phase3
 #   powershell -ExecutionPolicy Bypass -File frederik\g3_start.ps1 grid curves
 
 param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Stages)
-if (-not $Stages) { $Stages = @("curves") }
+if (-not $Stages) { $Stages = @("phase3") }
 $repo = Split-Path $PSScriptRoot -Parent
 # One chain at a time: two would train and evaluate the same runs at once.
 $running = Get-CimInstance Win32_Process | Where-Object {
