@@ -43,7 +43,8 @@ scans (2,000 resamples); they do not include training noise.
   [+0.037, +0.114] at *k* = 10, mean over *k* +0.023 [+0.009, +0.048], gone from *k* = 70 (`summary.csv`; nine *k*
   values, not corrected for multiple comparisons).
 - Secondary, tumor left out (`kidney_cyst_ignore_tumor`): mean over *k* −0.0010 [−0.0025, +0.0010]; at *k* = 10 the
-  queue is behind, −0.0076 [−0.0165, −0.0009]; bad scans +0.0068 [−0.0009, +0.0185] (`summary.csv`).
+  queue is behind, −0.0076 [−0.0165, −0.0009]; bad scans, mean over *k* +0.0068 [−0.0009, +0.0185], at *k* = 10
+  +0.0164 [−0.0029, +0.0447] (`summary.csv`).
 - Secondary, development set (20 scans): +0.0019 [−0.0017, +0.0067] (`summary.csv`).
 - Forgetting (secondary): every fine-tuned model relabels 1.7–2.2 % of the non-kidney voxels compared with the
   original model; the control 1.6 % (`models.csv`).
@@ -62,8 +63,9 @@ scans (2,000 resamples); they do not include training noise.
   the pool (2026-11-04).
 - The queue's early lead on the bad test scans is most likely the model learning our tumor definition faster (a
   bias foreseen in docs/g3_plan.md): the most uncertain pool scans are the ones with very large tumors, the bad test
-  scans are too, and with the tumor left out the lead shrinks to +0.007 (on all scans the queue is even behind at
-  *k* = 10). Task B is descriptive: it cannot separate the definition from other features of large-tumor scans.
+  scans are too, and with the tumor left out the lead shrinks: at *k* = 10 from +0.071 to +0.016 [−0.003, +0.045],
+  averaged over *k* from +0.023 to +0.007 (on all scans the queue is even behind at *k* = 10). Task B is
+  descriptive: it cannot separate the definition from other features of large-tumor scans.
 - Not shown: real reviewers (the simulated one is perfect and instant), other organs, datasets or models.
 - Not shown either: whether the order matters for the first few corrected scans (*k* < 10), where most of the gain
   is. Phase 3 would have tested this and was dropped (section 5).
@@ -121,9 +123,9 @@ scans (2,000 resamples); they do not include training noise.
    gives 0.877. The corrections give the gain.
 2. Correcting in the queue's order (most uncertain first) was not clearly better for fine-tuning than random order:
    +0.0019 [−0.0009, +0.0058], about the size of the training noise.
-3. On the 11 worst test scans the queue helps early (+0.07 at *k* = 10), but not with the tumor left out: the queue
-   starts with the large-tumor scans (median tumor 527 ml against 20–55 ml), so the model learns our
-   tumor-counts-as-kidney definition faster, rather than fixing errors better.
+3. On the 11 worst test scans the queue helps early (+0.07 at *k* = 10), but hardly with the tumor left out (+0.016,
+   interval includes 0): the queue starts with the large-tumor scans (median tumor 527 ml against 20–55 ml), so the
+   model learns our tumor-counts-as-kidney definition faster, rather than fixing errors better.
 
 ## 9. Contribution
 
