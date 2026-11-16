@@ -176,8 +176,9 @@ The full working rules (git, branches, locked results, new experiments, what to 
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
 5. G3 (Frederik): done. The learning curve (2026-11-02, section 2;
    [docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)) and task B (2026-11-16); phase 3 dropped before any
-   run (2026-11-16). Pull request to `main`. The predictions are in the
-   OneDrive folder "delte store filer" (`g3_pool.zip`, `g3_kits_predictions.zip`; not in git; SHA-256 in the log).
+   run (2026-11-16). Pull request to `main`: [#3](https://github.com/Ottohesten/02830-medical-segmentation/pull/3).
+   The predictions are zipped for the OneDrive folder "delte store filer" (`g3_pool.zip`, `g3_kits_predictions.zip`;
+   not in git; SHA-256 in the log).
 6. Divide the report sections (the Trello board exists).
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).

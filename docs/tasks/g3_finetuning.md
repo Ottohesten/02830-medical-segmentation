@@ -346,5 +346,7 @@ A new chat starts by reading this section.)*
   log and the report notes. Due 2026-11-18, at the latest 2026-11-20.
 - 2026-11-16 (later): **G3 done.** Phase 3 dropped before any run (section 6); its code removed again, the design
   kept in g3_plan.md, marked as dropped. Report notes, the log and the overview updated. Tests 188 passed,
-  7 skipped. Nothing is left to train. **Next action:** Frederik pushes (GitHub Desktop), uploads
-  `g3_kits_predictions.zip` to the OneDrive folder and opens the pull request.
+  7 skipped. Nothing is left to train. Pushed; pull request
+  [#3](https://github.com/Ottohesten/02830-medical-segmentation/pull/3) to `main` opened (no conflicts).
+  **Next action:** Frederik uploads `g3_kits_predictions.zip` to the OneDrive folder, if not done yet; the group
+  reviews and merges #3.

@@ -1265,6 +1265,9 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
     it is open whether the order matters for the first few corrected scans. The queue has one training seed, so its
     lead on the bad test scans at *k* = 10 (+0.071) is not checked against training noise.
   - G3 is done: phase 2 and task B.
+- `[admin]` Pull request [#3](https://github.com/Ottohesten/02830-medical-segmentation/pull/3) from `frederik/g3`
+  to `main` opened at `d81a500` (no conflicts with `main`). Its description lists the changes to shared code and why,
+  what is not changed (`uv.lock`, `pyproject.toml`, locked results, no data) and the test result.
 
 ---
 
