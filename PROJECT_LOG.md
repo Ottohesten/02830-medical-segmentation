@@ -1905,3 +1905,31 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
   checked; group review remains required before merging into main. Step 6 still awaits Otto's actual
   presentation. Practical next improvements: review the combined branch, then present the primary-CI
   figure and gained/lost-case tradeoff and record actual group feedback. No fresh scoring or evaluation rerun.
+
+## 2026-11-18: Otto's report notes checked and completed for joint synthesis
+
+- `[admin]` Otto relayed Bjørn's report-notes assignment: fill each owner's own file, no report prose;
+  deadline 2026-11-20, then update when new results arrive. Fetched origin and ran `git merge main` on
+  `otto/missed-errors`: already up to date, main `b55e807` is an ancestor. Offline locked sync checked
+  133 packages without downloads/dependency changes.
+- `[decision]` Reviewed the initially filled notes against both task documents, configs, recorded run
+  provenance and saved tables. Expanded only `docs/report_notes/otto_robustness_missed_errors.md` within
+  the report-notes folder; retained English notes, completed all ten sections, and prioritized three
+  findings for the joint synthesis. Other owners' files and all numerical results are unchanged.
+- `[result]` Notes now explain the strength-selection rule and resolution simulation; GT-free score
+  definitions; confident-omission evidence; all fresh AUC intervals and paired comparisons; secondary
+  entropy/quality signals; the severe development displacement; target-label mismatch, patient grouping,
+  probability precision and assistant-review limits. Every result points to its saved source. No new
+  metric computation, model inference, pool opening or scientific-lock amendment.
+- `[dropped]` Do not write a chapter or duplicate the full log in the notes: Bjørn will combine the four
+  files before report writing and chapter allocation. Do not run more experiments for this handoff;
+  the completed evidence and its limitations answer the current request before the deadline.
+- `[result]` Checked ten completed sections, exactly three priority findings, all 29 code-formatted
+  source/figure references and the saved primary/secondary estimates used in the notes. `git diff`
+  confirms no changes to code, configs, dependencies, result folders or the frozen protocol. Full suite:
+  **230 passed, 38 skipped, 8 existing warnings, 4.27 s**, from
+  `MPLCONFIGDIR=/tmp/otto-missed-mpl UV_CACHE_DIR=/tmp/otto-uv-cache uv run --locked --offline pytest -ra`.
+- `[admin]` Updated the task decisions and "Where we are". The notes are complete for the experiments
+  finished by today. Next practical improvements: include the file in the four-owner synthesis; review
+  Otto's assigned chapter against the cited tables; add actual presentation/group feedback when available.
+  The actual group presentation remains pending; this completed notes handoff does not mark it delivered.

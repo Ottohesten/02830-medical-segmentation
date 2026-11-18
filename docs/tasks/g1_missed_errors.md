@@ -409,6 +409,12 @@ Full step 5 results: [fresh summary](../../results/kits_missed_fresh/fresh_summa
 
 ## 6. Decisions and dropped ideas
 
+- **2026-11-18 — Finish Otto's evidence notes for the joint report synthesis.** Follow Bjørn's request
+  and `docs/report_notes/README.md`: complete only Otto's report-notes file, covering both robustness and
+  missed errors, with source tables, intervals, interpretation, limitations, rejected alternatives and
+  three priority findings. Reject writing a chapter or copying the whole log: chapter allocation and
+  report prose follow the four-file synthesis. No new pool analysis or experiment is needed for this task.
+
 - **2026-11-18 — Integrate current main without rewriting scientific history.** Resolve the overview's
   overlapping status/next-step edits by keeping both G3 completion and the completed joint fresh test.
   Retain main's shared-code changes and all published result bytes. Reject replacing the old lock with
@@ -510,6 +516,16 @@ Full step 5 results: [fresh summary](../../results/kits_missed_fresh/fresh_summa
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
+
+- **2026-11-18 — Report-notes task complete for all currently finished experiments.** Rechecked current
+  main (`git merge main`: already up to date) and expanded
+  `docs/report_notes/otto_robustness_missed_errors.md` under Bjørn's November 20 deadline. All ten sections
+  are filled, including exactly three priority findings; saved estimates/intervals and all 29 source/figure
+  references were checked. Only Otto's file under `docs/report_notes/` was changed. No report chapter,
+  ranking rerun, source/lock change or other owner's note edit. Full suite: **230 passed, 38 skipped,
+  8 existing warnings, 4.27 s**. Next: include these notes in the four-file synthesis, review Otto's assigned
+  chapter against them, and update the notes when new results or actual group feedback arrive. The pending
+  five-minute presentation remains separate from this completed notes task.
 
 - **2026-11-18 — PR integration:** fetched origin and merged `origin/main` (`b55e807`) into
   `otto/missed-errors`. Only `PROJECT_OVERVIEW.md` had textual conflicts; combined the latest G3 and
