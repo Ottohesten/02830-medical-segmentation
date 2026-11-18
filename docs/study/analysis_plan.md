@@ -83,10 +83,18 @@ block. The difference is again with − without.
 
 ## Participants and stopping
 
-- **Stopping rule (set at the lock, because the study started late):** sessions run until and including the last
-  day in the Lock table. Then the analysis uses the **largest multiple of 4 complete participants, in ID order**
-  (`analysis.complete_groups_only`); later complete participants are listed in `study_exclusions.csv`. The rule
-  depends only on the date and the IDs, never on results. The original target was 16 participants.
+- **Stopping rule (set at the lock):** sessions run until and including the last day in the Lock table. Then the
+  analysis uses only **complete ID blocks** (P01–P04, P05–P08, ...: all four participants of the block complete;
+  `analysis.complete_groups_only`). Each block holds the 4 participant types once, so the conditions stay balanced.
+  Complete participants in an incomplete block are listed in `study_exclusions.csv`. The rule depends only on the
+  date and the IDs, never on results. The original target was 16 participants.
+- **Several experimenters and computers:** each group member who runs sessions gets whole ID blocks (Rasmus
+  P01–P04; the next blocks in the order members ask), so no ID is used twice. Sessions run on the members' own
+  computers, all in Google Chrome with the same commit and `study_kits_v2`. The program logs the browser and window
+  size; the experimenter writes the computer, operating system and input device (trackpad or mouse) in the session
+  log. Because every block runs on one computer and holds all 4 types, and every participant does both conditions
+  on the same computer, computer differences do not favor either condition; they add noise. Reported as a
+  limitation. After the stopping day, all session folders are copied into one `sessions/` folder for the analysis.
 - **At least 8 are needed for a test.** With 4 participants the exact two-sided Wilcoxon test cannot reach
   p < 0.05 (its smallest possible p-value is 2/16 = 0.125); then all numbers are reported descriptively only.
 - **No interim analysis.** Nobody runs `analyze_study.py` or looks at Dice values of P sessions before the last
@@ -150,4 +158,5 @@ time and reason, and reported in the paper.
 
 | Date and time | What changed | Why | Who |
 |---------------|--------------|-----|-----|
+| 2026-11-18, before P01 (no data yet) | Stopping rule: complete ID blocks instead of "the largest multiple of 4 in ID order"; IDs given out in blocks of 4 per experimenter; sessions on several computers, with computer, OS and input device in the session log; session folders collected in the group's OneDrive. Code: `keep_complete_groups`. | The group decided to run sessions at home on their own computers, which the lock did not foresee. With blocks per experimenter, "the first 4 in ID order" could mix blocks and break the balancing. | Rasmus |
 | 2026-11-18, before P01 | Consent form, SUS and session log online (Google Forms, a file on the Mac) instead of on paper; the participant ID is told, not written on a slip. | Practical: nothing is to be printed. Only the session logistics change; the analysis, data rules, code and config are as locked. | Rasmus |

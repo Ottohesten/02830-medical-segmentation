@@ -9,10 +9,13 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
 - **Participants:** lay people without medical imaging training (e.g. students, friends, family) who have not seen
   the project or the interface; no clinicians. Group members never take part (they know the design);
   they only run pilots with test IDs (see [pilot_plan.md](pilot_plan.md)). Nobody takes part twice.
-- **IDs:** real participants get `P01`, `P02`, ... in order, with no gaps. The number sets the order of scans and
-  conditions, and the design needs complete groups of four (P01–P04, P05–P08, ...). Test runs always use `T01`,
-  `T02`, ... Never use a P ID for a test.
-- **Same setup for everyone:** the same MacBook, Google Chrome, the built-in trackpad, no external mouse or screen.
+- **IDs:** each experimenter gets whole blocks of four from Rasmus (Rasmus P01–P04; the next blocks, P05–P08,
+  P09–P12, ..., in the order group members ask) and uses them in order. The number sets the order of scans and
+  conditions, and only complete blocks are analyzed, so finish a block before starting a new one. Test runs always
+  use `T01`, `T02`, ... Never use a P ID for a test.
+- **Setup:** your own computer is fine, but always Google Chrome, and preferably a trackpad (the interface is made
+  for one). Use the same computer for a whole block. Write the computer, operating system and input device
+  (trackpad or mouse) in the session log for every participant; the program does not record them.
 - **Say the same thing to everyone.** Read the script below. Do not tell participants that we expect the heatmap to
   help, and do not point at the screen or comment on their work.
 - **No names in the data.** The only link between a person and their data is the ID they write down themselves.
@@ -21,16 +24,21 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
 
 ## Before the study day
 
-1. On the study MacBook, pull the latest version and run `uv sync`. The prepared scans must be in
-   `data/study/study_kits/`: unzip the shared `study_kits_v2.zip` from the group's OneDrive ("delte store filer").
-   Do not run `scripts/prepare_study.py` yourself; everyone uses the same shared scans.
+1. On your computer: `git fetch` and `git checkout rasmus/user-study` (the locked version; the commit to use is
+   in the [analysis plan](analysis_plan.md) under "Changes after locking"), then `uv sync`. The prepared scans must
+   be in `data/study/study_kits/`: unzip the shared `study_kits_v2.zip` from the group's OneDrive ("delte store
+   filer"). Do not run `scripts/prepare_study.py` yourself; everyone uses the same shared scans.
 2. Check that `configs/study.yaml` has the settings agreed after the pilot and written in the
    [analysis plan](analysis_plan.md) under "Lock" (`time_limit_min`, `heatmap_display`, `tlx: after_each_block`).
    **Do not change the config once P01 has started.**
-3. Run `uv run pytest` (about two minutes). All tests should pass.
-4. Nothing is printed. Have two Google Forms ready: the [consent form](consent_form.md) and the
-   [SUS questionnaire](sus.md). Keep the [session log](#session-log) as a file on the Mac,
-   `data/study/study_kits/session_log.md` (not in git; no names).
+3. Run `uv run pytest` (about two minutes). All tests should pass. Then do one test session with a T ID on this
+   computer, check that painting, slices and saving work, and delete it (see "Cleaning up").
+4. Nothing is printed. The two Google Forms (answers go to Rasmus):
+   - consent ([text](consent_form.md)): https://docs.google.com/forms/d/e/1FAIpQLSdZz9KAvDo_5N-gFgvwN4umpCcCf5DgrAc8DXeiUUfGgdUcKA/viewform
+   - SUS ([text](sus.md)): https://docs.google.com/forms/d/e/1FAIpQLSd8Egake_9JoXYik549phpCIlkPr0UzTEMYxqsbiZriFfursQ/viewform
+
+   Keep the [session log](#session-log) as a file on your computer, `data/study/study_kits/session_log.md` (not in
+   git; no names).
 
 ## Before each session
 
@@ -110,9 +118,11 @@ Write their comments in the session log (no names). Then:
 
 1. Check the saved files in `data/study/study_kits/sessions/<ID>/`: `session.json`, 6 `*_mask.nii.gz`,
    6 `*_log.json`, `tlx_with_heatmap.json`, `tlx_without_heatmap.json` and a `practice/` folder.
-2. Add the SUS answers as one line to `data/study/study_kits/sus.csv` (see [sus.md](sus.md)), and fill in the row
-   in the session log.
-3. Copy `data/study/study_kits/sessions/<ID>/` and `sus.csv` to the group's backup location. **Never put study data in git.**
+2. Check that the SUS form shows the participant's answers (the form collects them centrally; Rasmus makes
+   `sus.csv` from it after the last session, see [sus.md](sus.md)), and fill in the row in the session log.
+3. Copy `data/study/study_kits/sessions/<ID>/` to the group's OneDrive, folder "delte store filer" →
+   `g2_sessions/<ID>/`, and your session log to `g2_sessions/logs/`. **Never put study data in git.** Nobody opens
+   other people's session folders before the analysis on 2026-11-24.
 4. Leave the interface running for the next session, or stop it with Ctrl+C in the terminal.
 
 ## If something goes wrong
@@ -141,21 +151,27 @@ Write their comments in the session log (no names). Then:
   uv run python scripts/clean_test_data.py --config configs/study.yaml             # delete it
   ```
 
-- **End of the study day:** stop the server (Ctrl+C) and make sure every session, `sus.csv` and the session log
-  are backed up. The consent answers stay in the consent form's own response sheet, apart from the data.
-- **After the study:** `uv run python scripts/analyze_study.py --config configs/study.yaml`.
+- **End of the study day:** stop the server (Ctrl+C) and make sure every session folder and your session log are
+  in `g2_sessions/` on OneDrive. The consent answers stay in the consent form's own response sheet, apart from the data.
+- **After the study (2026-11-24, Rasmus):** copy all `g2_sessions/<ID>/` folders into
+  `data/study/study_kits/sessions/`, export the SUS form to `data/study/study_kits/sus.csv`, then run
+  `uv run python scripts/analyze_study.py --config configs/study.yaml` once.
 
 ## Session log
 
 One row per session. No names.
 
-| ID | Date | Start | End | Experimenter | Restarted scans / problems | Comments from the participant |
-|----|------|-------|-----|--------------|----------------------------|-------------------------------|
-| P01 | | | | | | |
-| P02 | | | | | | |
-| P03 | | | | | | |
-| P04 | | | | | | |
-| P05 | | | | | | |
-| P06 | | | | | | |
-| P07 | | | | | | |
-| P08 | | | | | | |
+Also note usability problems you see (what happened, on which screen) with a severity from 0 to 4 (Nielsen:
+0 not a problem, 1 cosmetic, 2 minor, 3 major, 4 catastrophe). They are not part of the analysis; they feed the
+report's list of improvements for a version 2.
+
+| ID | Date | Start | End | Experimenter | Computer, OS, trackpad/mouse | Restarted scans / problems | Usability problems (severity 0–4) | Comments from the participant |
+|----|------|-------|-----|--------------|------------------------------|----------------------------|-----------------------------------|-------------------------------|
+| P01 | | | | | | | | |
+| P02 | | | | | | | | |
+| P03 | | | | | | | | |
+| P04 | | | | | | | | |
+| P05 | | | | | | | | |
+| P06 | | | | | | | | |
+| P07 | | | | | | | | |
+| P08 | | | | | | | | |

@@ -86,8 +86,8 @@ analysis:                             # scripts/analyze_study.py; LOCKED with do
   alpha: 0.05                         # two-sided; H2 (NASA-TLX) is only tested if H1 (gain per minute) is supported
   n_bootstrap: 10000                  # resamples of participants for the confidence interval of the mean difference
   ci_level: 0.95                      # (the bootstrap uses the study seed)
-  complete_groups_only: true          # stopping rule: analyze the largest multiple of 4 complete participants,
-                                      # in id order (the others are listed as excluded)
+  complete_groups_only: true          # stopping rule: analyze only complete id blocks P01-P04, P05-P08, ...
+                                      # (each holds the 4 types once); the others are listed as excluded
 
 power:                                # planning: participants needed for an assumed effect (scripts/power_study.py)
   effect_sizes_dz: [0, 0.5, 0.8, 1.0, 1.2]   # d_z = mean / SD of the per-participant differences (with - without);

@@ -237,17 +237,17 @@ def test_incomplete_sessions_timeouts_and_unchanged_scans(simulated, tmp_path):
     assert counts.n_unchanged.sum() == 1 and counts.n_timeout.sum() == 1 and counts.n_scans.sum() == 18
 
 
-def test_stopping_rule_keeps_complete_groups_of_four():
-    """Only the largest multiple of 4 complete participants counts, in id order; the rest are listed as excluded."""
-    ids = ["P01", "P02", "P03", "P04", "P05", "P06", "P07"]
+def test_stopping_rule_keeps_complete_id_blocks():
+    """Only complete id blocks of 4 (P01-P04, P05-P08, ...) count; the rest are listed as excluded."""
+    ids = ["P01", "P02", "P03", "P05", "P06", "P07", "P08", "P09"]
     scans = pd.DataFrame({"participant": np.repeat(ids, 6), "included": True})
-    scans.loc[scans.participant == "P06", "included"] = False                  # incomplete, already excluded
+    kept, excl = keep_complete_groups(scans, pd.DataFrame(columns=["participant", "n_scans", "reason"]))
+    assert sorted(kept.loc[kept.included, "participant"].unique()) == ["P05", "P06", "P07", "P08"]
+    assert excl.participant.tolist() == ["P01", "P02", "P03", "P09"] and "stopping rule" in excl.reason.iloc[0]
+    scans.loc[scans.participant == "P06", "included"] = False                  # incomplete session in block 2
     exclusions = pd.DataFrame({"participant": ["P06"], "n_scans": [5], "reason": ["incomplete session"]})
     kept, excl = keep_complete_groups(scans, exclusions)
-    assert sorted(kept.loc[kept.included, "participant"].unique()) == ["P01", "P02", "P03", "P04"]
-    assert excl.participant.tolist() == ["P06", "P05", "P07"] and "stopping rule" in excl.reason.iloc[1]
-    kept, excl = keep_complete_groups(scans[scans.participant.isin(ids[:3])], exclusions.iloc[:0])
-    assert not kept.included.any() and len(excl) == 3                           # fewer than 4: nothing analyzed
+    assert not kept.included.any() and excl.participant.tolist()[0] == "P06" and len(excl) == 8
 
 
 def test_sus_scores(tmp_path):

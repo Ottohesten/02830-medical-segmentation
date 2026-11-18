@@ -24,8 +24,8 @@ comparison is exploratory: its p-value is reported, but no conclusion is drawn f
 
 Which data count: only real participant ids (P01, ...). Test ids (T01, ...) and practice scans are left out.
 Only COMPLETE sessions count (every study scan saved); other participants are listed in study_exclusions.csv.
-Stopping rule (analysis.complete_groups_only): only the largest multiple of 4 complete participants is analyzed, in id order (complete groups
-of the 4 participant types); the rest are listed as excluded too.
+Stopping rule (analysis.complete_groups_only): only complete id blocks (P01-P04, P05-P08, ...) are analyzed, so
+every block holds the 4 participant types once; complete participants in other blocks are listed as excluded too.
 All participants must have seen the heatmap shown the same way (study.heatmap_display, saved by the server in
 every scan log); the analysis stops if the display differs between scans, because then "with heatmap" would mean
 different things for different participants.
@@ -162,16 +162,19 @@ def mark_complete(scans: pd.DataFrame, n_study_scans: int) -> tuple[pd.DataFrame
 
 def keep_complete_groups(scans: pd.DataFrame, exclusions: pd.DataFrame,
                          group: int = GROUP_SIZE) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Stopping rule: analyze only the largest multiple of `group` complete participants, in id order.
+    """Stopping rule: analyze only complete id blocks (P01-P04, P05-P08, ...): all `group` participants complete.
 
-    The balancing needs complete groups of 4 participant types; complete participants after the last full group
-    are left out and listed in the exclusions. Which ones are left out depends only on their ids, not on results.
+    Each block holds the 4 participant types once (type = (number - 1) % 4), so the conditions stay balanced, also
+    when the blocks are run by different experimenters. Complete participants in an incomplete block are left out
+    and listed in the exclusions. Which ones are left out depends only on their ids, not on results.
     """
-    complete = sorted(scans.loc[scans.included, "participant"].unique())
-    extra = complete[len(complete) // group * group:]
+    complete = scans.loc[scans.included, "participant"].unique()
+    block = {p: (int("".join(filter(str.isdigit, p))) - 1) // group for p in complete}
+    sizes = pd.Series(block).value_counts()
+    extra = sorted(p for p in complete if sizes[block[p]] < group)
     scans = scans.assign(included=scans.included & ~scans.participant.isin(extra))
     rows = pd.DataFrame({"participant": extra, "n_scans": [int((scans.participant == p).sum()) for p in extra],
-                         "reason": [f"after the last complete group of {group} (stopping rule)"] * len(extra)})
+                         "reason": [f"id block of {group} not complete (stopping rule)"] * len(extra)})
     return scans, pd.concat([exclusions, rows], ignore_index=True) if len(rows) else exclusions
 
 

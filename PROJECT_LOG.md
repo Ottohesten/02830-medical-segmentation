@@ -979,6 +979,10 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
 - `[decision]` (2026-11-18 11:35, G2) Analysis plan locked by Rasmus in commit `17286c8e3953`: `contour`, 5 min,
   `study_kits_v2`, sessions until 2026-11-23, complete groups of 4. Participants: lay people without medical imaging
   training who have not seen the project (widened from fellow students before the lock).
+- `[decision]` (2026-11-18, G2, after the lock, before P01, no data) Sessions also on group members' own computers:
+  IDs in blocks of 4 per experimenter, stopping rule = complete ID blocks (keeps the balancing), computer/OS/input
+  logged by hand, session folders in OneDrive `g2_sessions/`, consent and SUS as Google Forms. Recorded under
+  "Changes after locking" in `docs/study/analysis_plan.md`.
 
 ## 2026-10-27: G3 phase 2 starts — learning-curve design, merge, Smart App Control blocks torch
 

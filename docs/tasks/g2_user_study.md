@@ -203,3 +203,8 @@ A new chat starts by reading this section.)*
 - 2026-11-18 11:35: Step 5 done, analysis plan locked (`17286c8e3953`). Nothing in the setup changes from now on. Next
   action: sessions P01, P02, ... until 2026-11-23 (at least 8 for a testable result; Rasmus expects to find 4, the
   group helps); report notes by 2026-11-20; analysis once on 2026-11-24.
+- 2026-11-18 (after the lock, before P01): sessions also at home on group members' computers. IDs in blocks of 4
+  per experimenter (Rasmus P01–P04), stopping rule changed to complete ID blocks, computer/OS/input in the session
+  log, session folders in OneDrive `delte store filer/g2_sessions/`, usability problems with severity 0–4 in the
+  log (for the report's version-2 list). Consent and SUS as Google Forms (links in the session guide). All in the
+  analysis plan under "Changes after locking".
