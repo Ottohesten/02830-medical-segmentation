@@ -8,7 +8,10 @@ under an identical config and source snapshot. --verify checks saved outputs wit
 import hashlib
 import json
 import os
-import resource
+try:
+    import resource          # peak memory of the process (macOS and Linux)
+except ImportError:          # Windows has no resource module: the peak memory is not recorded there
+    resource = None
 import signal
 import subprocess
 import sys
@@ -196,9 +199,9 @@ def run_test(cfg: dict, config_path: Path, cases: list, out: Path) -> None:
         info.update({'status': 'failed', 'error': f'{type(exc).__name__}: {exc}'})
         raise
     finally:
-        peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss if resource else None
         info.update({'elapsed_seconds': time.perf_counter() - start,
-                     'process_peak_rss_mib': peak / 2**20 if sys.platform == 'darwin' else peak / 1024,
+                     'process_peak_rss_mib': None if peak is None else peak / 2**20 if sys.platform == 'darwin' else peak / 1024,
                      'gpu_peak_allocated_mib': torch.cuda.max_memory_allocated() / 2**20 if device.type == 'cuda' else None})
         write_json(out / 'machine.json', info)
         history.append(info)

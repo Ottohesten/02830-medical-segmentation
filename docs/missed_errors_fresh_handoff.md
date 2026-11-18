@@ -1,5 +1,11 @@
 # Fresh ranking test: confirmed coordination and input handoff
 
+**Integration note (2026-11-18):** the completed test used the source version recorded with its November 4
+results. Merging the group's newer `main` brings in an updated `src/segreview/data.py`; its current fingerprint
+therefore differs from the historical scientific lock. Preserve that lock and the saved outputs. The frozen
+runner should reject that source change, and this integration does not authorize another fresh evaluation.
+The original implementation remains in commit `402dd91`; reporting can use the verified saved aggregates.
+
 **Coordination complete — confirmed by Bjørn via Otto on 2026-11-04.** No direct group message was sent by
 the assistant. On 2026-11-03 Otto relayed Bjørn's instruction to use Frederik's
 `g3_pool.zip` and pool config; maps are now local. Source metadata and current gaps are recorded in

@@ -409,6 +409,12 @@ Full step 5 results: [fresh summary](../../results/kits_missed_fresh/fresh_summa
 
 ## 6. Decisions and dropped ideas
 
+- **2026-11-18 — Integrate current main without rewriting scientific history.** Resolve the overview's
+  overlapping status/next-step edits by keeping both G3 completion and the completed joint fresh test.
+  Retain main's shared-code changes and all published result bytes. Reject replacing the old lock with
+  current hashes: the lock identifies the code used before outcomes, not the latest repository state.
+  Update only Otto's report-notes file under the new CONTRIBUTING section 7; no fresh evaluation rerun.
+
 - **2026-11-02 — Reuse the existing shared environment and saved kits100 predictions.** Step 1 needs CPU
   file/header checks only. A GPU-environment change is deferred because it would not help this step; no new
   kits100 inference is permitted. No detector ideas have been tested or rejected yet.
@@ -504,6 +510,19 @@ Full step 5 results: [fresh summary](../../results/kits_missed_fresh/fresh_summa
 
 *(Update at the end of every work session: date, last finished step, what is half done, the next concrete action,
 and ideas for what could make the result better.)*
+
+- **2026-11-18 — PR integration:** fetched origin and merged `origin/main` (`b55e807`) into
+  `otto/missed-errors`. Only `PROJECT_OVERVIEW.md` had textual conflicts; combined the latest G3 and
+  missed-errors statuses and replaced obsolete fresh-test instructions with the completed result.
+  Otto's report notes are filled from saved outputs under CONTRIBUTING section 7. Integration checks
+  passed: **230 tests passed, 38 skipped, 8 existing warnings, 4.72 s**; all **348** previously published
+  branch result files and **413** incoming main result files retain their exact bytes. Evidence:
+  `results/kits_missed_integration/{merge_verification.json,tests.txt}`. No inference, ranking test or
+  scientific-lock amendment was run. The original
+  fresh execution source is in `402dd91`; main's updated `src/segreview/data.py` should fail that
+  historical source fingerprint. Publication target: existing PR #2, which remains a draft for group
+  review before merging into main. Next: group review of the combined branch and Otto's five-minute
+  presentation, then record its actual date/feedback. Step 6 still awaits that presentation.
 
 - **2026-11-04 — Last fully finished step: 5. The single joint fresh test is complete and verified.**
   All 100 GT-free scores were saved before GT; both locked questions ran in one guarded outcome stage.
