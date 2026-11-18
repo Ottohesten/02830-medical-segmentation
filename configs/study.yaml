@@ -14,7 +14,8 @@ paths:
 
 selection:                            # which KiTS scans are suitable for the study (ground truth is used here,
   dice_min: 0.70                      # only to pick scans; the participants never see it)
-  dice_max: 0.90                      # visible errors, but not an empty or nearly empty mask
+  dice_max: 0.88                      # visible errors, but not an empty or nearly empty mask (0.90 until
+                                      # 2026-11: let in scans whose error was only a thin edge; study_kits_v2)
   error_ml_min: 50                    # total wrong volume (missed + extra) in ml: big enough to see ...
   error_ml_max: 400                   # ... small enough to fix within the time limit
   max_axial_slices: 150               # many thin slices make a fix too slow with a 2D brush
@@ -85,6 +86,8 @@ analysis:                             # scripts/analyze_study.py; LOCKED with do
   alpha: 0.05                         # two-sided; H2 (NASA-TLX) is only tested if H1 (gain per minute) is supported
   n_bootstrap: 10000                  # resamples of participants for the confidence interval of the mean difference
   ci_level: 0.95                      # (the bootstrap uses the study seed)
+  complete_groups_only: true          # stopping rule: analyze the largest multiple of 4 complete participants,
+                                      # in id order (the others are listed as excluded)
 
 power:                                # planning: participants needed for an assumed effect (scripts/power_study.py)
   effect_sizes_dz: [0, 0.5, 0.8, 1.0, 1.2]   # d_z = mean / SD of the per-participant differences (with - without);

@@ -14,8 +14,8 @@ import pytest
 
 from segreview.config import REPO_ROOT
 from segreview.study import WITH, WITHOUT, assignment, study_dir
-from segreview.study_analysis import (TruthCache, analyze, conclude, paired_tests, participant_table, scan_table,
-                                      signed_rank_p, wilcoxon_paired)
+from segreview.study_analysis import (TruthCache, analyze, conclude, keep_complete_groups, paired_tests,
+                                      participant_table, scan_table, signed_rank_p, sus_table, wilcoxon_paired)
 from tests.conftest import manifest
 from tests.simulated_sessions import simulate_sessions
 
@@ -223,6 +223,7 @@ def test_incomplete_sessions_timeouts_and_unchanged_scans(simulated, tmp_path):
     log.update(reason="timeout", duration_s=300.2)
     log_path.write_text(json.dumps(log))
 
+    study = {**study, "analysis": {**study["analysis"], "complete_groups_only": False}}   # stopping rule: below
     result = analyze(study, source, copy_dir, tmp_path / "out", truths)
     assert result["exclusions"].participant.tolist() == ["P03"]
     assert "5 of 6" in result["exclusions"].reason.iloc[0]
@@ -234,3 +235,29 @@ def test_incomplete_sessions_timeouts_and_unchanged_scans(simulated, tmp_path):
     assert scans.loc[("P02", second), "timeout"] and scans.loc[("P02", second), "minutes"] == pytest.approx(300.2 / 60)
     counts = result["conditions"].set_index("condition")
     assert counts.n_unchanged.sum() == 1 and counts.n_timeout.sum() == 1 and counts.n_scans.sum() == 18
+
+
+def test_stopping_rule_keeps_complete_groups_of_four():
+    """Only the largest multiple of 4 complete participants counts, in id order; the rest are listed as excluded."""
+    ids = ["P01", "P02", "P03", "P04", "P05", "P06", "P07"]
+    scans = pd.DataFrame({"participant": np.repeat(ids, 6), "included": True})
+    scans.loc[scans.participant == "P06", "included"] = False                  # incomplete, already excluded
+    exclusions = pd.DataFrame({"participant": ["P06"], "n_scans": [5], "reason": ["incomplete session"]})
+    kept, excl = keep_complete_groups(scans, exclusions)
+    assert sorted(kept.loc[kept.included, "participant"].unique()) == ["P01", "P02", "P03", "P04"]
+    assert excl.participant.tolist() == ["P06", "P05", "P07"] and "stopping rule" in excl.reason.iloc[1]
+    kept, excl = keep_complete_groups(scans[scans.participant.isin(ids[:3])], exclusions.iloc[:0])
+    assert not kept.included.any() and len(excl) == 3                           # fewer than 4: nothing analyzed
+
+
+def test_sus_scores(tmp_path):
+    """SUS: odd items count answer - 1, even items 5 - answer, times 2.5; only analyzed participants are kept."""
+    path = tmp_path / "sus.csv"
+    best = [5, 1] * 5
+    pd.DataFrame([["P01", *best], ["P02", *[3] * 10], ["P03", *[1, 5] * 5], ["T01", *best]],
+                 columns=["participant"] + [f"q{i}" for i in range(1, 11)]).to_csv(path, index=False)
+    sus = sus_table(path, {"P01", "P02", "P03"}).set_index("participant").sus
+    assert sus.to_dict() == {"P01": 100.0, "P02": 50.0, "P03": 0.0}
+    pd.DataFrame([["P01", *best[:-1], 6]], columns=["participant"] + [f"q{i}" for i in range(1, 11)]).to_csv(path, index=False)
+    with pytest.raises(ValueError):
+        sus_table(path, {"P01"})

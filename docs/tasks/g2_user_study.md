@@ -6,9 +6,9 @@
 | **Contact / lead** | Bjørn (lead; not part of running the study) |
 | **Branch** | `rasmus/user-study` |
 | **Created** | 2026-10-20 |
-| **Status** | In progress (step 1) |
+| **Status** | In progress (step 5: lock) |
 | **Way of working** | Independent: Rasmus runs the study and makes its decisions. The task is large enough to keep going without waiting for new instructions; questions to Bjørn or the group are welcome, and keep the group posted. |
-| **Deadlines** | Pilot run by **2026-10-28** · analysis plan locked before the first participant · study in weeks 9–10 (**2026-11-02 – 11-13**) · analysis done by **2026-11-18** (before the final presentation 2026-11-25) |
+| **Deadlines** | Pilot run by **2026-10-28** · analysis plan locked before the first participant · study in weeks 9–10 (**2026-11-02 – 11-13**) · analysis done by **2026-11-18** (before the final presentation 2026-11-25) · **revised 2026-11-18:** sessions until 2026-11-23, analysis 2026-11-24, report notes 2026-11-20 |
 
 This document is the task description **and** the working notes. Whoever works on the task updates it after every
 step: tick the box, write the date and what was done, and update "Where we are" at the bottom. Then anyone in the
@@ -151,6 +151,16 @@ Tick each box when done and write the date and a short note under it.
 - 2026-11-04 — Heatmap display `contour` — the pilot found `full` covering the border and preferred `contour`;
   the pilot plan's rule then takes the preferred mode. `top_percent` and `contour_margin_mm` unchanged (not tuned on
   pilots). One pilot only.
+- 2026-11-18 — Study scans `study_kits_v2` (study: 00045, 00406, 00260, 00470, 00546, 00184; practice 00236),
+  `selection.dice_max` 0.88 — the v1 scans that the pilot left unchanged had errors that were almost only a thin
+  edge along the outline (group's check against G1 numbers); a rule change, not hand-picking, before P01. The v1 set
+  is kept in `data/study/study_kits_v1/`.
+- 2026-11-18 — One round, not two — the study is two weeks late and the presentation is 2026-11-25; a round 2
+  with a version 2 of the interface is left for after the presentation, if at all. Think-aloud dropped with it.
+- 2026-11-18 — SUS added (10 standard items after each session, `docs/study/sus.md`), reported descriptively.
+- 2026-11-18 — Stopping rule: sessions until 2026-11-23, analyze the largest multiple of 4 complete participants
+  in ID order (`analysis.complete_groups_only`) — replaces the target of 16, which cannot be reached; fixed before
+  P01 and independent of results. At least 8 are needed for the test to be able to reach p < 0.05.
 - 2026-11-04 — Mask fill `mask_opacity` 0.45 → 0.2, outline (2 px) unchanged — in all three modes the fill hid the
   tissue under the mask; 0.2 tried on the same scans and judged much better. Same in both conditions.
 
@@ -163,6 +173,9 @@ Tick each box when done and write the date and a short note under it.
   in the study scans visible enough for lay participants? Changing scans needs a new shared `study_kits.zip`
   (`prepare_study.py` with the locked kits100 output): who would do it, and is it worth it given one pilot?
 - 2026-11-04 (group): Is anyone who has not seen the interface available for a second pilot (T03)?
+  - Answered by the group: (1) a teammate rebuilt the scans with `selection.dice_max` 0.90 → 0.88, so scans whose
+    error is only a thin edge drop out (`study_kits_v2.zip`); (2) use the first recruit as pilot, or skip the second
+    pilot. Also proposed: two rounds (Build-Measure-Learn), SUS, problem list → hypotheses, think-aloud.
 
 ## 7. Where we are
 
@@ -180,3 +193,7 @@ A new chat starts by reading this section.)*
   then second pilot (if possible) and step 5 (lock). The study weeks have started (2026-11-02): P01 is delayed
   until the lock. Note: the pilot plan's rule for "too hard" scans says to rerun `prepare_study.py`, but
   that is no longer allowed locally (shared kits); if that rule fires, ask the group who rebuilds `study_kits.zip`.
+- 2026-11-18: Main merged in (tests pass on Mac). `study_kits_v2` unzipped (v1 kept as `study_kits_v1`); config
+  `dice_max` 0.88; SUS and the stopping rule added to the plan, the session guide and the analysis code (192 tests
+  pass). Next action: Rasmus does a short test run (T02) with the new scans; fill in the consent form contact and
+  date; then lock the analysis plan (step 5) and start P01. Report notes due 2026-11-20.

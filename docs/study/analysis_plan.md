@@ -16,9 +16,10 @@ plan changes after that, except through [Changes after locking](#changes-after-l
 | Locked on (date and time) | ____________________ |
 | Locked by | ____________________ |
 | Git commit with the locked plan, code and `configs/study.yaml` | ____________________ |
-| Heatmap display (`study.heatmap_display`, chosen in the pilot) | ____________________ (now: `full`) |
+| Heatmap display (`study.heatmap_display`, chosen in the pilot) | ____________________ (now: `contour`) |
 | Time limit per scan (`study.time_limit_min`) | ____________________ (now: 5 minutes) |
-| Study scans, block A / block B (`manifest.json`) | ____________________ (now: case_00470, case_00259, case_00460 / case_00554, case_00438, case_00426) |
+| Study scans, block A / block B (`manifest.json`) | ____________________ (now, `study_kits_v2`: case_00045, case_00406, case_00260 / case_00470, case_00546, case_00184) |
+| Last day of sessions (stopping rule) | ____________________ (now: 2026-11-23) |
 
 ## Design in short
 
@@ -75,12 +76,18 @@ block. The difference is again with − without.
   - median difference, and the means per condition.
 - **What we can detect:** with 16 participants the test has about 80 % power for a standardized effect
   d_z = 0.8 (mean difference / SD of the differences); d_z = 0.5 would need 36
-  (`results/study_kits/power_needed.csv`; these are assumed effect sizes, not results).
+  (`results/study_kits/power_needed.csv`; these are assumed effect sizes, not results). With 8 participants the
+  power is about 43 % for d_z = 0.8 and 61 % for d_z = 1.0 (`results/study_kits/power_simulation.csv`), so a result
+  that is not significant is weak evidence that the heatmap does not help.
 
 ## Participants and stopping
 
-- **Target: 16 complete participants** (4 complete groups of 4). If there is time before the end of the study weeks,
-  we may add more, but only in complete groups of 4, and the decision is made without looking at any outcome.
+- **Stopping rule (set at the lock, because the study started late):** sessions run until and including the last
+  day in the Lock table. Then the analysis uses the **largest multiple of 4 complete participants, in ID order**
+  (`analysis.complete_groups_only`); later complete participants are listed in `study_exclusions.csv`. The rule
+  depends only on the date and the IDs, never on results. The original target was 16 participants.
+- **At least 8 are needed for a test.** With 4 participants the exact two-sided Wilcoxon test cannot reach
+  p < 0.05 (its smallest possible p-value is 2/16 = 0.125); then all numbers are reported descriptively only.
 - **No interim analysis.** Nobody runs `analyze_study.py` or looks at Dice values of P sessions before the last
   session. The checks after each session (session guide) only look at whether the files exist.
 - The analysis is run **once**, after the last session.
@@ -115,6 +122,9 @@ draw no conclusions from them. Anything not listed here that we look at after se
   two-sided (`study_order.csv`). A large difference would mean the heatmap's effect depends on the order.
 - Per scan: Dice before and after for each scan and condition (`study_scans.csv`), e.g. to show which scans
   gained most from the heatmap.
+- Usability: SUS score (Brooke 1996, [sus.md](sus.md)), asked once at the end of each session, so not split by
+  condition. Mean with 95 % percentile bootstrap interval (seed 42) and median over the analyzed participants
+  (`study_sus.csv`, `study_sus_summary.csv`).
 
 ## Output
 
@@ -129,6 +139,7 @@ draw no conclusions from them. Anything not listed here that we look at after se
 | `study_conditions.csv` | Descriptive numbers per condition |
 | `study_order.csv` | Order check |
 | `study_tlx.csv` | All NASA-TLX answers |
+| `study_sus.csv`, `study_sus_summary.csv` | SUS answers and score per analyzed participant; mean, interval, median |
 | `figures/study_gain_per_min.png` | One line per participant from without to with the heatmap |
 
 ## Changes after locking

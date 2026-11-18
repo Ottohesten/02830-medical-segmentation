@@ -971,6 +971,11 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
   timeouts, all scans under 2 min); heatmap display `contour` (pilot found `full` covering the border and preferred
   `contour`); mask fill opacity 0.45 → 0.2 (the fill hid the tissue under the mask). Open: are the study scans'
   errors visible enough (3 of 6 not edited), second pilot T03. P01 waits for the lock. `docs/tasks/g2_user_study.md`.
+- `[decision]` (2026-11-18, G2) New study scans `study_kits_v2` (`selection.dice_max` 0.90 → 0.88, so scans with only
+  thin-edge errors drop out; built by a teammate from the locked kits100 output). One round only (the study is two
+  weeks late; presentation 2026-11-25). SUS added after each session. Stopping rule: sessions until 2026-11-23,
+  analyze the largest multiple of 4 complete participants in ID order; at least 8 are needed for a possible
+  p < 0.05. `docs/tasks/g2_user_study.md`, `docs/study/analysis_plan.md`.
 
 ## 2026-10-27: G3 phase 2 starts — learning-curve design, merge, Smart App Control blocks torch
 

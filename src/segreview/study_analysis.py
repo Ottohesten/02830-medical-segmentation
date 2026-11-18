@@ -24,6 +24,8 @@ comparison is exploratory: its p-value is reported, but no conclusion is drawn f
 
 Which data count: only real participant ids (P01, ...). Test ids (T01, ...) and practice scans are left out.
 Only COMPLETE sessions count (every study scan saved); other participants are listed in study_exclusions.csv.
+Stopping rule (analysis.complete_groups_only): only the largest multiple of 4 complete participants is analyzed, in id order (complete groups
+of the 4 participant types); the rest are listed as excluded too.
 All participants must have seen the heatmap shown the same way (study.heatmap_display, saved by the server in
 every scan log); the analysis stops if the display differs between scans, because then "with heatmap" would mean
 different things for different participants.
@@ -54,6 +56,8 @@ HYPOTHESES = {"gain_per_min": ("H1", "primary", +1), "raw_tlx": ("H2", "key seco
 EXACT_MAX_PAIRS = 24          # up to this many non-zero differences the p-value uses all 2^n sign patterns
 RANDOM_SIGN_PATTERNS = 2 ** 20   # above that: this many random sign patterns (seeded)
 SIMULATED_PREFIX = "SIMULATED_"
+GROUP_SIZE = 4                # participant types in the balancing; only complete groups are analyzed
+SUS_FILE = "sus.csv"          # SUS answers, next to the sessions folder (typed in from the form after each session)
 
 
 def participant_folders(study: dict, sessions_dir: Path) -> list[Path]:
@@ -154,6 +158,45 @@ def mark_complete(scans: pd.DataFrame, n_study_scans: int) -> tuple[pd.DataFrame
                                "reason": [f"incomplete session: {n} of {n_study_scans} study scans saved"
                                           for n in incomplete.values]})
     return scans, exclusions
+
+
+def keep_complete_groups(scans: pd.DataFrame, exclusions: pd.DataFrame,
+                         group: int = GROUP_SIZE) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Stopping rule: analyze only the largest multiple of `group` complete participants, in id order.
+
+    The balancing needs complete groups of 4 participant types; complete participants after the last full group
+    are left out and listed in the exclusions. Which ones are left out depends only on their ids, not on results.
+    """
+    complete = sorted(scans.loc[scans.included, "participant"].unique())
+    extra = complete[len(complete) // group * group:]
+    scans = scans.assign(included=scans.included & ~scans.participant.isin(extra))
+    rows = pd.DataFrame({"participant": extra, "n_scans": [int((scans.participant == p).sum()) for p in extra],
+                         "reason": [f"after the last complete group of {group} (stopping rule)"] * len(extra)})
+    return scans, pd.concat([exclusions, rows], ignore_index=True) if len(rows) else exclusions
+
+
+def sus_table(path: Path, participants: set[str]) -> pd.DataFrame:
+    """SUS scores (Brooke 1996) from a CSV with columns participant, q1 ... q10 (answers 1-5, 1 = strongly disagree).
+
+    Score = 2.5 * (sum over odd items of (answer - 1) + sum over even items of (5 - answer)), 0-100. Only the
+    analyzed participants are kept. One score per session (asked once, at the end), so not split by condition.
+    """
+    sus = pd.read_csv(path, dtype={"participant": str})
+    items = [f"q{i}" for i in range(1, 11)]
+    answers = sus[items]
+    if answers.isna().any().any() or not answers.isin([1, 2, 3, 4, 5]).all().all():
+        raise ValueError(f"{path}: every SUS answer must be 1-5")
+    odd, even = answers[items[0::2]], answers[items[1::2]]
+    sus["sus"] = 2.5 * ((odd - 1).sum(axis=1) + (5 - even).sum(axis=1))
+    return sus[sus.participant.isin(participants)].reset_index(drop=True)
+
+
+def bootstrap_mean(values: np.ndarray, n_bootstrap: int, ci_level: float, seed: int) -> tuple[float, float, float]:
+    """Mean with a percentile bootstrap interval (resampling the values with replacement)."""
+    rng = np.random.default_rng(seed)
+    means = values[rng.integers(0, len(values), size=(n_bootstrap, len(values)))].mean(axis=1)
+    tail = (1 - ci_level) / 2 * 100
+    return float(values.mean()), float(np.percentile(means, tail)), float(np.percentile(means, 100 - tail))
 
 
 def participant_table(scans: pd.DataFrame) -> pd.DataFrame:
@@ -356,7 +399,8 @@ def analyze(study: dict, source: dict, sessions_dir: Path, out_dir: Path,
 
     Output files (all starting with SIMULATED_ if the sessions are simulated): study_scans.csv (every saved study
     scan, with 'included'), study_exclusions.csv, study_participants.csv, study_tests.csv (H1, H2, exploratory),
-    study_conditions.csv, study_order.csv, study_tlx.csv (if any) and figures/study_gain_per_min.png.
+    study_conditions.csv, study_order.csv, study_tlx.csv (if any), study_sus.csv and study_sus_summary.csv (if
+    sus.csv exists next to the sessions folder) and figures/study_gain_per_min.png.
     Settings: study.analysis (alpha, n_bootstrap, ci_level) and the study seed.
     Returns the tables, or None if there are no participant sessions yet.
     """
@@ -374,6 +418,8 @@ def analyze(study: dict, source: dict, sessions_dir: Path, out_dir: Path,
         raise ValueError(f"The participants saw the heatmap in different ways {displays}; the comparison needs one "
                          "locked study.heatmap_display. See study_scans for who saw what.")
     scans, exclusions = mark_complete(scans, len(load_manifest(study)["study_scans"]))
+    if study["analysis"].get("complete_groups_only", False):
+        scans, exclusions = keep_complete_groups(scans, exclusions)
     included = scans[scans.included]
     tlx = tlx_table(study, sessions_dir)
     if len(tlx):
@@ -385,6 +431,15 @@ def analyze(study: dict, source: dict, sessions_dir: Path, out_dir: Path,
     tables = {"scans": scans, "exclusions": exclusions, "participants": participants, "tests": tests,
               "conditions": condition_table(included, tlx),
               "order": order_table(participants) if len(participants) else pd.DataFrame(), "tlx": tlx}
+    sus_path = Path(sessions_dir).parent / SUS_FILE
+    if sus_path.exists():
+        sus = sus_table(sus_path, set(included.participant))
+        if len(sus):
+            mean, low, high = bootstrap_mean(sus.sus.to_numpy(float), settings["n_bootstrap"], settings["ci_level"],
+                                             study["seed"])
+            tables["sus"] = sus
+            tables["sus_summary"] = pd.DataFrame([{"n": len(sus), "mean": mean, "ci_low": low, "ci_high": high,
+                                                   "median": float(sus.sus.median())}])
     if len(tests):
         tests.insert(0, "heatmap_display", displays[0])
     for table in tables.values():
@@ -394,7 +449,7 @@ def analyze(study: dict, source: dict, sessions_dir: Path, out_dir: Path,
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     for name, table in tables.items():
-        if name != "tlx" or len(table):
+        if name not in ("tlx", "sus") or len(table):
             table.to_csv(out_dir / f"{prefix}study_{name}.csv", index=False)
     if len(participants):
         title = f"{'SIMULATED DATA - ' if simulated else ''}{len(participants)} participants"

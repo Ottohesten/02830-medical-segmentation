@@ -20,15 +20,16 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
 
 ## Before the study day
 
-1. On the study MacBook, pull the latest version and run `uv sync`. The study must already be prepared on this
-   Mac: `data/study/study_kits/` must exist. It is made by `scripts/prepare_study.py`, which needs the KiTS data and
-   the model output, so prepare the study on the Mac that has them.
+1. On the study MacBook, pull the latest version and run `uv sync`. The prepared scans must be in
+   `data/study/study_kits/`: unzip the shared `study_kits_v2.zip` from the group's OneDrive ("delte store filer").
+   Do not run `scripts/prepare_study.py` yourself; everyone uses the same shared scans.
 2. Check that `configs/study.yaml` has the settings agreed after the pilot and written in the
    [analysis plan](analysis_plan.md) under "Lock" (`time_limit_min`, `heatmap_display`, `tlx: after_each_block`).
    **Do not change the config once P01 has started.**
 3. Run `uv run pytest` (about two minutes). All tests should pass.
-4. Print for each participant: two copies of the [consent form](consent_form.md). Print one
-   [session log](#session-log) sheet for the day.
+4. Print for each participant: two copies of the [consent form](consent_form.md) and one
+   [SUS questionnaire](sus.md) (or have the Google Form open on a phone). Print one [session log](#session-log)
+   sheet for the day.
 
 ## Before each session
 
@@ -89,7 +90,13 @@ Allowed answers to questions:
 
 Write anything unusual in the session log (questions asked, technical problems, interruptions).
 
-**4. Debriefing (about 3 min)**
+**4. SUS questionnaire (about 2 min)**
+
+When the screen says "Thank you!", give them the [SUS sheet](sus.md) (or the form) with their ID filled in:
+
+> "Last thing: please answer these 10 short questions about the program. Go with your first impression."
+
+**5. Debriefing (about 3 min)**
 
 > "Thank you, you're done. What we are testing is whether showing where the AI is uncertain helps people correct
 > its mistakes faster. Is there anything you would like to tell us about the program or the task?"
@@ -103,8 +110,9 @@ Write their comments in the session log (no names). Then:
 
 1. Check the saved files in `data/study/study_kits/sessions/<ID>/`: `session.json`, 6 `*_mask.nii.gz`,
    6 `*_log.json`, `tlx_with_heatmap.json`, `tlx_without_heatmap.json` and a `practice/` folder.
-2. Fill in the row in the session log.
-3. Copy `data/study/study_kits/sessions/<ID>/` to the group's backup location. **Never put study data in git.**
+2. Add the SUS answers as one line to `data/study/study_kits/sus.csv` (see [sus.md](sus.md)), and fill in the row
+   in the session log.
+3. Copy `data/study/study_kits/sessions/<ID>/` and `sus.csv` to the group's backup location. **Never put study data in git.**
 4. Leave the interface running for the next session, or stop it with Ctrl+C in the terminal.
 
 ## If something goes wrong
@@ -147,3 +155,7 @@ One row per session. No names.
 | P02 | | | | | | |
 | P03 | | | | | | |
 | P04 | | | | | | |
+| P05 | | | | | | |
+| P06 | | | | | | |
+| P07 | | | | | | |
+| P08 | | | | | | |
