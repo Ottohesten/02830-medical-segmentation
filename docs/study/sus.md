@@ -1,11 +1,11 @@
 # SUS questionnaire (System Usability Scale)
 
 Asked once per session, after the "Thank you!" screen and before the debriefing (about 2 minutes). Standard wording
-(Brooke 1996); do not change it, so the score can be compared with other studies. The participant answers on paper
-or in a Google Form on a phone or another computer (not on the study Mac, so the interface stays open).
+(Brooke 1996); do not change it, so the score can be compared with other studies. The participant answers in a Google Form,
+in a new tab on the study Mac after the interface shows "Thank you!".
 
 **Instruction to the participant:** "Please answer these 10 short questions about the program you just used.
-Tick one box per line; go with your first impression."
+Choose one answer per line; go with your first impression."
 
 Each item: 1 = Strongly disagree, 2, 3, 4, 5 = Strongly agree.
 
@@ -27,7 +27,11 @@ The form also has a field **Participant ID** (filled in by the experimenter, e.g
 
 ## Storing the answers
 
-After each session, add one line to `data/study/study_kits/sus.csv` (not in git; back it up with the sessions):
+In the form, each statement is a "Linear scale" question from 1 to 5 (labels: Strongly disagree / Strongly
+agree), all required, in this order. The experimenter types the ID before handing over.
+
+After each session (or once at the end, from the form's response sheet), make sure
+`data/study/study_kits/sus.csv` has one line per participant (not in git; back it up with the sessions):
 
 ```
 participant,q1,q2,q3,q4,q5,q6,q7,q8,q9,q10

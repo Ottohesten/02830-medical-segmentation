@@ -15,7 +15,7 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
 - **Same setup for everyone:** the same MacBook, Google Chrome, the built-in trackpad, no external mouse or screen.
 - **Say the same thing to everyone.** Read the script below. Do not tell participants that we expect the heatmap to
   help, and do not point at the screen or comment on their work.
-- **No names in the data.** The only link between a person and their data is the ID slip they keep themselves.
+- **No names in the data.** The only link between a person and their data is the ID they write down themselves.
 - **No peeking.** Nobody runs `scripts/analyze_study.py` or looks at Dice values of P sessions before the last
   session. The data rules and the analysis are fixed in the [analysis plan](analysis_plan.md), locked before P01.
 
@@ -28,9 +28,9 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
    [analysis plan](analysis_plan.md) under "Lock" (`time_limit_min`, `heatmap_display`, `tlx: after_each_block`).
    **Do not change the config once P01 has started.**
 3. Run `uv run pytest` (about two minutes). All tests should pass.
-4. Print for each participant: two copies of the [consent form](consent_form.md) and one
-   [SUS questionnaire](sus.md) (or have the Google Form open on a phone). Print one [session log](#session-log)
-   sheet for the day.
+4. Nothing is printed. Have two Google Forms ready: the [consent form](consent_form.md) and the
+   [SUS questionnaire](sus.md). Keep the [session log](#session-log) as a file on the Mac,
+   `data/study/study_kits/session_log.md` (not in git; no names).
 
 ## Before each session
 
@@ -45,8 +45,7 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
    `Heatmap display: ...`; check that it is the setting locked after the pilot (see the session log). Never change
    `configs/study.yaml` during the study.
 3. In Chrome: full screen (⌃⌘F), zoom 100 % (⌘0). The start page should show the "Participant ID" field.
-4. Look up the next unused P ID in the session log. Write it on the participant's ID slip (the bottom part of their
-   copy of the consent form), not on the copy you keep.
+4. Look up the next unused P ID in the session log. Open the consent form in a Chrome tab next to the interface.
 
 ## Script
 
@@ -59,8 +58,8 @@ limit instead of "5 minutes".
 > and it makes mistakes. Your job is to correct the outlines. You don't need any medical knowledge; the program
 > explains what to look for. It takes about 40 minutes. Please read this form, and ask me if anything is unclear."
 
-Give them both copies of the consent form. When they have signed, keep the signed copy (without the ID) and give
-them their copy with the ID slip.
+Let them fill in the consent form in the Chrome tab and submit it. Then tell them their participant ID and ask
+them to write it down (it is not in the form, so the ID cannot be linked to their name). Close the tab.
 
 **2. The task (1 min)**
 
@@ -93,7 +92,7 @@ Write anything unusual in the session log (questions asked, technical problems, 
 
 **4. SUS questionnaire (about 2 min)**
 
-When the screen says "Thank you!", give them the [SUS sheet](sus.md) (or the form) with their ID filled in:
+When the screen says "Thank you!", open the [SUS form](sus.md) in a new tab, type their ID, and hand over:
 
 > "Last thing: please answer these 10 short questions about the program. Go with your first impression."
 
@@ -105,7 +104,7 @@ When the screen says "Thank you!", give them the [SUS sheet](sus.md) (or the for
 Write their comments in the session log (no names). Then:
 
 > "Please don't tell others about the details, since some of them may take part later. If you want your
-> data deleted, send us the ID on your slip."
+> data deleted, send us your participant ID."
 
 ## After each session
 
@@ -142,8 +141,8 @@ Write their comments in the session log (no names). Then:
   uv run python scripts/clean_test_data.py --config configs/study.yaml             # delete it
   ```
 
-- **End of the study day:** stop the server (Ctrl+C), make sure every session is backed up, and keep the signed
-  consent forms in an envelope, apart from the session log.
+- **End of the study day:** stop the server (Ctrl+C) and make sure every session, `sus.csv` and the session log
+  are backed up. The consent answers stay in the consent form's own response sheet, apart from the data.
 - **After the study:** `uv run python scripts/analyze_study.py --config configs/study.yaml`.
 
 ## Session log

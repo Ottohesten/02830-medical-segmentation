@@ -150,4 +150,4 @@ time and reason, and reported in the paper.
 
 | Date and time | What changed | Why | Who |
 |---------------|--------------|-----|-----|
-| | | | |
+| 2026-11-18, before P01 | Consent form, SUS and session log online (Google Forms, a file on the Mac) instead of on paper; the participant ID is told, not written on a slip. | Practical: nothing is to be printed. Only the session logistics change; the analysis, data rules, code and config are as locked. | Rasmus |
