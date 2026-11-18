@@ -53,6 +53,8 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
    `Heatmap display: ...`; check that it is the setting locked after the pilot (see the session log). Never change
    `configs/study.yaml` during the study.
 3. In Chrome: full screen (⌃⌘F), zoom 100 % (⌘0). The start page should show the "Participant ID" field.
+   **Remote session** (the participant opens a link to your server): ask them to open the link in **Google Chrome**
+   and check it before they type the ID (in Chrome, the menu ⋮ is at the top right). Firefox is not supported.
 4. Look up the next unused P ID in the session log. Open the consent form in a Chrome tab next to the interface.
 
 ## Script
