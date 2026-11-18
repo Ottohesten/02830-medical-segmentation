@@ -1,0 +1,78 @@
+# The G3 pool (docs/g3_plan.md): the next 100 KiTS23 scans of the same seed-42 draw that picked kits100, i.e. positions
+# 101-200 of the draw, never part of kits100. G1's ground-truth-free steps run on them with exactly kits100's model
+# and uncertainty settings: the 3 mm model, the 6 mm model and the scan scores. That gives the queue for G3, and the
+# model output the group's locked ranking test uses later (PROJECT_LOG.md, 2026-10-21).
+#
+# NO ground truth is used through this config: no Dice, no label check, no ranking metric on the pool before the
+# locked test. evaluation.splits is empty, so G1's evaluation steps find no scans. (The simulated corrections of G3
+# read the ground truth separately, in src/segreview/finetune.py.)
+#
+# Used by scripts/g3_prepare.py (configs/g3_kits.yaml). Download: scripts/download_data.py --config configs/g3_pool.yaml
+
+name: g3_pool           # output goes to results/g3_pool/ and data/predictions/g3_pool/
+seed: 42
+
+compute:
+  device: auto        # auto = CUDA if available, else MPS (Apple Silicon), else CPU
+  num_threads: 0      # CPU threads for torch. 0 = use all cores
+  reduce_chunk_slices: 16  # slices processed at a time when reducing the 117-class output
+
+paths:                # relative paths are relative to the repository root
+  raw_dir: data/raw
+  models_dir: models
+  predictions_dir: data/predictions
+  results_dir: results
+
+dataset:
+  file: configs/datasets/kits23.yaml
+  n_cases: 100        # the pool size
+  selection: random   # the same seeded draw as kits100 ...
+  offset: 100         # ... after its first 100 scans (kits100): positions 101-200
+  split:
+    dev: []           # no development scans here: the pool is only used for the queue and the G3 training
+
+model:                # as kits100
+  task: total
+  resolution: fast    # the 3 mm model (task 297)
+  folds: [0]
+  tile_step_size: 0.8
+
+uncertainty:          # as kits100
+  border_mm: 5
+  second_model_resolution: fastest  # the 6 mm model (task 298), for the model disagreement
+  tta:
+    n_passes: 0
+    max_shift_voxels: 2
+    intensity_scale: 0.05
+    intensity_shift_hu: 20
+    noise_std_hu: 10
+
+heatmap_eval:         # as kits100 (not run on the pool)
+  candidates: [entropy, m2_diff]
+  top_fraction: 0.1
+
+plausibility:         # as kits100 (ground-truth-free)
+  body_threshold_hu: -500
+  min_component_ml: 20
+
+perturbations: []
+perturbation_settings:
+  contrast_level_hu: 40
+
+evaluation:
+  splits: []          # NO ground truth of the pool for G1's evaluation steps (locked test, log 2026-10-21)
+  bad_rules:          # kept as in kits100 only so the shared code finds the keys; nothing is evaluated here
+    - {name: worst10, rule: worst_fraction, value: 0.1}
+    - {name: dice_below_083, rule: threshold, value: 0.83}
+  n_bootstrap: 2000
+  ci_level: 0.95
+  n_random_orders: 1000
+  combinations: []
+
+visualization:
+  ct_window_level: 40
+  ct_window_width: 400
+  dice_bin_width: 0.01
+  share_bin_width: 0.05
+  label_worst_n: 3
+  dpi: 120

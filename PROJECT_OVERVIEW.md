@@ -4,7 +4,7 @@
 reasons behind every choice. Keep it up to date: when something changes, update this file and add a dated entry to
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-*Last updated: 2026-10-21 (robustness step 6 complete; report figure/summary ready; group presentation next).*
+*Last updated: 2026-11-16 (G3 done: task B; phase 3 dropped before any run). Before: 2026-11-02 (G3: learning curve done; the queue order is not clearly better than random order).*
 
 | | |
 |---|---|
@@ -35,7 +35,7 @@ opened, **show where in the scan the AI is unsure**. The goal is the most improv
 |---|---|---|
 | **G1** (core) | Rank scans by likely failure, without ground truth | **Done.** Locked and tested once on 80 test scans |
 | **G2** (core) | Review interface with an uncertainty heatmap + user study | Interface and analysis built and tested; **pilot and study not run yet** |
-| **G3** (stretch) | Fine-tune the model on corrections | Plan and smoke test only. Now run in parallel by Frederik on an RTX 4090 |
+| **G3** (stretch) | Fine-tune the model on corrections | **Learning curve done** (2026-11-02): 10 corrected scans raise test Dice from 0.870 to 0.94; the queue order is not clearly better than random order (+0.002 Dice, 95 % CI −0.001 to +0.006) ([task](docs/tasks/g3_finetuning.md)) |
 
 ### G1 — how the ranking works and how well it does
 
@@ -91,8 +91,25 @@ The usual trick (ask several copies of the same model) is impossible because onl
 ### G3 — learning from corrections
 
 Kristine's question (2026-10-06): are the scans with the biggest errors also the ones where correction helps future
-training most? G3 is how we would answer it. The plan and smoke test show fine-tuning can start, but nothing has been
-trained, so there is no result yet.
+training most? G3 answers it with a **learning curve** (design 2026-10-27, Kristine's advice). The model is
+fine-tuned on *k* = 0, 10, …, 100 corrected pool scans, taken in queue order (most uncertain first) or in random
+order (3 seeds), each point from the original model, with test Dice after each point. If the queue picks useful
+scans, its curve rises faster; if the most uncertain scans are mainly outliers, it rises more slowly. Details, the
+settings choice on the development set and the primary summary: [docs/g3_plan.md](docs/g3_plan.md), "Design:
+learning curve".
+
+**Result (2026-11-02; 40 fine-tuning runs, 17 h on Frederik's RTX 4090):** correcting scans helps a lot, and early.
+Test Dice is 0.870 with the original model, 0.94 after 10 corrected scans and 0.955 after 70–100, in both orders; a
+control trained on the model's own predictions instead of corrections reaches only 0.877. **The queue order is not
+clearly better than random order:** queue minus random, mean over *k* = 10–90 on the 80 test scans, is +0.0019 Dice
+(95 % CI −0.0009 to +0.0058), about the size of the training noise. On the 11 test scans where the original model
+did worst (Dice below 0.83), the queue is ahead with few corrected scans (+0.07 Dice at *k* = 10, gone from
+*k* = 70); a secondary finding. Task B (2026-11-16) explains it: the queue's first pool scans have very large tumors
+(median 527 ml in the first 10, against 20–55 ml in the random orders), and so do those 11 test scans (596 ml against
+30 ml), so the model learns our tumor-counts-as-kidney definition faster; with the tumor left out the lead is gone.
+Figure: `results/g3_kits/figures/learning_curve_test.png`; details: PROJECT_LOG.md, 2026-11-02 and 2026-11-16.
+A phase 3 (*k* = 1, 2, 3, 5 and three training seeds for the queue) was designed on 2026-11-16 and dropped before
+any run ([docs/g3_plan.md](docs/g3_plan.md), "Phase 3"), so the curve has no points below *k* = 10.
 
 ## 3. Where things are
 
@@ -101,6 +118,7 @@ trained, so there is no result yet.
 | **Dated log of everything tried, measured, decided or dropped** | [PROJECT_LOG.md](PROJECT_LOG.md) |
 | How to install and run each part | [README.md](README.md) |
 | Working rules (git, locked results, logging) | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| **Report notes: one file per group member; the report is written from them** | [docs/report_notes/](docs/report_notes/README.md) (complete by 2026-11-20, then kept up to date) |
 | Configurations (one per environment, one per dataset) | `configs/`, `configs/datasets/` |
 | Shared code | `src/segreview/` (inference, uncertainty, evaluation, heatmaps, plausibility, UI server, study analysis) |
 | Runnable steps | `scripts/` (`run_g1.py` runs all of G1; `run_ui.py` starts the interface; `analyze_study.py` after the study) |
@@ -111,10 +129,11 @@ trained, so there is no result yet.
 | Heatmap evaluation | `results/kits100/heatmap_eval_*.csv` |
 | Power simulation | `results/study_kits/` |
 | User-study documents | `docs/study/` — session guide, consent form, pilot plan, analysis plan (locked after the pilot) |
-| G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` |
-| Task documents (owner, steps, status) | `docs/tasks/` — e.g. [g1_robustness.md](docs/tasks/g1_robustness.md) (Otto; steps 1–6 complete; report figure/summary ready; group presentation next), [g2_user_study.md](docs/tasks/g2_user_study.md) (Rasmus), [g1_missed_errors.md](docs/tasks/g1_missed_errors.md) (Otto) |
+| G3 plan and smoke test | `docs/g3_plan.md`, `results/g3_smoke/` (Mac), `results/g3_smoke_gpu*/` (RTX 4090) |
+| Task documents (owner, steps, status) | `docs/tasks/` — [g1_robustness.md](docs/tasks/g1_robustness.md) (Otto; steps 1–6 complete; report figure/summary ready; group presentation next), [g2_user_study.md](docs/tasks/g2_user_study.md) (Rasmus), [g1_missed_errors.md](docs/tasks/g1_missed_errors.md) (Otto), [g3_finetuning.md](docs/tasks/g3_finetuning.md) (Frederik) |
 | Robustness report material | [Figure PDF](results/kits_robustness_eval/report/fig_robustness_summary_test.pdf), [PNG](results/kits_robustness_eval/report/fig_robustness_summary_test.png), [caption](results/kits_robustness_eval/report/caption.md), [eight-line summary](results/kits_robustness_eval/report/summary.md) |
 | HPC job scripts (never run on the cluster) | `jobs/` |
+| Running on Frederik's Windows GPU PC (G3) | [frederik/README.md](frederik/README.md) |
 | Scans, model output, weights (not in git) | `data/`, `models/` — download with `scripts/download_data.py` and `download_model.py` |
 
 ## 4. Rules everyone should know
@@ -132,6 +151,9 @@ The full working rules (git, branches, locked results, new experiments, what to 
 - Code, comments, docs and the report in English (American spelling).
 - **Log as you go:** every result, experiment, idea and decision gets a dated entry in [PROJECT_LOG.md](PROJECT_LOG.md),
   also when it is dropped (with the reason).
+- **Report notes instead of report text:** nobody writes report text in the repository. Each of us collects what
+  our part found in our own file in [docs/report_notes/](docs/report_notes/README.md); the report is written from
+  the four files (CONTRIBUTING.md, section 7).
 
 ## 5. Timeline
 
@@ -144,15 +166,18 @@ The full working rules (git, branches, locked results, new experiments, what to 
 | 2026-12-02 | Report hand-in (ACM two-column, max 5 pages for 4 people, plus contribution appendix and declaration of generative-AI use) |
 | 2026-12-18 | Defense |
 
-## 6. Next steps (2026-10-20)
+## 6. Next steps (2026-10-27)
 
 1. Send Kristine the three follow-up results (6 mm alone, where 3 mm and 6 mm differ, simulated voxel correction;
    see the log of 2026-10-19) and decide with the group what goes into the report (as exploratory results).
-2. Decide with the group which disagreement score (if any) to test once on the G3 pool: the pre-registered choice
-   (`far_6mm_drops_ml`) or a different one, logged with date and reason before the pool is opened (log 2026-10-20).
+2. Decided 2026-10-21 (log): the locked test of `far_disagree_per_volume` on the G3 pool, run once after Frederik's
+   model output for the pool exists, together with Otto's missed-errors check; latest 2026-11-18.
 3. Everyone installs the project and tries the demo (`README.md` → Quick start).
 4. Pilot, choose the heatmap display, lock the analysis plan, recruit 16 participants.
-5. G3 (Frederik): smoke test on the RTX 4090, then the pipeline with the 6 mm model.
+5. G3 (Frederik): done. The learning curve (2026-11-02, section 2;
+   [docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)) and task B (2026-11-16); phase 3 dropped before any
+   run (2026-11-16). Pull request to `main`. The predictions are in the
+   OneDrive folder "delte store filer" (`g3_pool.zip`, `g3_kits_predictions.zip`; not in git; SHA-256 in the log).
 6. Divide the report sections (the Trello board exists).
 
 Open questions are listed at the bottom of [PROJECT_LOG.md](PROJECT_LOG.md).

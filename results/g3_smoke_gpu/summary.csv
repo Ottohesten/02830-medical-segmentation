@@ -1,0 +1,9 @@
+phase,batch_size,augmentation_processes,steps,data_s,step_s,step_s_median,wall_s,step_s_per_sample,peak_ram_gb,peak_commit_gb,peak_system_ram_gb,peak_gpu_allocated_gb,peak_gpu_reserved_gb,peak_ram_method
+train,2,0,20,0.4105,0.0588,0.064,0.4692,0.0294,2.32,7.64,22.48,2.19,2.72,uss_process_tree_at_end
+validation,2,0,10,0.0123,0.0217,0.0193,0.034,0.0108,2.32,7.64,22.48,2.19,2.72,uss_process_tree_at_end
+train,2,16,20,0.0003,0.0396,0.0379,0.0399,0.0198,11.44,62.1,31.55,2.19,2.89,uss_process_tree_at_end
+validation,2,16,10,0.0004,0.021,0.0209,0.0214,0.0105,11.44,62.1,31.55,2.19,2.89,uss_process_tree_at_end
+train,13,0,20,2.1503,0.2717,0.2852,2.422,0.0209,2.44,20.82,21.9,12.41,15.76,uss_process_tree_at_end
+validation,13,0,10,0.0438,0.0967,0.0962,0.1405,0.0074,2.44,20.82,21.9,12.41,15.76,uss_process_tree_at_end
+train,13,16,20,0.0003,0.1812,0.1806,0.1814,0.0139,12.65,77.86,32.34,12.41,17.33,uss_process_tree_at_end
+validation,13,16,10,0.0002,0.1648,0.0986,0.165,0.0127,12.65,77.86,32.34,12.41,17.33,uss_process_tree_at_end

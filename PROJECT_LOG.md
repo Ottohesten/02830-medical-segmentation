@@ -453,6 +453,69 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   still reports "could not read Username". Otto's confirmed setup push remains on GitHub; only this subsequent
   documentation update needs `git push origin otto/robustness` from his authenticated terminal.
 
+## 2026-10-20: G3 phase 1 on Frederik's PC — Windows environment, nothing trained yet
+
+Task document: [docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md) (Frederik), branch `frederik/g3`.
+
+- `[admin]` Machine check (`results/g3_smoke_gpu/machine_windows.txt`): NVIDIA GeForce RTX 4090, 24,564 MiB, compute
+  capability 8.9 (Ada, not Blackwell, so torch 2.2.2 with CUDA 12.1 should support it), driver 617.14; Intel Core
+  i9-14900K, 24 cores / 32 threads; 34.1 GB RAM (31.7 GiB); Windows 11 Home 10.0.26200; free disk C: 1,035 GB
+  (D: 2,048 GB, E: and F: 4,000 GB each, empty).
+- `[dropped]` Running G3 inside WSL2 (Linux inside Windows), planned first because `uv.lock` has no Windows packages
+  (`uv sync --dry-run` fails on Windows; checked 2026-10-06). WSL2 was not installed (it needs administrator rights
+  and a restart); a setup script and a `.wslconfig` for it were written and deleted again; nothing was installed.
+  Reason: Frederik prefers to stay on Windows.
+- `[decision]` G3 runs natively on Windows, in a separate environment `.venv` built by `frederik/windows_setup.ps1`:
+  every package version of `uv.lock` is a constraint; torch 2.2.2 and torchvision 0.17.2 come as CUDA 12.1 builds from
+  PyTorch's own server (`--torch-backend cu121`; the Windows torch on PyPI has no CUDA); `psutil` is added (Windows
+  only, to measure memory). `uv.lock` and `pyproject.toml` are not changed. Packages that only Windows needs are not
+  in `uv.lock` and get their newest compatible version (`results/g3_smoke_gpu/windows_env.txt`). `uv sync` and
+  `uv run` do not work on Windows, so scripts run with `.venv\Scripts\python.exe`.
+- `[decision]` Tools that only Frederik's Windows PC needs live in `frederik/` (setup script, README), at Frederik's
+  request; the G3 code itself stays in `configs/`, `scripts/` and `src/segreview/`, where `docs/g3_plan.md` puts it.
+  None of it changes how results are computed: the code is the same on every machine, only the machine differs
+  (GPU instead of CPU, Windows torch with cuDNN 8.8.1), so G3 compares models only within this PC.
+- `[admin]` Git for Windows 2.55.0 installed (winget; `C:\Program Files\Git`), so `machine.json` can record the git
+  commit (before, `git` was only inside GitHub Desktop and not on PATH).
+- `[decision]` GPU smoke test with its own configs: `configs/g3_smoke_gpu.yaml` (6 mm, batch 2 and 13) and
+  `configs/g3_smoke_gpu_3mm.yaml` (3 mm, batch 2), results in `results/g3_smoke_gpu/` and `results/g3_smoke_gpu_3mm/`.
+  Rerunning `configs/g3_smoke.yaml` would overwrite the Mac's results in `results/g3_smoke/`. Settings: device `cuda`
+  forced (no silent fallback to the CPU); torch threads 1, as nnU-Net's own training start does on a GPU (nnU-Net's
+  data loader limits each augmentation worker to 1 thread itself); augmentation with 0 workers (the time to prepare
+  one batch) and with 16 of the 24 cores (whether the GPU waits for data, as in a real run; nnU-Net adds 8 validation
+  workers); 30 training steps per run, the first 10 not counted (warm-up); 10 validation steps; cuDNN benchmark on, as
+  in nnU-Net's training.
+- `[decision]` `scripts/g3_smoke_test.py` extended; the Mac config runs as before and only gets new output files.
+  New: peak RAM of the main process plus all worker processes (PSS on Linux, private memory on Windows;
+  `src/segreview/memory.py`) and peak GPU memory (allocated and reserved) per run; validation steps; several worker
+  settings per batch size; `summary.csv`; `machine.json` with CPU model, OS, memory, GPU, driver, torch/CUDA/cuDNN
+  versions and git commit (`src/segreview/machine.py` now also reads Linux and Windows hardware and nvidia-smi); it
+  runs on Windows (the Unix-only `resource` module is no longer imported). The kits100 overlap check uses the
+  dataset's full case list and the scans in the locked `results/kits100/dice.csv` (read only), so the 100 kits100
+  scans need not be downloaded; it stops if the case list does not reproduce kits100.
+- `[admin]` `scripts/download_data.py --cases`: downloads only the given scans plus the full case list
+  (`download_cases` and `selected_case_ids` in `src/segreview/data.py`; `list_cases` behaves as before).
+- `[decision]` Every G3 run sets `nnUNet_compile=false`: nnU-Net turns `torch.compile` on by default on a Linux GPU
+  (nnU-Net 2.8.1's `_do_i_compile`; off on Windows), and torch 2.2 does not support it on Python 3.12. Setting it
+  explicitly keeps a run the same on Windows and on the HPC.
+- `[result]` Windows environment (`results/g3_smoke_gpu/windows_env.txt`, `setup_check.txt`): 123 packages; none
+  differs from the 132 versions pinned by `uv.lock`; torch 2.2.2+cu121 and torchvision 0.17.2+cu121; Windows-only:
+  colorama 0.4.6, psutil 7.2.2, tzdata 2026.5. The Windows torch build brings cuDNN 8.8.1 (8801), while the Linux
+  build in `uv.lock` uses `nvidia-cudnn-cu12` 8.9.2.26: one more reason why numbers from this PC and from Linux or the
+  HPC can differ slightly.
+- `[result]` GPU check (no training): torch sees the RTX 4090 (compute capability 8.9, 24.0 GiB, CUDA 12.1), and one
+  float16 3D convolution runs on it (`results/g3_smoke_gpu/setup_check.txt`).
+- `[result]` Tests in the Windows environment: 87 passed, 37 skipped (30 need a prepared user study; 6 browser tests
+  do not find Chrome, because the test helper only looks where Chrome is on macOS/Linux; 1 Linux-only memory test).
+  Includes the new tests `tests/test_data_selection.py`, `test_memory.py` and `test_machine.py`.
+- `[admin]` Downloaded (not in git): TotalSegmentator weights for task 297 (3 mm) and 298 (6 mm), fold 0 each
+  (`models/`, 0.33 GB); the 2 smoke-test scans case_00183 and case_00002 with the full KiTS case list
+  (`data/raw/kits23/`, 0.20 GB).
+- `[result]` The downloaded case list reproduces the 100 kits100 scans exactly (`selected_case_ids` of
+  `configs/kits100.yaml` = the 100 scans in `results/kits100/dice.csv`), and the 2 smoke-test scans are not among them.
+- `[admin]` Not run yet, on purpose (Frederik: set up, do not train yet): the GPU smoke test and therefore the
+  estimates for one fine-tuning run, the whole plan and the disk space (phase 1, steps 4b–6).
+
 ## 2026-10-21: robustness step 2, GPU compatibility and timing
 
 - `[admin]` Otto created PR [#1](https://github.com/Ottohesten/02830-medical-segmentation/pull/1).
@@ -797,6 +860,73 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   failed because noninteractive HTTPS Git cannot read a GitHub username. Otto must push from his authenticated
   terminal. Included publication status in the same unpublished work commit; no extra status-only push is needed.
 
+## 2026-10-21: G3 phase 1 — GPU smoke test on Frederik's PC (RTX 4090, Windows)
+
+Machine for every number below (`machine.json` in each result folder): Windows 11 (build 26200), Intel Core
+i9-14900K, 31.7 GiB RAM, NVIDIA GeForce RTX 4090 (24,564 MiB, driver 617.14), Python 3.12, torch 2.2.2+cu121, CUDA
+12.1, cuDNN 8.8.1 (`.venv` from `frederik/windows_setup.ps1`). Code: commit `9686315` plus the measurement changes
+listed at the end of this section (in the next commit). Before the runs, other programs used 18.7 of 34.1 GB RAM
+and 2.3 GB of the GPU's memory (games closed). Seed 42.
+
+- `[experiment]` GPU smoke test (`scripts/g3_smoke_test.py`) for the 6 mm model at batch 2 and 13
+  (`configs/g3_smoke_gpu.yaml`) and the 3 mm model at batch 2 (`configs/g3_smoke_gpu_3mm.yaml`), each with 0 and 16
+  augmentation workers; 30 training steps per run (10 warm-up, not counted) and 10 validation steps. About 2.5 min
+  per model. Results: `results/g3_smoke_gpu/`, `results/g3_smoke_gpu_3mm/` (`summary.csv`, `timing.csv`,
+  `cases.csv`, `sanity.csv`, `machine.json`). No model was saved.
+- `[result]` Fine-tuning runs on Windows: nnU-Net's trainer with spawned workers (16 for training, 8 for validation)
+  works, and with 16 workers the GPU never waited for data (0.000 s per step).
+- `[result]` Start from all weights confirmed (`sanity.csv`, loss on one batch at batch 2): random weights 4.86
+  (6 mm) / 5.07 (3 mm); nnU-Net's default start with the last layer re-initialized 7.15 / 8.85, worse than random;
+  all pretrained weights −0.83 / −0.91. Same pattern as on the Mac (6 mm: 5.38 / 7.86 / −0.77).
+- `[result]` The data line up (`cases.csv`): kidney Dice of the model against the ground truth on the network grid
+  6 mm 0.930 / 0.904, 3 mm 0.924 / 0.912 (case_00183 / case_00002). The correction changes 267 / 523 voxels (6 mm;
+  the Mac: 267 / 522, so GPU and CPU differ in one voxel) and 2,225 / 3,692 voxels (3 mm).
+- `[result]` Time per training step with 16 workers (mean of 20 steps; data wait + step): 6 mm batch 2 0.040 s,
+  6 mm batch 13 0.181 s, 3 mm batch 2 0.176 s; per validation step 0.021 / 0.165 / 0.208 s. The Mac (CPU, batch
+  2 / 13): 21 s / 586 s per step. Preparing one batch in a single process (0 workers, 1 thread): 6 mm 0.41 s
+  (batch 2) and 2.15 s (batch 13), i.e. 0.17–0.21 s per 64³ patch (Mac: 0.8–0.9 s); 3 mm 2.23 s (batch 2). So about
+  12–13 workers are needed for the GPU never to wait (2.15 / 0.181, 2.23 / 0.176). (`summary.csv`)
+- `[result]` GPU memory (torch's peak allocated / reserved): 6 mm batch 2 2.2 / 2.9 GB, batch 13 12.4 / 17.3 GB;
+  3 mm batch 2 11.7 / 16.3 GB. Fits in the 24 GB together with the ~2.3 GB Windows and other programs use.
+- `[result]` RAM (`summary.csv`): with 16 workers the run's processes used 11.4 GB (6 mm batch 2), 12.7 GB (batch
+  13) and 14.2 GB (3 mm) of RAM (private working sets; about 0.5 GB per worker); with 0 workers 2.3–2.4 GB. The PC's
+  RAM in use reached 31.6 / 32.3 / 34.0 GB of 34.1 GB. Windows' commit (memory reserved against RAM + page file)
+  reached 62 / 78 / 79 GB with 16 workers (2.3–2.5 GB per worker process, which loads CUDA torch) and 8–21 GB
+  with 0 workers.
+- `[result]` **On this PC the RAM, not the GPU, is the limit:** with 16 workers and the usual programs open, the
+  RAM was full for the 3 mm model (34.0 of 34.1 GB). For long runs: close other programs (18.7 GB in use before the
+  test), or use 12–14 workers (each about 0.5 GB RAM and 2.3–2.5 GB commit; at 12 the GPU may wait a little). If the
+  commit passes RAM + page file, Windows stops the run ("the paging file is too small", WinError 1455).
+- `[result]` Prediction time per scan on this GPU with G1's inference code (resampling, network, reduction,
+  resampling back; `scripts/g3_smoke_estimate.py`, `results/g3_smoke_gpu/inference_times_gpu.csv`): 3 mm 6.4 / 8.5 s
+  (mean 7.45 s), 6 mm 3.8 / 5.7 s (mean 4.75 s), for the 2 smoke-test scans (195 and 261 slices; kits100: mean
+  224, median 132). The Mac (CPU, kits100 run): 138 s / 24 s.
+- `[result]` **Estimates for planning, not results** (`scripts/g3_smoke_estimate.py`,
+  `results/g3_smoke_gpu/estimates.csv`; one run = steps × training step + epochs × 50 validation steps, 16
+  workers): one fine-tuning run of 2,500 / 6,250 steps takes 2 / 5 min (6 mm, batch 2), 9 / 22 min (6 mm, batch
+  13) and 9 / 23 min (3 mm, batch 2). The whole plan: 11 fine-tuned 3 mm models × 6,250 steps 4.2 h + predicting
+  kits100 (100 scans) with the 11 models and the original 2.5 h + the queue on the pool 0.3 h = about 7 h of GPU
+  time (docs/g3_plan.md estimated one to two days on a V100). Not included: starting each run (seconds), the 6 mm
+  stage and the grid of settings in phase 2, extra seeds. The prediction time rests on 2 scans.
+- `[result]` Disk (`results/g3_smoke_gpu/disk.csv`): KiTS files of kits100 9.94 GB and of the G3 pool (positions
+  101–200 of the draw) 8.26 GB (sizes from the dataset's server, nothing downloaded); preprocessed training data
+  for 100 pool scans 0.07 GB (6 mm) / 0.43 GB (3 mm); checkpoints 0.33 GB per fine-tuned model (final + best),
+  3.6 GB for the plan's 11 models. Predictions are not included (phase 2 decides what is saved). C: has 1,035 GB free.
+- `[result]` The seed-42 draw order confirms the pool definition: its first 100 scans are exactly kits100, and
+  positions 101–102 are the 2 smoke-test scans (checked in `scripts/g3_smoke_estimate.py`).
+- `[experiment]` Two earlier runs the same night were replaced by the final run, because the RAM measurement was
+  wrong: (1) the first measured Windows' commit and called it RAM (62–78 GB, more than the PC has); its step times
+  matched the final run (6 mm batch 13: 0.177 s). (2) the second read the private working sets every 0.5 s, which
+  paused the run: every 3rd step was 0.25–0.3 s slower (6 mm batch 13: mean 0.255 s, median 0.179 s).
+- `[decision]` RAM measurement on Windows (`src/segreview/memory.py`): RAM = the private working sets of all the
+  run's processes, read once when the steps are done (the workers are still running); commit and the PC's RAM in
+  use are sampled every 0.5 s (cheap). In the final run the mean step time equals the median (0.181 / 0.181 s).
+- `[admin]` New since commit `9686315`: `scripts/g3_smoke_estimate.py` with `src/segreview/g3_estimates.py`
+  (settings in `configs/g3_smoke_gpu.yaml`, section `estimate`); `random_draw` and `all_case_ids` in
+  `src/segreview/data.py` (the draw order, also needed for the pool in phase 2); the smoke test takes the machine
+  info at its start, so its own new result files no longer count as uncommitted changes. Tests: 94 passed, 37
+  skipped.
+
 ## 2026-10-21: supervisor advice on G3, task changes
 
 - `[supervisor]` Kristine (meeting): the comparison "most uncertain first" vs. random order is a good way to see whether
@@ -841,6 +971,306 @@ separately, and a score chosen here must later be tested once on the G3 pool bef
   timeouts, all scans under 2 min); heatmap display `contour` (pilot found `full` covering the border and preferred
   `contour`); mask fill opacity 0.45 → 0.2 (the fill hid the tissue under the mask). Open: are the study scans'
   errors visible enough (3 of 6 not edited), second pilot T03. P01 waits for the lock. `docs/tasks/g2_user_study.md`.
+
+## 2026-10-27: G3 phase 2 starts — learning-curve design, merge, Smart App Control blocks torch
+
+- `[admin]` Frederik approved phase 2 (message from the group) and asked for `main` to be merged into `frederik/g3`:
+  merge commit `c9f0018`. Conflicts only in PROJECT_LOG.md and PROJECT_OVERVIEW.md, resolved by keeping both sides
+  (log sections in date order).
+- `[admin]` Data from the group's OneDrive moved into place on Frederik's PC: `kits100` → `data/predictions/kits100/`
+  (600 files: the 6 maps of all 100 kits100 scans, the same scans as `results/kits100/dice.csv`) and `study_kits` →
+  `data/study/study_kits/` (manifest, 6 study scans, the practice scan, 10 demo-queue scans; no session data). G3
+  does not need them, but with the prepared study the 30 study tests can run. Still missing for G3, public and
+  downloaded by `scripts/download_data.py`: the KiTS scans of kits100 (9.9 GB) and of the G3 pool (8.3 GB).
+- `[admin]` **Blocker:** Windows Smart App Control is on (the CodeIntegrity log shows it enforcing since 2026-10-15)
+  and now blocks torch's DLLs (`torch_cpu.dll`, "an application control policy has blocked this file", WinError
+  4551), so `import torch` fails in `.venv`. It worked on 2026-10-20/21; Smart App Control decides from the files'
+  cloud reputation, which can change. Nothing that needs torch (tests, our download scripts, inference, training)
+  runs on this PC until Frederik decides: turn Smart App Control off (Windows Security), or run G3 elsewhere.
+  The setting was not changed by Claude (a security setting is the owner's decision).
+- `[decision]` **G3 is run as a learning curve** (Kristine and the group, 2026-10-21), written into `docs/g3_plan.md`
+  ("Design: learning curve") before anything is built. Fixed now: queue order (`model_diff_mean_region`, computed on
+  this PC from the pool's model output, no ground truth) vs. random order (seeds 42, 43, 44; 45 and 46 if time
+  allows); *k* = 0, 10, …, 100 corrected pool scans; every point fine-tuned from the original 3 mm model; 39 runs,
+  plus one control run without correction at *k* = 100. The same steps *S* and learning rate *L* for every point,
+  chosen on the 20 development scans from *S* ∈ {2,500, 6,250} × *L* ∈ {0.001, 0.0003}, each trained at *k* = 50 in
+  queue order and in random order (seed 42), so the choice favors neither order; criterion: mean development Dice
+  over both runs, within 0.001 the fewer steps. Kidney-only foreground oversampling; the final checkpoint is
+  evaluated. Dice per scan and model on the 20 development and 80 test scans after every point; the test set only
+  draws the curves. Primary summary: mean over *k* = 10, …, 90 of (queue − mean of the random seeds) test Dice,
+  with a 95 % paired bootstrap over the 80 test scans (2,000 resamples, seed 42); training noise is judged from the
+  spread of the random seeds and the *k* = 100 runs.
+- `[dropped]` The earlier G3 comparison at fixed budgets (models A–D at *k* = 10/20/40; phase 2 as "the 6 mm model
+  at *k* = 20"): replaced by the learning curve. The 6 mm model is used only for one pipeline test; on the RTX 4090 a
+  training step costs the same for both models (0.18 s), so the curves use the 3 mm model directly.
+- `[decision]` The locked ranking test on the pool (2026-10-21) is respected: G3 computes the queue and the simulated
+  corrections and saves the pool's 3 mm/6 mm output in G1's format (`data/predictions/g3_pool/`) for that test, but
+  computes no ranking metric on the pool; the size of each correction is saved but not compared with the queue order
+  before the test.
+- `[result]` Correction to the 2026-10-21 summary ("2,500 steps take about 7–8 min"): that is the training steps
+  alone; with the validation steps of nnU-Net's 10 epochs it is about 9 min for both models
+  (`results/g3_smoke_gpu/estimates.csv`).
+- `[admin]` Estimate for the learning curve, from the smoke test: about 15–25 h of GPU time (settings grid about 2 h,
+  40 curve runs 6–15 h, predicting 100 scans with each model about 8 h).
+
+## 2026-10-27: G3 phase 2 — Smart App Control off, pipeline built, first stages started
+
+- `[admin]` Frederik turned Windows Smart App Control off (state 0); torch loads again in `.venv`.
+- `[admin]` Windows fixes in shared code so the whole test suite runs on Windows, behavior on Linux/macOS unchanged
+  (**Otto, for your scripts**): four robustness scripts (`benchmark_robustness.py`, `evaluate_robustness.py`,
+  `run_robustness_test.py`, `select_robustness_strengths.py`) imported the Unix-only `resource` module at the top; it
+  is now optional (on Windows the process's peak memory is recorded as empty). `tests/conftest.py` links the prepared
+  study folders with a directory junction where Windows does not allow symbolic links (the study files were checked
+  to be unchanged after the tests).
+- `[result]` **Otto's integrity checks fail on a Windows checkout although nothing changed:** they hash files byte for
+  byte, and GitHub Desktop's git checks text files out with Windows line endings (CRLF). The hashes of
+  `configs/kits_perturbed.yaml`, `configs/kits_robustness_dev.yaml` and `results/kits_robustness_dev/
+  dev_degradation_summary.csv` differ on this PC, but with line endings normalized to LF all three equal the locked
+  ones (so `tests/test_robustness_evaluation.py` failed only here). On this PC the three files were checked out again
+  with LF (no change in git). Suggestion for Otto/Bjørn: hash LF-normalized content, or keep hashed files LF
+  everywhere with `.gitattributes` (`eol=lf`).
+- `[result]` Tests on Frederik's PC with all data in place: **186 passed, 7 skipped** (6 need Google Chrome, 1 needs
+  Linux), 0 failed.
+- `[admin]` Downloaded the KiTS scans of kits100 and of the G3 pool: 200 scans with labels, **18.20 GB in 679 s**,
+  as estimated in `results/g3_smoke_gpu/disk.csv` (9.94 + 8.26 GB). Checked: the pool (`configs/g3_pool.yaml`) is
+  exactly positions 101–200 of the seed-42 draw, shares no scan with kits100 and contains the 2 smoke-test scans.
+- `[admin]` **G3 pipeline built** (docs/g3_plan.md, "What to build"): `configs/g3_pool.yaml`, `configs/g3_kits.yaml`,
+  `src/segreview/finetune.py` (orders, runs, targets, nnU-Net's trainer on a list of scans), `src/segreview/g3_analysis.py`
+  (curves, summary, bootstrap), `scripts/g3_prepare.py`, `g3_train.py`, `g3_evaluate.py`, `g3_run.py` (the stages),
+  `g3_curves.py`, and `frederik/g3_chain.ps1` (runs stages as a process of its own on Windows). Shared code extended
+  without changing existing behavior: `dataset.offset` (`src/segreview/data.py`, for the pool),
+  `step_uncertainty(cfg, cases=...)` (scores the pool while its ground truth stays closed to G1's evaluation),
+  `OrganSegmenter.predict(..., labels=True)` (all structures' labels, for the forgetting measure). New tests
+  `tests/test_finetune.py`, `tests/test_g3_analysis.py`.
+- `[decision]` G3 training uses 14 augmentation workers instead of 16: other programs use 17–19 GB of the PC's 34 GB
+  RAM, and the smoke test needed about 12.7 workers for the GPU never to wait (`configs/g3_kits.yaml`).
+- `[experiment]` Started 2026-10-27 20:08 as a process of its own (`frederik/g3_chain.ps1 prepare test grid`): the
+  pool's model output and the queue, the training data, the 6 mm pipeline test, then the settings grid on the
+  development set. Progress: `data/g3_kits/logs/chain_status.txt`.
+- `[result]` Prepare stage done in 44.9 min: the pool's 3 mm and 6 mm model output (600 maps in
+  `data/predictions/g3_pool/clean/`), its queue score, the four orders (`results/g3_kits/orders.csv`: queue and
+  random 42/43/44) and the training data: 100 corrected and 100 uncorrected (control) 3 mm scans, 10 corrected 6 mm
+  scans for the pipeline test. `results/g3_kits/targets_*.csv` hold only the grid size, the number of voxels the
+  correction changes and timings: no Dice, and nothing is compared with the queue order.
+- `[result]` 6 mm pipeline test (queue order, *k* = 10, 250 steps) passed: training starts from the pretrained weights
+  (first epoch's training loss −0.77) and both checkpoints are written; Dice on 2 development scans 0.529
+  (`case_00040`, the pelvic kidney) and 0.928 (`case_00051`). It only checks the chain; it is not a result.
+- `[result]` First settings-grid run (queue order, *k* = 50, 2,500 steps, *L* = 0.001): 14.3 min, training loss
+  −0.85 → −0.90 over the 10 epochs. RAM in use 15.9 GB before, system peak 29.1 of 34.1 GB, commit charge peak 69.9 GB
+  (page file), GPU 11.6 GB allocated (14.7 reserved). The GPU waits for data augmentation about half of the time
+  (mean utilization 72 %; 15 of 30 samples under 20 %), so a step takes about 0.34 s instead of the smoke test's
+  0.18 s; the RAM leaves no room for more workers. New estimate: settings grid about 4 h, curves about 16 h with
+  2,500 steps or about 30 h with 6,250.
+- `[admin]` Memory in training runs: `peak_ram_gb` (private memory of the process tree, read once at the end on
+  Windows) misses nnU-Net's augmentation workers, which have exited by then. For training runs use
+  `peak_system_ram_gb` and `peak_commit_gb`. Not changed during the experiment.
+
+## 2026-10-28: G3 settings grid interrupted by a shutdown, restarted
+
+- `[result]` The grid stopped on 2026-10-27 at 23:10: the PC's power button was pressed at 23:10:25 (Windows
+  Kernel-Power event 41 at the next start: short press, no crash code), and Windows ended the 7th grid run
+  (`queue_k050_S6250_L0.0003`, epoch 4 of 25) with exit code 0x40010004. The PC was off until 08:27; the shutdown
+  was not clean. Not caused by the G3 code; no automatic sleep is set on mains power.
+- `[admin]` Checked after the restart: the 6 finished grid runs' final checkpoints load, with finite weights and the
+  expected epochs, and their training logs are complete. The interrupted attempt was moved, not deleted, to
+  `data/g3_kits/runs_interrupted/queue_k050_S6250_L0.0003_2026-10-27T2304/`. Its result is not used.
+- `[experiment]` Grid restarted 2026-10-28 08:32 (`frederik/g3_chain.ps1 grid`): the 6 finished runs are skipped, and
+  run 7 starts again from the pretrained weights, as every run does.
+- `[decision]` **Training setting for every point of the learning curve: 2,500 steps, learning rate 0.001.** Chosen
+  by the rule fixed beforehand (docs/g3_plan.md): the mean development Dice (kidney + tumor + cyst, 20 scans) over
+  the queue run and the random run at *k* = 50. 6,250 steps with *L* = 0.001 scored 0.00018 higher, which is within
+  the 0.001 margin, so the fewer steps win. Written by the code to `results/g3_kits/settings_choice.json`
+  (2026-10-28 09:58:56) and `settings_grid.csv`, and logged here before any test scan was predicted by a fine-tuned
+  model.
+
+  | Steps | *L* | Queue run (dev) | Random run, seed 42 (dev) | Mean |
+  |---|---|---|---|---|
+  | 2,500 | 0.001 | 0.9383 | 0.9361 | **0.9372** (chosen) |
+  | 2,500 | 0.0003 | 0.9378 | 0.9326 | 0.9352 |
+  | 6,250 | 0.001 | 0.9406 | 0.9342 | 0.9374 |
+  | 6,250 | 0.0003 | 0.9380 | 0.9331 | 0.9356 |
+
+  The original model on the same 20 scans: 0.8472.
+- `[result]` On the development set every fine-tuned model is far above the original model (0.933–0.941 vs. 0.847
+  Dice; with tumors ignored 0.932–0.938 vs. 0.868). On average they relabel 1.1–1.6 % of the voxels the original
+  model gives other structures (at most 2.2 % on one scan). The queue run is above the random run in all four
+  settings (by 0.0005–0.0064). That is one random seed at one *k* on 20 scans, and these scans chose the setting, so
+  it is not a result: the test-set curves answer it.
+- `[admin]` Timing: this morning a 6,250-step run took 28.2 min, against 35–37 min last night, probably because fewer
+  other programs ran after the restart. Predicting one development scan takes 8.7 s; the 9 models' development
+  evaluation took 29.9 min.
+- `[experiment]` **Learning curves started 2026-10-28 10:00** (`frederik/g3_chain.ps1 curves`). First the original
+  model on the 80 test scans, then 38 training runs: 37 corrected plus the control without correction. The two
+  *k* = 50 grid runs at the chosen setting are reused, and queue order and random seed 42 share the *k* = 100 run.
+  Every model is evaluated on the 20 development and 80 test scans, in the order *k* = 10, 20, … (at each *k*:
+  queue, random 42, 43, 44, then the control). Estimate about 18 h (training about 8 h, prediction about 10 h), so
+  done around 04:00 on 2026-10-29. The PC must stay on.
+- `[admin]` **G3 can be stopped and continued at any time** (Frederik's request). Until now a stopped training run
+  started again from the beginning. Now `scripts/g3_train.py` has nnU-Net save the whole training state after every
+  epoch (`checkpoint_latest.pth`: weights, optimizer, epoch, log), and a stopped run continues from it. A run counts
+  as finished only when its `results/g3_kits/training/<run_id>.json` is written, as the last step. Checkpoints and
+  result tables are written through a temporary file (`finetune.save_atomically`), so a stop while saving cannot
+  leave a broken file. New scripts: `frederik/g3_start.ps1` (start or continue, as a process of its own; refuses
+  while G3 is running) and `frederik/g3_stop.ps1` (stops G3 with all its processes). How runs train is unchanged;
+  a continued run is marked in its JSON (`resumed_after_epochs`). New unit test in `tests/test_finetune.py`; tests
+  187 passed, 7 skipped.
+- `[result]` Tested before use: a throwaway 3-epoch 6 mm run, stopped by `g3_stop.ps1` during its 3rd epoch,
+  continued after 2 of 3 epochs. The learning rate followed the same schedule as without a stop, and the log had all
+  3 epochs. The test's files were deleted. For the test, the curves were stopped on 2026-10-28 from 12:13 to 12:18
+  during the evaluation of `queue_k020_S2500_L0.001`; they continued with its remaining 56 of 100 scans.
+
+## 2026-11-02: G3 curves interrupted by a shutdown, continued
+
+- `[result]` The curves stopped on 2026-10-28 at 21:37, during the predictions of `queue_k080_S2500_L0.001` (24 of
+  its 100 development and test scans done): the PC's power button was pressed at 21:37:07 (Kernel-Power event 41 at
+  the next start: no crash code; Windows was shutting down when the PC went off). As on 2026-10-27, not caused by
+  the G3 code. By then 28 of the 40 curve runs were trained and evaluated (*k* = 10–70 in all four orders), and
+  `queue_k080` was trained.
+- `[admin]` Checked before continuing: the interrupted evaluation's table was intact (24 scans, last written
+  21:37:01), and no temporary file was left.
+- `[experiment]` Curves continued 2026-11-02 11:19 (`frederik/g3_start.ps1`). Skipping the finished runs took 4 min,
+  and at 11:23 the `queue_k080` evaluation continued with scan 25 of 100 (none evaluated twice). Left: its
+  remaining scans, then 11 runs (*k* = 80 for the three random orders, *k* = 90 for all four, and at *k* = 100
+  three runs plus the control), about 25 min each; done around 16:00.
+- `[experiment]` **Learning curves done 2026-11-02 17:05** (`END curves exit 0`): all 40 runs (39 corrected plus the
+  control without correction) trained and evaluated on the 20 development and 80 test scans; no step failed. About
+  17.3 h in all (2026-10-28 10:00–21:37 and 2026-11-02 11:19–17:05). Today's steps took about 20 % longer than on
+  2026-10-28 (training 13.7–14.3 min instead of 11.5–11.8, evaluation 15.6–16.7 min instead of 13.0); the cause was
+  not checked. `scripts/g3_curves.py` wrote `results/g3_kits/curves.csv`, `summary.csv`, `seed_spread.csv`,
+  `models.csv` and `figures/learning_curve_test.{png,pdf}`.
+- `[result]` **Primary summary (fixed beforehand, docs/g3_plan.md): queue minus random, mean over *k* = 10–90, all 80
+  test scans, kidney + tumor + cyst: +0.0019 Dice (95 % paired bootstrap CI −0.0009 to +0.0058).** The queue order
+  is not clearly better than random order. At *k* = 100 all orders train on the same 100 scans, so their difference
+  there (+0.0015) is training noise alone, and it is about as large as the primary estimate.
+- `[result]` Correcting scans helps a lot, and early, in both orders: test Dice 0.870 with the original model, 0.94
+  after 10 corrected scans, 0.95 from about 40, 0.955 at 70–100. The control (all 100 pool scans with the model's own
+  prediction as target, no correction) reaches 0.877, so the gain comes from the corrections, not from training on
+  the pool's scans.
+
+  | *k* | Queue | Random, mean of 3 seeds | Queue − random | Spread of the 3 random seeds | Bad scans (n = 11): queue − random |
+  |---|---|---|---|---|---|
+  | 0 | 0.8700 | 0.8700 | | | |
+  | 10 | 0.9410 | 0.9385 | +0.0025 | 0.0166 | +0.071 |
+  | 20 | 0.9454 | 0.9450 | +0.0004 | 0.0015 | +0.039 |
+  | 30 | 0.9487 | 0.9496 | −0.0009 | 0.0061 | +0.017 |
+  | 40 | 0.9507 | 0.9489 | +0.0018 | 0.0008 | +0.017 |
+  | 50 | 0.9536 | 0.9488 | +0.0048 | 0.0071 | +0.029 |
+  | 60 | 0.9523 | 0.9500 | +0.0023 | 0.0065 | +0.033 |
+  | 70 | 0.9545 | 0.9525 | +0.0020 | 0.0035 | +0.005 |
+  | 80 | 0.9547 | 0.9522 | +0.0026 | 0.0008 | +0.003 |
+  | 90 | 0.9546 | 0.9535 | +0.0012 | 0.0052 | −0.002 |
+  | 100 | 0.9547 | 0.9532 | +0.0015 | 0.0044 | +0.002 |
+
+  Mean test Dice (kidney + tumor + cyst) over all 80 test scans; spread: highest minus lowest random seed.
+- `[result]` Secondary (11 scans, nine *k* values, intervals not corrected for multiple comparisons): on the 11 "bad"
+  test scans (Dice below 0.83 with the original model; mean 0.608) the queue is ahead at small *k*: at *k* = 10
+  0.913 against 0.842 (+0.071, CI +0.037 to +0.114); mean over *k* = 10–90 +0.023 (CI +0.009 to +0.048). The gap is
+  gone from *k* = 70. The random seeds differ widely on these scans (at *k* = 10: 0.767–0.904). With tumors ignored
+  the gap is smaller: on the bad scans +0.007 (CI −0.001 to +0.018); on all test scans the queue is slightly below
+  random at *k* = 10–30 (−0.008 to −0.004), and the mean over *k* is −0.0010 (CI −0.0025 to +0.0010). So the queue's
+  advantage on the bad scans may be mostly about tumors (counted as kidney in the primary definition); not checked.
+  Development set (20 scans): +0.0019 (CI −0.0017 to +0.0067).
+- `[result]` Limits: the intervals cover the choice of test scans, not training noise. The queue has one training
+  seed, the random mean three, and the random seeds' spread at the same *k* (0.001–0.017) is larger than the
+  queue − random difference at 8 of the 10 *k* values.
+- `[result]` Forgetting: on average every fine-tuned model relabels 1.7–2.2 % of the test voxels the original model
+  gives other structures (the control 1.6 %), so most of it comes from fine-tuning itself. Whether these changes are
+  errors cannot be checked: KiTS has ground truth only for kidney, tumor and cyst.
+- `[admin]` Logged per run (step 9): config, git commit (`c9f0018` plus the uncommitted G3 code), machine, loss,
+  learning rate and time per epoch, the corrected scans and peak memory in `results/g3_kits/training/`; the voxels
+  changed per corrected scan in `results/g3_kits/targets_fast.csv`; Dice and forgetting per scan and model in
+  `results/g3_kits/dice/`. Not in git (for the OneDrive): the trained models in `data/g3_kits/runs/` (12 GB) and the
+  predictions in `data/g3_kits/predictions/` (1.3 GB). Tests: 187 passed, 7 skipped.
+- `[admin]` For the group's locked test (Otto), so the models need not run again: the pool's model output
+  `data/predictions/g3_pool/` (600 files: per scan the 3 mm and 6 mm masks and probabilities, the entropy and the
+  difference map; no ground truth) zipped as `data/g3_pool.zip` for the group's OneDrive folder "delte store filer".
+  283.3 MB, entries under `g3_pool/clean/` (unzip into `data/predictions/`), SHA-256
+  `4c0c0d68590527dd9e14c821969623ab7581523f8b3d51106994bf1f81c2c15d`. The group folder is not synced on this PC, so
+  Frederik uploads it in the browser.
+
+## 2026-11-03: provenance of the pool's model output for the locked test
+
+- `[admin]` Asked by the group for the preflight of the joint locked test on the pool (`docs/tasks/g1_missed_errors.md`
+  on `otto/missed-errors`). Checked on Frederik's PC:
+  - The pool's model output (`data/predictions/g3_pool/`, shared as `g3_pool.zip`) was written by
+    `scripts/g3_prepare.py` on 2026-10-27 20:08–20:45 with the public TotalSegmentator v2 weights, tasks 297 (3 mm)
+    and 298 (6 mm), fold 0, not fine-tuned. The first fine-tuned model was created at 20:53, in `data/g3_kits/runs/`.
+  - SHA-256 of the two `checkpoint_final.pth`: 3 mm `1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac`
+    (164,939,235 bytes), 6 mm `3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270` (164,951,587 bytes),
+    last modified at the download on 2026-10-20. Identical to Otto's verified download
+    (`results/robustness_setup/download_verification.json`) and to the hashes in Otto's lock
+    (`results/kits_missed_fresh/lock.json` on `otto/missed-errors`).
+  - The code that wrote the output (`scripts/g3_prepare.py`, `src/segreview/{inference,pipeline,uncertainty,data}.py`,
+    `configs/g3_pool.yaml`, `configs/kits100.yaml`) was not changed after the run; it is committed unchanged in
+    `de91651`.
+- `[admin]` The locked ranking test has not been run: no review-AUC, Spearman or other ranking metric on the pool, and
+  no such file in `results/g3_pool/` or `results/g3_kits/`. The pool's ground truth was used only for (a) G3's
+  simulated corrections (allowed, 2026-10-21); their sizes per scan are in `results/g3_kits/targets_fast.csv` and
+  `targets_fastest.csv`, never compared with the queue or the scores; and (b) the smoke tests before the lock: the
+  model's kidney Dice on case_00002 and case_00183 (pool positions 101–102), 0.904–0.930 (Mac 2026-10-14,
+  `results/g3_smoke/`; GPU 2026-10-21, `results/g3_smoke_gpu*/`).
+- `[admin]` Frederik cannot confirm that Bjørn knows the exact locked check: per the task document Otto tells Bjørn,
+  so Otto or Bjørn confirms it.
+
+## 2026-11-16: G3 closed (pull request, report notes, predictions shared, task B; phase 3 dropped)
+
+- `[admin]` Task list from the group for closing G3: (A, due 2026-11-15) a pull request from `frederik/g3` to `main`,
+  step 9 ticked, the report notes, the predictions on the OneDrive; (B) what the queue's first pool scans contain,
+  now allowed after the joint locked test on the pool (2026-11-04, on `otto/missed-errors`); (C) a phase 3 on the
+  first ten scans, Frederik's if wanted.
+- `[admin]` `main` merged into `frederik/g3` (`c8a23b7`, report-notes templates; no conflicts). Step 9 ticked (all
+  per-run logging was in place on 2026-11-02). Report notes filled in for phase 2:
+  `docs/report_notes/frederik_g3.md`.
+- `[admin]` The curves' predictions (`data/g3_kits/predictions/`: 4,222 files, the development and test predictions
+  of the original model, the 40 curve models, the 6 other grid models and the pipeline test) zipped as
+  `data/g3_kits_predictions.zip` for the OneDrive folder "delte store filer": 1,363.0 MB, entries under
+  `g3_kits/predictions/` (unzip into `data/`), SHA-256
+  `eebb99eef7eab4e3bd0df16b8960df800783fd465d9da66e4883e838457bb38c`. Frederik uploads it in the browser (the group
+  folder is not synced on this PC). The trained models (`data/g3_kits/runs/`, 12 GB) stay on this PC.
+- `[result]` **Task B: the queue's first pool scans have very large tumors** (`scripts/g3_queue_content.py`;
+  `results/g3_kits/queue_content.csv`, `pool_scan_content.csv`, `test_tumor_sizes.csv`; allowed after the joint
+  locked test of 2026-11-04). Every pool scan has a tumor (KiTS has only tumor patients), so the size is what differs:
+
+  | First *k* pool scans | Queue | Random 42 / 43 / 44 | Random, pooled |
+  |---|---|---|---|
+  | Tumor volume, median (mean), *k* = 10 | 527 ml (656) | 55 / 20 / 24 ml | 35 ml (139) |
+  | *k* = 20 | 345 ml (462) | 63 / 33 / 45 ml | 47 ml (180) |
+  | *k* = 30 | 174 ml (344) | 58 / 44 / 57 ml | 51 ml (168) |
+  | Voxels changed by the correction, median (mean), *k* = 10 | 16,242 (24,601) | 3,352 / 2,368 / 2,481 | 2,721 (6,331) |
+  | *k* = 20 | 9,729 (16,726) | 3,362 / 2,652 / 3,637 | 3,266 (7,136) |
+  | *k* = 30 | 7,577 (12,674) | 3,362 / 2,914 / 3,356 | 3,260 (6,642) |
+
+  Voxels on the 3 mm model's grid. Cysts are about as common in the queue's first scans as in the random orders'
+  (4 of 10 against 4–6). The 11 bad test scans are also the large-tumor scans: median tumor 596 ml (mean 598) against
+  30 ml (mean 73) for the other 69. So the queue's early lead on the bad test scans (+0.071 at *k* = 10), which is gone
+  with the tumor left out, fits the model learning from the queue's large-tumor scans that the whole tumor counts as
+  kidney: our label definition, as foreseen in docs/g3_plan.md ("Label definition"). Descriptive; it does not
+  separate the definition from other features of large-tumor scans.
+- `[decision]` **G3 phase 3: the first ten scans, a pre-specified follow-up** (written before any phase 3 run;
+  details in docs/g3_plan.md, "Phase 3"). Not a new locked test: the test set already drew the phase 2 curves, and
+  the results above are known.
+  - Runs (30, the phase 2 setting unchanged: 2,500 steps, learning rate 0.001, no new tuning): *k* = 1, 2, 3, 5 in
+    queue order with training seeds 42, 43, 44 and in the three random orders (24 runs); the queue with seeds 43 and
+    44 at *k* = 10, 20, 30 (6 runs). Each model predicts the 20 development and 80 test scans. About 14 h.
+  - **Primary number:** test set, kidney + tumor + cyst, the mean over *k* = 1, 2, 3, 5, 10 of (queue's three runs −
+    the three random orders' runs), with a 95 % interval from a two-stage bootstrap over test scans and, within each
+    arm and *k*, over its three runs (2,000 resamples, seed 42). Always reported with the same number with the tumor
+    left out; a lead that is only there with the tumor counts as the label definition, not as better error fixing.
+  - Secondary: each *k*; the bad test scans; the development set; the spread of the queue's seeds next to the random
+    orders' at *k* = 10, 20, 30; forgetting. Overfitting at *k* = 1 (many passes over one scan) is reported as a
+    limitation: Dice against the original model and the share of test scans that get worse.
+- `[decision]` **G3 phase 3 dropped, before any run** (Frederik, the same day). Phase 3 was optional (task C), and
+  Frederik chose not to spend another 14 h of training on the PC. Nothing of phase 3 was trained or evaluated.
+  - Its code from `f26c5ee` was removed again: the `phase3` section of `configs/g3_kits.yaml`,
+    `finetune.phase3_runs`, the `phase3` stage of `scripts/g3_run.py`, `scripts/g3_phase3.py` and
+    `g3_analysis.arm_difference_with_ci`. The run code and the config are as they were for phase 2, and
+    `frederik/g3_start.ps1` starts the curves stage by default again, as before.
+  - The design stays in docs/g3_plan.md, "Phase 3", as written, marked as dropped. The optional random seeds 45 and
+    46 (2026-10-27) were not run either.
+  - Two limitations stay in the report. There are no points below *k* = 10, where over 80 % of the gain happens, so
+    it is open whether the order matters for the first few corrected scans. The queue has one training seed, so its
+    lead on the bad test scans at *k* = 10 (+0.071) is not checked against training noise.
+  - G3 is done: phase 2 and task B.
 
 ---
 

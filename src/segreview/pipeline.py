@@ -252,18 +252,19 @@ def step_dice(cfg: dict) -> pd.DataFrame:
     return df
 
 
-def step_uncertainty(cfg: dict) -> pd.DataFrame:
+def step_uncertainty(cfg: dict, cases: list | None = None) -> pd.DataFrame:
     """GT-free scores for every saved prediction, and the heatmaps per scan -> scores.csv.
 
     Uses only the saved mask and probability (and TTA / second-model maps, if present), and for a paired
     organ (dataset.paired_organ) the CT image for the plausibility check. No ground truth.
     Runs on the scans in evaluation.splits (it does not need ground truth, but there is no reason to
-    score scans that are not evaluated yet).
+    score scans that are not evaluated yet), or on the given cases: the G3 pool is scored for its queue
+    while its ground truth stays closed to G1's evaluation (configs/g3_pool.yaml).
     """
     n_tta = cfg["uncertainty"]["tta"]["n_passes"]
     paired = cfg["dataset"].get("paired_organ", False)
     rows = []
-    for case in evaluation_cases(cfg):
+    for case in (evaluation_cases(cfg) if cases is None else cases):
         ct = load_canonical(case.image_path).get_fdata(dtype=np.float32) if paired else None
         for variant in variants(cfg):
             if not has_prediction(cfg, variant, case.case_id):

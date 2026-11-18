@@ -1,0 +1,3 @@
+model,case_id,split,dice_kidney_tumor_cyst,dice_kidney_cyst_ignore_tumor,forgetting_share,predict_s
+pipelinetest_queue_k010_S250_L0.001,case_00040,dev,0.5287670517078651,0.5207710833741394,,7.26
+pipelinetest_queue_k010_S250_L0.001,case_00051,dev,0.9275232300552309,0.9220769771784736,,2.67

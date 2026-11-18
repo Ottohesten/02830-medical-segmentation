@@ -6,6 +6,7 @@ DTU 02830 Advanced Project in Digital Media Engineering, group 2.
 **New to the project? Start with [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** (what it is, status, where everything is)
 and [PROJECT_LOG.md](PROJECT_LOG.md) (dated log of every result, experiment, idea and decision, including what was dropped and why).
 **Before you change code or run experiments, read [CONTRIBUTING.md](CONTRIBUTING.md)** (branches, locked results, logging).
+**What your part found goes in your own file in [docs/report_notes/](docs/report_notes/README.md)** (one file per group member; the report is written from these files).
 
 A pretrained segmentation model (TotalSegmentator / nnU-Net) segments an organ in many CT scans.
 Instead of chasing higher Dice, we rank the scans by the model's own uncertainty, so a human reviewer
@@ -505,7 +506,7 @@ uv run python scripts/power_study.py   --config configs/study.yaml   # planning:
   effect sizes d_z (mean / SD of the per-participant differences), the share of simulated studies where the Wilcoxon
   test finds the effect. These are assumptions for planning, not results.
 
-## G3 (stretch): fine-tuning on corrected scans — plan only
+## G3 (stretch): fine-tuning on corrected scans — learning curve
 
 [docs/g3_plan.md](docs/g3_plan.md) describes the experiment (simulated corrections of the top of the review queue,
 fine-tuning, evaluation on the `kits100` test set) and what needs the HPC. It is not built. A feasibility smoke test
@@ -516,14 +517,62 @@ training step (2 KiTS scans that are not in `kits100`; nothing is saved as a mod
 uv run python scripts/g3_smoke_test.py --config configs/g3_smoke.yaml   # -> results/g3_smoke/
 ```
 
+It writes `cases.csv`, `sanity.csv`, `timing.csv` (one row per step), `summary.csv` (per run: time to get a batch,
+time per step, peak RAM of all processes and peak GPU memory) and `machine.json`. `compute.augmentation_processes`
+may be a list: 0 measures the time to prepare one batch in the main process, a number of workers measures whether
+the GPU waits for data, as in a real training run. The smoke test only needs the dataset's case list, not the 100
+kits100 scans; the 2 scans are downloaded with
+`uv run python scripts/download_data.py --config configs/kits100.yaml --cases case_00183 case_00002`.
+
+**G3 on a Windows PC with an NVIDIA GPU** (Frederik's RTX 4090; task document
+[docs/tasks/g3_finetuning.md](docs/tasks/g3_finetuning.md)). `uv.lock` covers only macOS and Linux, so `uv sync` and
+`uv run` do not work on Windows. `frederik/windows_setup.ps1` builds a separate environment in `.venv` with the same
+package versions as `uv.lock` (torch 2.2.2 and torchvision 0.17.2 as CUDA 12.1 builds from PyTorch's own server),
+without changing `uv.lock` or `pyproject.toml`. It also checks the GPU (no training), runs the tests and downloads
+the weights and the 2 smoke-test scans. Afterwards, scripts run with the environment's Python instead of `uv run`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File frederik\windows_setup.ps1                         # once
+.venv\Scripts\python.exe -m pytest
+.venv\Scripts\python.exe scripts\g3_smoke_test.py --config configs\g3_smoke_gpu.yaml       # 6 mm, batch 2 and 13
+.venv\Scripts\python.exe scripts\g3_smoke_test.py --config configs\g3_smoke_gpu_3mm.yaml   # 3 mm, batch 2
+.venv\Scripts\python.exe scripts\g3_smoke_estimate.py --config configs\g3_smoke_gpu.yaml   # planning estimates
+```
+
+`g3_smoke_estimate.py` turns the two smoke tests into planning estimates (time of one fine-tuning run and of the
+whole G3 plan, disk space): it reads their `summary.csv`, measures the time to predict a scan with G1's inference
+code on the 2 smoke-test scans, and asks the dataset's server for the file sizes of kits100 and the G3 pool. Output:
+`results/g3_smoke_gpu/{estimates,disk,inference_times_gpu}.csv`. The numbers are estimates for planning, not results.
+
+**The learning curve (phase 2; design in [docs/g3_plan.md](docs/g3_plan.md), "Design: learning curve").** Settings:
+`configs/g3_kits.yaml` (orders, *k*, settings grid, evaluation) and `configs/g3_pool.yaml` (the G3 pool, positions
+101–200 of kits100's seeded draw; its ground truth is closed to G1's evaluation). One script runs each stage, one step
+per process, and skips finished work, so a stage can be stopped and started again:
+
+```powershell
+.venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage prepare   # pool output, orders, training data
+.venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage test      # 6 mm pipeline test (minutes)
+.venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage grid      # settings on the dev set + choice
+.venv\Scripts\python.exe scripts\g3_run.py --config configs\g3_kits.yaml --stage curves    # the curves (many hours)
+.venv\Scripts\python.exe scripts\g3_curves.py --config configs\g3_kits.yaml               # curves, summary
+```
+
+The steps are `g3_prepare.py`, `g3_train.py` (one run) and `g3_evaluate.py` (Dice per scan and model on kits100);
+`src/segreview/finetune.py` has the orders, the runs, the training targets and nnU-Net's trainer, and
+`src/segreview/g3_analysis.py` the curves and the summary. Small results go to `results/g3_kits/` (orders, Dice per
+model, training logs per run, the settings choice, curves); trained models, predictions and nnU-Net's data to
+`data/g3_kits/` (not in git). Until the group's locked ranking test has run, nothing computes a ranking metric on the
+pool (PROJECT_LOG.md, 2026-10-21).
+
 ## Layout
 
 ```
 configs/        one YAML config per environment; configs/datasets/ describes each dataset
 src/segreview/  shared code (config, data, weights, inference, augment, uncertainty, evaluation, figures, pipeline,
-                model_comparison, voxel_correction, machine)
+                model_comparison, voxel_correction, machine, memory)
 scripts/        runnable pipeline steps
 jobs/           LSF job scripts for the DTU HPC (not tested on the cluster)
+frederik/       tools only Frederik's Windows GPU PC needs (setup of .venv; see frederik/README.md)
 ui/             review interface (G2): index.html, app.js (flow), viewer.js (slice viewer), style.css, vendor/niivue
 tests/          automatic tests (uv run pytest)
 results/        results/<config name>/: small result files (csv, figures)

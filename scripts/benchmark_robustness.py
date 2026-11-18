@@ -10,7 +10,10 @@ Run: PYTHONPATH=src .venv-gpu/bin/python scripts/benchmark_robustness.py --confi
 import gc
 import hashlib
 import json
-import resource
+try:
+    import resource          # peak memory of the process (macOS and Linux)
+except ImportError:          # Windows has no resource module: the peak memory is not recorded there
+    resource = None
 import signal
 import sys
 import time
@@ -129,7 +132,7 @@ def run_benchmark(cfg: dict, config_path: Path, overwrite: bool = False) -> None
                     save_map(cfg, variant, case.case_id, prefix + 'mask', pred.mask, pred.affine)
                     save_map(cfg, variant, case.case_id, prefix + 'prob', pred.prob, pred.affine)
                     t4 = time.perf_counter()
-                    peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+                    peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss if resource else None
                     rows.append({'case_id': case.case_id, 'case_index': case_index, 'variant': variant,
                                  'resolution': resolution, 'spacing_mm': segmenter.spec.spacing_mm,
                                  'device': str(device), 'shape': 'x'.join(map(str, image.shape)),
@@ -138,7 +141,8 @@ def run_benchmark(cfg: dict, config_path: Path, overwrite: bool = False) -> None
                                  'total_seconds': t4 - t0,
                                  'gpu_peak_allocated_mib': torch.cuda.max_memory_allocated() / 2**20
                                  if device.type == 'cuda' else None,
-                                 'process_peak_rss_mib': peak_rss / 2**20 if sys.platform == 'darwin' else peak_rss / 1024})
+                                 'process_peak_rss_mib': None if peak_rss is None else
+                                 peak_rss / 2**20 if sys.platform == 'darwin' else peak_rss / 1024})
                     pd.DataFrame(rows).to_csv(timings_path, index=False)
                     print(f'{case.case_id} {variant} {resolution}: {t3-t2:.2f} s prediction, {t4-t0:.2f} s total', flush=True)
                     del image, pred
