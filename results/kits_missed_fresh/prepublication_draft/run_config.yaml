@@ -1,0 +1,65 @@
+# Prospective joint ranking check. Scientific settings are frozen before fresh outcome access.
+# Input locations/coordination evidence are supplied separately through --handoff; no inference here.
+name: kits_missed_fresh
+seed: 42
+compute: {device: cpu, num_threads: 6}
+paths:
+  raw_dir: data/raw
+  models_dir: models
+  predictions_dir: data/predictions
+  results_dir: results
+dataset: {file: configs/datasets/kits23.yaml, n_cases: 100, selection: random}
+
+fresh:
+  source_config: configs/kits100.yaml
+  protocol: docs/missed_errors_fresh_protocol.md
+  skip_cases: 100
+  n_cases: 100
+  known_g3_smoke_cases: [case_00183, case_00002]
+  required_maps: [mask, prob, m2_mask, m2_prob]
+  border_mm: 5
+  grid_band_mm: 6
+  body_threshold_hu: -500
+  min_component_ml: 20
+  max_components: 2
+  connectivity: 1
+  rank_lattice_atol: 0.000000001
+  comparison_atol: 0.000000000001
+  old_far_rounding_atol: 0.00000051  # archived exploratory far-score CSV has six decimals
+  old_dice_rounding_atol: 0.000051   # archived Dice CSV has four decimals
+  benchmark: {n_cases: 3, n_bootstrap: 50, safety_factor: 2, max_stage_seconds: 1800}
+  reference_checkpoints:
+    model_3mm: models/totalsegmentator/nnunet/results/Dataset297_TotalSegmentator_total_3mm_1559subj/nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres/fold_0/checkpoint_final.pth
+    model_6mm: models/totalsegmentator/nnunet/results/Dataset298_TotalSegmentator_total_6mm_1559subj/nnUNetTrainer_4000epochs_NoMirroring__nnUNetPlans__3d_fullres/fold_0/checkpoint_final.pth
+  implementation_files:
+    - scripts/fresh_missed_errors.py
+    - scripts/check_missed_errors.py
+    - scripts/combine_missed_errors.py
+    - src/segreview/config.py
+    - src/segreview/data.py
+    - src/segreview/io.py
+    - src/segreview/uncertainty.py
+    - src/segreview/plausibility.py
+    - src/segreview/model_comparison.py
+    - src/segreview/disagreement_scores.py
+    - src/segreview/evaluation.py
+    - src/segreview/metrics.py
+    - uv.lock
+
+checks:
+  primary: model_diff_mean_region
+  review_fraction: 0.20
+  bad_dice_threshold: 0.83
+  methods: [model_diff_mean_region, g1_missing_hull_mean, far_disagree_per_volume, entropy_mean_region, neg_volume_ml]
+  references: [model_diff_mean_region]
+
+combinations:
+  - {name: g1_missing_hull_mean, rule: mean_rank, scores: [model_diff_mean_region, plaus_missing_side, shape_hull_deficit_max]}
+
+evaluation:
+  bad_rules:
+    - {name: dice_below_083, rule: threshold, value: 0.83}
+    - {name: worst10, rule: worst_fraction, value: 0.1}
+  n_bootstrap: 2000
+  ci_level: 0.95
+  n_random_orders: 1000

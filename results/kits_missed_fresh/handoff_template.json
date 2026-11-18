@@ -1,0 +1,12 @@
+{
+  "bjorn_notified_at": null,
+  "frederik_confirmed_at": null,
+  "evidence": null,
+  "ranking_metrics_not_previously_evaluated": null,
+  "checkpoint_sha256": {
+    "model_3mm": "1e38e40356adc2706a662e365405a97f862d62a7da65f6bf81d025aee1b979ac",
+    "model_6mm": "3489323a4b759506ab46b489eb78b72142f2143aea6e6d828604d754bd7a9270"
+  },
+  "inference_metadata": null,
+  "inputs_manifest": null
+}

@@ -228,5 +228,8 @@ models/
 *.nii.gz
 *.npz
 
+# CT-derived missed-errors montages stay local; recreate them with the inspection script.
+results/kits_missed_errors/figures/exploratory_*_inspection.png
+
 # Output of HPC jobs (jobs/*.sh)
 logs/

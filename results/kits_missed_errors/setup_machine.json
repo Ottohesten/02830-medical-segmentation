@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-02T01:31:30+01:00",
+  "platform": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "cpu": "x86_64",
+  "cpu_count": 12,
+  "python": "3.12.15",
+  "torch": "2.2.2+cu121",
+  "numpy": "1.26.4",
+  "cuda": "12.1",
+  "gpu": null,
+  "mps_available": false,
+  "git_commit": "0fe9216da97a3ed0fd6ad6bd57c7cc1a36a8a508",
+  "git_uncommitted_changes": true,
+  "os": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "execution_device": "cpu",
+  "seed": 42,
+  "purpose": "Step 1 setup audit only; no inference, new scores, Dice, or ranking evaluation.",
+  "source_config_sha256": "e95284456a6fb9624d2727051b6bdd407aa511a8bf80836c9b39160b2c06d71b",
+  "uv_lock_sha256": "96e52f25c8a315a7af81cf7ec23b19a79d018c5f07331ae46755b05560b4376c",
+  "cpu_model": "AMD Ryzen 5 7500F 6-Core Processor",
+  "nvidia_smi": {
+    "returncode": 9,
+    "output": "NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver. Make sure that the latest NVIDIA driver is installed and running.",
+    "error": ""
+  }
+}

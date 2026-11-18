@@ -1,0 +1,15 @@
+method,review_budget,expected_bad_found,expected_false_alarms,expected_original_misses_found,distinct_score_values,status
+model_diff_mean_region,20,11.0,9.0,0.0,100,exploratory combinations on kits100 development data; no fresh-pool test or lock
+entropy_mean_region,20,13.0,7.0,2.0,100,exploratory combinations on kits100 development data; no fresh-pool test or lock
+neg_volume_ml,20,3.0,17.0,2.0,100,exploratory combinations on kits100 development data; no fresh-pool test or lock
+plaus_missing_side,20,4.166666666666666,15.83333333333333,1.5000000000000002,3,exploratory combinations on kits100 development data; no fresh-pool test or lock
+shape_hull_deficit_max,20,9.0,11.0,1.0,100,exploratory combinations on kits100 development data; no fresh-pool test or lock
+plaus_asymmetry,20,6.0,14.0,2.0,99,exploratory combinations on kits100 development data; no fresh-pool test or lock
+far_disagree_per_volume,20,12.0,8.0,1.0,73,exploratory combinations on kits100 development data; no fresh-pool test or lock
+far_6mm_adds_per_volume,20,12.0,8.0,2.0,63,exploratory combinations on kits100 development data; no fresh-pool test or lock
+g1_missing_mean,20,11.0,9.0,1.0,100,exploratory combinations on kits100 development data; no fresh-pool test or lock
+g1_missing_max,20,11.0,9.0,1.0,50,exploratory combinations on kits100 development data; no fresh-pool test or lock
+g1_hull_mean,20,11.0,9.0,1.0,72,exploratory combinations on kits100 development data; no fresh-pool test or lock
+g1_hull_max,20,10.0,10.0,1.0,70,exploratory combinations on kits100 development data; no fresh-pool test or lock
+g1_missing_hull_mean,20,11.0,9.0,1.0,72,exploratory combinations on kits100 development data; no fresh-pool test or lock
+g1_missing_hull_max,20,11.0,9.0,2.0,45,exploratory combinations on kits100 development data; no fresh-pool test or lock

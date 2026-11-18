@@ -1,0 +1,13 @@
+{
+  "status": "runtime planning only; no real Dice/GT loaded",
+  "n_cases": 100,
+  "settings_sha256": "6d92d3353ac68addb74fc52a5714766761ec412aaffe81606534b8bcf5aa4344",
+  "script_sha256": "c5a18cfa2fff4c00e1660c6b5bbf9e019a81daaf1cc4bfd8c1b8c0a7f765a2d3",
+  "case_seconds": 4.142488910003522,
+  "synthetic_evaluation_seconds": 1.4668053739987954,
+  "feature_stage_projected_seconds": 207.1798634120156,
+  "evaluation_stage_projected_seconds": 117.34442991990363,
+  "safety_factor": 2,
+  "stage_cap_seconds": 1800,
+  "within_stage_cap": true
+}

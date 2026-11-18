@@ -1,0 +1,18 @@
+{
+  "status": "exploratory; all kits100 cases are development data for this follow-up",
+  "n_cases": 100,
+  "review_budget": 20,
+  "n_bad": 15,
+  "n_bad_in_budget": 11,
+  "n_missed_bad": 4,
+  "score": "model_diff_mean_region",
+  "bad_dice_threshold": 0.83,
+  "tie_rule": "case_id_ascending",
+  "boundary_tied": false,
+  "missed_case_ids": [
+    "case_00236",
+    "case_00406",
+    "case_00040",
+    "case_00184"
+  ]
+}

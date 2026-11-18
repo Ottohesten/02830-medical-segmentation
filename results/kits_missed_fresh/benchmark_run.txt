@@ -1,0 +1,8 @@
+{
+  "old_scores_reproduced": true,
+  "fresh_arrays_read": false,
+  "seconds_per_grid_voxel": 1.5535471654414406e-07,
+  "dice_seconds_per_grid_voxel": 2.3392409631244918e-08,
+  "evaluation_projected_seconds": 67.75983375991927,
+  "safety_factor": 2
+}

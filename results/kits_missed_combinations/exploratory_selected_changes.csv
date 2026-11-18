@@ -1,0 +1,17 @@
+method,case_id,dice,bad,fair_rank,locked_top_probability,top_probability,inclusion_change
+g1_missing_hull_mean,case_00026,0.8921,False,20.0,0.0,1.0,1.0
+g1_missing_hull_mean,case_00046,0.9146,False,15.0,0.0,1.0,1.0
+g1_missing_hull_mean,case_00055,0.8976,False,17.5,0.0,1.0,1.0
+g1_missing_hull_mean,case_00178,0.8551,False,33.5,1.0,0.0,-1.0
+g1_missing_hull_mean,case_00180,0.9092,False,51.0,1.0,0.0,-1.0
+g1_missing_hull_mean,case_00198,0.8575,False,17.5,0.0,1.0,1.0
+g1_missing_hull_mean,case_00203,0.9032,False,39.5,1.0,0.0,-1.0
+g1_missing_hull_mean,case_00236,0.8023,True,9.0,0.0,1.0,1.0
+g1_missing_hull_mean,case_00247,0.8968,False,13.0,0.0,1.0,1.0
+g1_missing_hull_mean,case_00259,0.8969,False,11.5,0.0,1.0,1.0
+g1_missing_hull_mean,case_00260,0.8779,False,21.5,1.0,0.0,-1.0
+g1_missing_hull_mean,case_00271,0.9203,False,36.5,1.0,0.0,-1.0
+g1_missing_hull_mean,case_00280,0.8942,False,29.0,1.0,0.0,-1.0
+g1_missing_hull_mean,case_00526,0.9233,False,49.5,1.0,0.0,-1.0
+g1_missing_hull_mean,case_00554,0.8921,False,11.5,0.0,1.0,1.0
+g1_missing_hull_mean,case_00582,0.4605,True,45.0,1.0,0.0,-1.0

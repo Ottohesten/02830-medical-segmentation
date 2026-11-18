@@ -1,0 +1,298 @@
+Downloaded case_00002 ct
+Downloaded case_00002 label
+Downloaded case_00003 ct
+Downloaded case_00003 label
+Downloaded case_00008 ct
+Downloaded case_00008 label
+Downloaded case_00019 ct
+Downloaded case_00019 label
+Downloaded case_00024 ct
+Downloaded case_00024 label
+Downloaded case_00050 ct
+Downloaded case_00050 label
+Downloaded case_00056 ct
+Downloaded case_00056 label
+Downloaded case_00058 ct
+Downloaded case_00058 label
+Downloaded case_00060 ct
+Downloaded case_00060 label
+Downloaded case_00064 ct
+Downloaded case_00064 label
+Downloaded case_00068 ct
+Downloaded case_00068 label
+Downloaded case_00072 ct
+Downloaded case_00072 label
+Downloaded case_00073 ct
+Downloaded case_00073 label
+Downloaded case_00082 ct
+Downloaded case_00082 label
+Downloaded case_00086 ct
+Downloaded case_00086 label
+Downloaded case_00101 ct
+Downloaded case_00101 label
+Downloaded case_00104 ct
+Downloaded case_00104 label
+Downloaded case_00133 ct
+Downloaded case_00133 label
+Downloaded case_00144 ct
+Downloaded case_00144 label
+Downloaded case_00147 ct
+Downloaded case_00147 label
+Downloaded case_00150 ct
+Downloaded case_00150 label
+Downloaded case_00151 ct
+Downloaded case_00151 label
+Downloaded case_00156 ct
+Downloaded case_00156 label
+Downloaded case_00162 ct
+Downloaded case_00162 label
+Downloaded case_00166 ct
+Downloaded case_00166 label
+Downloaded case_00171 ct
+Downloaded case_00171 label
+Downloaded case_00174 ct
+Downloaded case_00174 label
+Downloaded case_00176 ct
+Downloaded case_00176 label
+Downloaded case_00179 ct
+Downloaded case_00179 label
+Downloaded case_00183 ct
+Downloaded case_00183 label
+Downloaded case_00191 ct
+Downloaded case_00191 label
+Downloaded case_00193 ct
+Downloaded case_00193 label
+Downloaded case_00197 ct
+Downloaded case_00197 label
+Downloaded case_00202 ct
+Downloaded case_00202 label
+Downloaded case_00204 ct
+Downloaded case_00204 label
+Downloaded case_00219 ct
+Downloaded case_00219 label
+Downloaded case_00225 ct
+Downloaded case_00225 label
+Downloaded case_00226 ct
+Downloaded case_00226 label
+Downloaded case_00234 ct
+Downloaded case_00234 label
+Downloaded case_00235 ct
+Downloaded case_00235 label
+Downloaded case_00239 ct
+Downloaded case_00239 label
+Downloaded case_00242 ct
+Downloaded case_00242 label
+Downloaded case_00243 ct
+Downloaded case_00243 label
+Downloaded case_00254 ct
+Downloaded case_00254 label
+Downloaded case_00256 ct
+Downloaded case_00256 label
+Downloaded case_00264 ct
+Downloaded case_00264 label
+Downloaded case_00273 ct
+Downloaded case_00273 label
+Downloaded case_00281 ct
+Downloaded case_00281 label
+Downloaded case_00282 ct
+Downloaded case_00282 label
+Downloaded case_00288 ct
+Downloaded case_00288 label
+Downloaded case_00405 ct
+Downloaded case_00405 label
+Downloaded case_00410 ct
+Downloaded case_00410 label
+Downloaded case_00412 ct
+Downloaded case_00412 label
+Downloaded case_00419 ct
+Downloaded case_00419 label
+Downloaded case_00422 ct
+Downloaded case_00422 label
+Downloaded case_00430 ct
+Downloaded case_00430 label
+Downloaded case_00434 ct
+Downloaded case_00434 label
+Downloaded case_00435 ct
+Downloaded case_00435 label
+Downloaded case_00437 ct
+Downloaded case_00437 label
+Downloaded case_00442 ct
+Downloaded case_00442 label
+Downloaded case_00445 ct
+Downloaded case_00445 label
+Downloaded case_00448 ct
+Downloaded case_00448 label
+Downloaded case_00450 ct
+Downloaded case_00450 label
+Downloaded case_00451 ct
+Downloaded case_00451 label
+Downloaded case_00452 ct
+Downloaded case_00452 label
+Downloaded case_00454 ct
+Downloaded case_00454 label
+Downloaded case_00461 ct
+Downloaded case_00461 label
+Downloaded case_00462 ct
+Downloaded case_00462 label
+Downloaded case_00463 ct
+Downloaded case_00463 label
+Downloaded case_00468 ct
+Downloaded case_00468 label
+Downloaded case_00469 ct
+Downloaded case_00469 label
+Downloaded case_00474 ct
+Downloaded case_00474 label
+Downloaded case_00479 ct
+Downloaded case_00479 label
+Downloaded case_00480 ct
+Downloaded case_00480 label
+Downloaded case_00486 ct
+Downloaded case_00486 label
+Downloaded case_00488 ct
+Downloaded case_00488 label
+Downloaded case_00495 ct
+Downloaded case_00495 label
+Downloaded case_00497 ct
+Downloaded case_00497 label
+Downloaded case_00500 ct
+Downloaded case_00500 label
+Downloaded case_00502 ct
+Downloaded case_00502 label
+Downloaded case_00504 ct
+Downloaded case_00504 label
+Downloaded case_00506 ct
+Downloaded case_00506 label
+Downloaded case_00510 ct
+Downloaded case_00510 label
+Downloaded case_00515 ct
+Downloaded case_00515 label
+Downloaded case_00518 ct
+Downloaded case_00518 label
+Downloaded case_00519 ct
+Downloaded case_00519 label
+Downloaded case_00524 ct
+Downloaded case_00524 label
+Downloaded case_00527 ct
+Downloaded case_00527 label
+Downloaded case_00533 ct
+Downloaded case_00533 label
+Downloaded case_00539 ct
+Downloaded case_00539 label
+Downloaded case_00543 ct
+Downloaded case_00543 label
+Downloaded case_00551 ct
+Downloaded case_00551 label
+Downloaded case_00556 ct
+Downloaded case_00556 label
+Downloaded case_00560 ct
+Downloaded case_00560 label
+Downloaded case_00565 ct
+Downloaded case_00565 label
+Downloaded case_00568 ct
+Downloaded case_00568 label
+Downloaded case_00569 ct
+Downloaded case_00569 label
+Downloaded case_00573 ct
+Traceback (most recent call last):
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 494, in _make_request
+    raise new_e
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 470, in _make_request
+    self._validate_conn(conn)
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 1125, in _validate_conn
+    conn.connect()
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 878, in connect
+    wrapped_socket, is_verified = _ssl_wrap_socket_and_match_hostname(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 1080, in _ssl_wrap_socket_and_match_hostname
+    ssl_sock = ssl_wrap_socket(
+               ^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/util/ssl_.py", line 437, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls, server_hostname)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/util/ssl_.py", line 481, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/ssl.py", line 457, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/ssl.py", line 1066, in _create
+    self.do_handshake()
+  File "/home/ottos/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/ssl.py", line 1344, in do_handshake
+    self._sslobj.do_handshake()
+ConnectionResetError: [Errno 104] Connection reset by peer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/util/retry.py", line 510, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/util/util.py", line 38, in reraise
+    raise value.with_traceback(tb)
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 494, in _make_request
+    raise new_e
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 470, in _make_request
+    self._validate_conn(conn)
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 1125, in _validate_conn
+    conn.connect()
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 878, in connect
+    wrapped_socket, is_verified = _ssl_wrap_socket_and_match_hostname(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 1080, in _ssl_wrap_socket_and_match_hostname
+    ssl_sock = ssl_wrap_socket(
+               ^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/util/ssl_.py", line 437, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls, server_hostname)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/urllib3/util/ssl_.py", line 481, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/ssl.py", line 457, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/ssl.py", line 1066, in _create
+    self.do_handshake()
+  File "/home/ottos/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/ssl.py", line 1344, in do_handshake
+    self._sslobj.do_handshake()
+urllib3.exceptions.ProtocolError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/scripts/prepare_fresh_download.py", line 96, in <module>
+    main()
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/scripts/prepare_fresh_download.py", line 85, in main
+    result = execute_plan(plan, cfg['fresh']['benchmark']['max_stage_seconds'])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/scripts/prepare_fresh_download.py", line 60, in execute_plan
+    _download_file(row['url'], path)
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/src/segreview/data.py", line 73, in _download_file
+    with requests.get(url, stream=True, timeout=60) as r:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/requests/api.py", line 87, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/requests/api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/requests/sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/requests/adapters.py", line 711, in send
+    raise ConnectionError(err, request=request)
+requests.exceptions.ConnectionError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))

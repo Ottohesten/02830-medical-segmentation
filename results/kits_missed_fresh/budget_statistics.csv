@@ -1,0 +1,16 @@
+method,measure,review_budget,value,difference_to_g1,difference_ci_low,difference_ci_high
+model_diff_mean_region,bad_capture,20,9.0,0.0,0.0,0.0
+model_diff_mean_region,false_alarms,20,11.0,0.0,0.0,0.0
+model_diff_mean_region,quality_after_correction,20,0.9315454284086964,0.0,0.0,0.0
+g1_missing_hull_mean,bad_capture,20,9.0,0.0,-3.0,3.0
+g1_missing_hull_mean,false_alarms,20,11.0,0.0,-3.0,3.0
+g1_missing_hull_mean,quality_after_correction,20,0.932528427695773,0.0009829992870766802,-0.0022735690435135873,0.005165548799234391
+far_disagree_per_volume,bad_capture,20,10.0,1.0,-1.0,3.0
+far_disagree_per_volume,false_alarms,20,10.0,-1.0,-3.0,1.0
+far_disagree_per_volume,quality_after_correction,20,0.9325239008054449,0.000978472396748531,-0.0011450531061827363,0.004858337151970827
+entropy_mean_region,bad_capture,20,9.0,0.0,-3.0,3.0
+entropy_mean_region,false_alarms,20,11.0,0.0,-3.0,3.0
+entropy_mean_region,quality_after_correction,20,0.9323694051520722,0.0008239767433758649,-0.005626598471132604,0.004186384613796858
+neg_volume_ml,bad_capture,20,2.0,-7.0,-12.0,-3.0
+neg_volume_ml,false_alarms,20,18.0,7.0,3.0,12.0
+neg_volume_ml,quality_after_correction,20,0.9093357746493532,-0.02220965375934314,-0.04447586011584337,-0.011546730796455105

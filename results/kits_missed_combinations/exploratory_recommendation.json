@@ -1,0 +1,43 @@
+{
+  "status": "provisional development recommendation; not a fresh-test lock",
+  "selected": "g1_missing_hull_mean",
+  "considered": [
+    {
+      "method": "g1_missing_mean",
+      "eligible": true,
+      "review_auc_gain": 0.00666666666666671,
+      "expected_bad_found": 11.0
+    },
+    {
+      "method": "g1_missing_max",
+      "eligible": false,
+      "review_auc_gain": -0.006000000000000005,
+      "expected_bad_found": 11.0
+    },
+    {
+      "method": "g1_hull_mean",
+      "eligible": true,
+      "review_auc_gain": 0.010666666666666713,
+      "expected_bad_found": 11.0
+    },
+    {
+      "method": "g1_hull_max",
+      "eligible": false,
+      "review_auc_gain": 0.002000000000000113,
+      "expected_bad_found": 10.0
+    },
+    {
+      "method": "g1_missing_hull_mean",
+      "eligible": true,
+      "review_auc_gain": 0.030000000000000027,
+      "expected_bad_found": 11.0
+    },
+    {
+      "method": "g1_missing_hull_max",
+      "eligible": true,
+      "review_auc_gain": 0.022666666666666613,
+      "expected_bad_found": 11.0
+    }
+  ],
+  "reason": "highest eligible review-AUC, then quality-AUC, then config order"
+}

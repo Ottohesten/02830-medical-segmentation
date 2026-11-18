@@ -1,0 +1,8 @@
+{
+  "ready": false,
+  "issues": [
+    "Need actual Bj\u00f8rn/Frederik coordination and an input handoff"
+  ],
+  "fresh_headers_or_voxels_read": false,
+  "checked_at": "2026-11-02T05:10:23+01:00"
+}

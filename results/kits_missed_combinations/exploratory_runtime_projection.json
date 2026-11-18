@@ -1,0 +1,18 @@
+{
+  "synthetic_evaluation_seconds": 1.797091181999349,
+  "projected_seconds": 143.7672945599479,
+  "stage_cap_seconds": 1800,
+  "within_cap": true,
+  "settings_sha256": "76d9bdc1f84be4656aa585ed72584c78d3d4d8ac432ab7280b2d7daaf6add700",
+  "source_hashes": {
+    "configs/kits_missed_combinations.yaml": "bb3169c12dfd676ac40926cbf317d22841c85f0348d1a23a0c60d1f2a69c4296",
+    "scripts/combine_missed_errors.py": "f8550eb86da2414d4206f7bdd7c119ab32c5374175a473ead4eef7a03a601fb1",
+    "scripts/check_missed_errors.py": "c5a18cfa2fff4c00e1660c6b5bbf9e019a81daaf1cc4bfd8c1b8c0a7f765a2d3",
+    "src/segreview/evaluation.py": "e5ed44abfb5330093c514a802348196ca47da8ae9c4e234cf9dce7abb554197e",
+    "uv.lock": "96e52f25c8a315a7af81cf7ec23b19a79d018c5f07331ae46755b05560b4376c",
+    "configs/kits100.yaml": "e95284456a6fb9624d2727051b6bdd407aa511a8bf80836c9b39160b2c06d71b",
+    "results/kits_missed_checks/exploratory_features.csv": "b38d56c059c6db1c1d8fde753a7495fdda7beb68167351bce4ac870d47b1784e",
+    "results/kits_missed_checks/exploratory_verification.json": "1898df7e779605d6fa8def33fa14a5f61b17e82e346747526586145140a36bed",
+    "results/kits100/scores.csv": "e0c3602a47b60a994c85c6c98c362416eeaf987456a9c0c2d6e41b5071bbee77"
+  }
+}

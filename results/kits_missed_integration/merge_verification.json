@@ -1,0 +1,63 @@
+{
+  "checked_at": "2026-11-18T02:04:22+01:00",
+  "purpose": "Integration validation only; preserve both published result trees and historical science",
+  "passed": true,
+  "merge_base": "0fe9216da97a3ed0fd6ad6bd57c7cc1a36a8a508",
+  "prior_branch_results": {
+    "source_commit": "21a50e7e1c2d2a78de4ae4ab605eb30270163f01",
+    "n_files": 348,
+    "all_bytes_unchanged": true
+  },
+  "incoming_main_results": {
+    "source_commit": "b55e8074cc5e8469565232162b9f3bba958f775a",
+    "n_files": 413,
+    "all_bytes_unchanged": true
+  },
+  "incoming_shared_code_and_rules": {
+    "source_commit": "b55e8074cc5e8469565232162b9f3bba958f775a",
+    "n_files": 35,
+    "all_bytes_unchanged": true
+  },
+  "other_owners_notes": {
+    "source_commit": "b55e8074cc5e8469565232162b9f3bba958f775a",
+    "n_files": 4,
+    "all_bytes_unchanged": true
+  },
+  "owned_frozen_recipe_and_implementation": {
+    "source_commit": "21a50e7e1c2d2a78de4ae4ab605eb30270163f01",
+    "n_files": 5,
+    "all_bytes_unchanged": true
+  },
+  "prior_branch_log_lines_and_incoming_log_additions_preserved": true,
+  "conflict_files": [
+    "PROJECT_OVERVIEW.md"
+  ],
+  "conflict_markers_absent": true,
+  "historical_source_fingerprints_changed_by_incoming_main": [
+    {
+      "path": "src/segreview/data.py",
+      "frozen_sha256": "ab5768d57fb36e7de26109408c47c4bfa486c1ae8339acf85eb277f51b1ea227",
+      "integrated_sha256": "04bd2f1e8c71dcfdfeac4b71ab349a27c4444d0e4376df4d75a066772a8a7015",
+      "original_source_preserved_in_git": true
+    }
+  ],
+  "historical_lock_amended": false,
+  "real_pool_scoring_or_evaluation_rerun": false,
+  "new_inference": false,
+  "tests": {
+    "passed": 230,
+    "skipped": 38,
+    "warnings": 8,
+    "seconds": 4.72,
+    "command": "MPLCONFIGDIR=/tmp/otto-missed-mpl UV_CACHE_DIR=/tmp/otto-uv-cache uv run --locked --offline pytest -ra",
+    "output": "tests.txt",
+    "python": "3.12.15"
+  },
+  "validation_machine": {
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "python": "3.14.10"
+  },
+  "local_main_ref_unchanged": true,
+  "actual_group_presentation_confirmed": false,
+  "pull_request_merged": false
+}

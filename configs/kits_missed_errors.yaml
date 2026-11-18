@@ -1,0 +1,34 @@
+# Exploratory missed-errors follow-up: read saved kits100 inputs, write only our own results.
+# All 100 cases are development data here. This config is for inspection, not inference.
+name: kits_missed_errors
+seed: 42
+
+compute: {device: cpu, num_threads: 6}
+paths:
+  raw_dir: data/raw
+  models_dir: models
+  predictions_dir: data/predictions
+  results_dir: results
+dataset:
+  file: configs/datasets/kits23.yaml
+  n_cases: 100
+  selection: random
+
+missed_errors:
+  source_config: configs/kits100.yaml  # read-only cohort, prediction and score locations
+  variant: clean
+  score: model_diff_mean_region
+  bad_dice_threshold: 0.83
+  review_fraction: 0.20
+  tie_break: case_id_ascending  # no Dice-dependent tie breaking
+  low_probability_threshold: 0.10  # descriptive FN diagnostic, never a ranking score
+  dice_check_atol: 0.000051  # source Dice was rounded to four decimal places
+
+visualization:
+  ct_window_level: 40
+  ct_window_width: 400
+  context_margin_mm: 25
+  dpi: 110
+  # Peak missed kidney/tumor/cyst, peak extra prediction, and peak GT organ area.
+  # Duplicate slices are shown once; a coronal view is added at the peak missed area.
+  axial_targets: [kidney, tumor, cyst, false_positive, organ]

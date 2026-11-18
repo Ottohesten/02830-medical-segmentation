@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "verified_at": "2026-11-04T18:18:29+01:00",
+  "pdf_pages": 1,
+  "pdf_numeric_labels_checked": true,
+  "png_size": [
+    2220,
+    1110
+  ],
+  "figure_visually_inspected_by": "Codex assistant",
+  "summary_numbered_lines": 8,
+  "plot_values_match_verified_primary_and_budget_tables": true,
+  "frozen_outcome_hashes_unchanged": true,
+  "scientific_lock_unchanged": true,
+  "metrics_recomputed": false,
+  "actual_group_presentation_performed": false,
+  "output_hashes": {
+    "fig_missed_fresh_summary.pdf": "c733b2e3c2e80e503a26e6b14d20ae24fa668fc94d4c0267f6dcac8a1e8c7e8c",
+    "fig_missed_fresh_summary.png": "81f21880c4817ba915a447c0bdb7a72732fe83316ee3b10bbe492d227931ff91",
+    "figure_source_data.csv": "18ce43f891dcbccbd58c89fc7984bdbc9e014920d5c53c67ad30c098f02ad8fd",
+    "figure_machine.json": "10fc92d7fc05a6287791d1ca6b603a564c0afe0b65a888a723f889e12fa49a64",
+    "caption.md": "c68f075bed887e81eac982c6c1aad6bbffdd8e5d02f6d76c25e6d77b3d20520a",
+    "summary.md": "6afd2a48266007fd97db4d21ba72fd94a3452140782a41b5d1ba30ba87c7a0fa",
+    "presentation_notes.md": "d486b22383b91854028ba09d9e26fc75b4c88675cbc08d1ed162ef2e46480afc",
+    "report_tests.txt": "898434ff72b7ddd21b21aa79b4ccbbf8b64c88571c99ee22f283f05347a79209"
+  },
+  "CT_or_GT_arrays_opened_for_report": false
+}

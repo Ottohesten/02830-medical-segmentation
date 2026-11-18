@@ -1,0 +1,17 @@
+Downloaded case_00573 label
+Downloaded case_00578 ct
+Downloaded case_00578 label
+Downloaded case_00583 ct
+Downloaded case_00583 label
+/home/ottos/Documents/DTU/02830 Advanced Project in Digital Media engineering/02830-medical-segmentation/.venv/lib/python3.12/site-packages/torch/cuda/__init__.py:218: UserWarning:
+NVIDIA GeForce RTX 5060 Ti with CUDA capability sm_120 is not compatible with the current PyTorch installation.
+The current PyTorch install supports CUDA capabilities sm_50 sm_60 sm_70 sm_75 sm_80 sm_86 sm_90.
+If you want to use the NVIDIA GeForce RTX 5060 Ti GPU with PyTorch, please check the instructions at https://pytorch.org/get-started/locally/
+
+  warnings.warn(
+{
+  "downloaded_files": 5,
+  "existing_files_preserved": 195,
+  "seconds": 12.846592410001904,
+  "fresh_voxel_arrays_read": false
+}

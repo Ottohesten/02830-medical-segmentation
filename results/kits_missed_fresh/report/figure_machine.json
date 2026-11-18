@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-04T18:16:25+01:00",
+  "platform": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "cpu": "x86_64",
+  "cpu_count": 12,
+  "python": "3.12.15",
+  "torch": "2.2.2+cu121",
+  "numpy": "1.26.4",
+  "cuda": "12.1",
+  "gpu": null,
+  "mps_available": false,
+  "git_commit": "402dd9171e9c10905fbf5c453b045d729b17e486",
+  "git_uncommitted_changes": true,
+  "os": "Linux-7.3.1-1-cachyos-x86_64-with-glibc2.44",
+  "execution_device": "cpu",
+  "seed": 42,
+  "seconds": 0.5551126040008967,
+  "source_commit": "402dd9171e9c10905fbf5c453b045d729b17e486",
+  "script_sha256": "ca8a986485431c98fad5e8e5d5fd6d0ff8cf369c773d70d394ef11192597cc28",
+  "config_sha256": "ec67c9968f6dff7ac67196e8566673cd8b5c2dfcb0d8f10859b5e41a77854a6b",
+  "inputs": {
+    "n_cases": 100,
+    "n_bad": 10,
+    "review_budget": 20,
+    "bad_dice_threshold": 0.83,
+    "n_bootstrap": 2000,
+    "seed": 42,
+    "input_hashes": {
+      "metrics.csv": "ee1669940521a3c59646592b7a472ad73e31a18b02f30d0563a64abe4a5fd811",
+      "paired.csv": "9b4bf9c8bb170c2782f2f41dbca7af1d99407489d65f16c146f9d28d1c5f93fd",
+      "budget_statistics.csv": "6413f817c12bf3166634c7a3d5581743e1c317640f1edf2d243831c51f94122e",
+      "evaluation_completed.json": "9232cf692466a27b7a74a50881ec89a9508b09c98f7d4ddf7a33860b857b898d"
+    }
+  },
+  "GT_or_model_arrays_read": false,
+  "metrics_recomputed": false,
+  "outputs": {
+    "fig_missed_fresh_summary.pdf": "c733b2e3c2e80e503a26e6b14d20ae24fa668fc94d4c0267f6dcac8a1e8c7e8c",
+    "fig_missed_fresh_summary.png": "81f21880c4817ba915a447c0bdb7a72732fe83316ee3b10bbe492d227931ff91",
+    "figure_source_data.csv": "18ce43f891dcbccbd58c89fc7984bdbc9e014920d5c53c67ad30c098f02ad8fd"
+  }
+}

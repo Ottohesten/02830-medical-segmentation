@@ -1,0 +1,25 @@
+{
+  "status": "joint outcome stage completed; per-comparison CIs, no familywise claim",
+  "n_cases": 100,
+  "n_bad": 10,
+  "decisions": [
+    {
+      "method": "g1_missing_hull_mean",
+      "difference": -0.014000000000000012,
+      "ci_low": -0.08999999999999997,
+      "ci_high": 0.04285714285714271,
+      "primary_informative": true,
+      "meets_per_comparison_criterion": false
+    },
+    {
+      "method": "far_disagree_per_volume",
+      "difference": 0.014999999999999902,
+      "ci_low": -0.010020833333333415,
+      "ci_high": 0.050000000000000044,
+      "primary_informative": true,
+      "meets_per_comparison_criterion": false
+    }
+  ],
+  "finite_primary_bootstrap_samples": 2000,
+  "completed_at": "2026-11-04T17:55:54+01:00"
+}

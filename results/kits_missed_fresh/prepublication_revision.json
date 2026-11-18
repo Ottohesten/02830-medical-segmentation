@@ -1,0 +1,8 @@
+{
+  "reason": "Add the dataset YAML to the dependency fingerprint set before publication",
+  "scientific_settings_unchanged": true,
+  "added_dependency": "configs/datasets/kits23.yaml",
+  "old_lock_sha256": "7e01121c93096f7f8d1a214586ec213198d48ae5d6f64199705e16a20ec892f9",
+  "cohort_sha256": "53bd4caeee140917dd2449b9cb7aea950c2470b5463e8c1454d4e96dfc3db458",
+  "fresh_outcomes_opened": false
+}

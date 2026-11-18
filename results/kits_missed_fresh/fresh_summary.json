@@ -1,0 +1,49 @@
+{
+  "n_cases": 100,
+  "n_bad": 10,
+  "bad_rules_identify_same_cases": true,
+  "primary_outcome": "review-AUC, 3mm Dice < 0.83",
+  "n_bootstrap": 2000,
+  "seed": 42,
+  "primary_decisions": [
+    {
+      "method": "g1_missing_hull_mean",
+      "difference": -0.014000000000000012,
+      "ci_low": -0.08999999999999997,
+      "ci_high": 0.04285714285714271,
+      "primary_informative": true,
+      "meets_per_comparison_criterion": false
+    },
+    {
+      "method": "far_disagree_per_volume",
+      "difference": 0.014999999999999902,
+      "ci_low": -0.010020833333333415,
+      "ci_high": 0.050000000000000044,
+      "primary_informative": true,
+      "meets_per_comparison_criterion": false
+    }
+  ],
+  "primary_baseline_review_auc": 0.921,
+  "methods": {
+    "model_diff_mean_region": {
+      "review_auc": 0.921,
+      "bad_in_first_20": 9.0,
+      "false_alarms_in_first_20": 11.0,
+      "simulated_mean_dice_after_20": 0.9315454284086964
+    },
+    "g1_missing_hull_mean": {
+      "review_auc": 0.907,
+      "bad_in_first_20": 9.0,
+      "false_alarms_in_first_20": 11.0,
+      "simulated_mean_dice_after_20": 0.932528427695773
+    },
+    "far_disagree_per_volume": {
+      "review_auc": 0.936,
+      "bad_in_first_20": 10.0,
+      "false_alarms_in_first_20": 10.0,
+      "simulated_mean_dice_after_20": 0.9325239008054448
+    }
+  },
+  "secondary_intervals_unadjusted": true,
+  "interpretation": "Neither locked candidate meets the primary improvement criterion; positive secondary findings do not replace it."
+}
