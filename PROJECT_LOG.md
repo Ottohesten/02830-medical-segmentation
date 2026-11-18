@@ -976,6 +976,9 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
   weeks late; presentation 2026-11-25). SUS added after each session. Stopping rule: sessions until 2026-11-23,
   analyze the largest multiple of 4 complete participants in ID order; at least 8 are needed for a possible
   p < 0.05. `docs/tasks/g2_user_study.md`, `docs/study/analysis_plan.md`.
+- `[decision]` (2026-11-18 11:35, G2) Analysis plan locked by Rasmus in commit `17286c8e3953`: `contour`, 5 min,
+  `study_kits_v2`, sessions until 2026-11-23, complete groups of 4. Participants: lay people without medical imaging
+  training who have not seen the project (widened from fellow students before the lock).
 
 ## 2026-10-27: G3 phase 2 starts — learning-curve design, merge, Smart App Control blocks torch
 

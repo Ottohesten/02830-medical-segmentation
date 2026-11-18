@@ -15,7 +15,7 @@ plan changes after that, except through [Changes after locking](#changes-after-l
 |-------|-------|
 | Locked on (date and time) | 2026-11-18 11:35 |
 | Locked by | Rasmus |
-| Git commit with the locked plan, code and `configs/study.yaml` | ____________________ |
+| Git commit with the locked plan, code and `configs/study.yaml` | `17286c8e3953` |
 | Heatmap display (`study.heatmap_display`, chosen in the pilot) | `contour` (`top_percent` 10, `contour_margin_mm` 3) |
 | Time limit per scan (`study.time_limit_min`) | 5 minutes |
 | Study scans, block A / block B (`manifest.json`) | `study_kits_v2`: case_00045, case_00406, case_00260 / case_00470, case_00546, case_00184 (practice: case_00236) |

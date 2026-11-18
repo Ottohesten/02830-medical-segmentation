@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn (lead; not part of running the study) |
 | **Branch** | `rasmus/user-study` |
 | **Created** | 2026-10-20 |
-| **Status** | In progress (step 5: lock) |
+| **Status** | In progress (steps 6–7: recruiting and sessions) |
 | **Way of working** | Independent: Rasmus runs the study and makes its decisions. The task is large enough to keep going without waiting for new instructions; questions to Bjørn or the group are welcome, and keep the group posted. |
 | **Deadlines** | Pilot run by **2026-10-28** · analysis plan locked before the first participant · study in weeks 9–10 (**2026-11-02 – 11-13**) · analysis done by **2026-11-18** (before the final presentation 2026-11-25) · **revised 2026-11-18:** sessions until 2026-11-23, analysis 2026-11-24, report notes 2026-11-20 |
 
@@ -117,9 +117,12 @@ Tick each box when done and write the date and a short note under it.
   before step 5: (b) a second pilot T03 (heatmap first) with `contour`, if a group member who has not seen the
   interface is available, (c) are the errors on the study scans visible enough (section 6)?
 
-- [ ] **5. Lock the analysis plan.** Fill in the "Lock" table in `docs/study/analysis_plan.md` (date, who, commit,
+- [x] **5. Lock the analysis plan.** Fill in the "Lock" table in `docs/study/analysis_plan.md` (date, who, commit,
   display mode, time limit, study scans), commit it, and from now on change nothing in the setup.
-  *Notes:*
+  *Notes:* 2026-11-18 11:35, locked by Rasmus in commit `17286c8e3953`: `contour`, 5 min, `study_kits_v2`, last session
+  day 2026-11-23, complete groups of 4. Before the lock: participants widened from "fellow students" to lay people
+  without medical imaging training who have not seen the project; consent form contact and deletion date
+  (2026-11-23) filled in; a short test run (T02, 3 scans) showed no problems and was deleted.
 
 - [ ] **6. Recruit and schedule.** Fill in the consent form placeholders, print forms, book rooms, make a schedule for
   weeks 9–10 that the group can sign up to run, and agree where session data are backed up (not git). Track:
@@ -197,3 +200,6 @@ A new chat starts by reading this section.)*
   `dice_max` 0.88; SUS and the stopping rule added to the plan, the session guide and the analysis code (192 tests
   pass). Next action: Rasmus does a short test run (T02) with the new scans; fill in the consent form contact and
   date; then lock the analysis plan (step 5) and start P01. Report notes due 2026-11-20.
+- 2026-11-18 11:35: Step 5 done, analysis plan locked (`17286c8e3953`). Nothing in the setup changes from now on. Next
+  action: sessions P01, P02, ... until 2026-11-23 (at least 8 for a testable result; Rasmus expects to find 4, the
+  group helps); report notes by 2026-11-20; analysis once on 2026-11-24.
