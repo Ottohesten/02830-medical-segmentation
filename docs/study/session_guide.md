@@ -6,7 +6,8 @@ uncertainty heatmap and 3 without, in the balanced order set by their participan
 
 ## Rules that hold for every session
 
-- **Participants:** students who have not seen the project. Group members never take part (they know the design);
+- **Participants:** lay people without medical imaging training (e.g. students, friends, family) who have not seen
+  the project or the interface; no clinicians. Group members never take part (they know the design);
   they only run pilots with test IDs (see [pilot_plan.md](pilot_plan.md)). Nobody takes part twice.
 - **IDs:** real participants get `P01`, `P02`, ... in order, with no gaps. The number sets the order of scans and
   conditions, and the design needs complete groups of four (P01–P04, P05–P08, ...). Test runs always use `T01`,
@@ -103,7 +104,7 @@ When the screen says "Thank you!", give them the [SUS sheet](sus.md) (or the for
 
 Write their comments in the session log (no names). Then:
 
-> "Please don't tell other students about the details, since some of them may take part later. If you want your
+> "Please don't tell others about the details, since some of them may take part later. If you want your
 > data deleted, send us the ID on your slip."
 
 ## After each session

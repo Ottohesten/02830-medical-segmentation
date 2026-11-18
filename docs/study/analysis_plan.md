@@ -13,13 +13,13 @@ plan changes after that, except through [Changes after locking](#changes-after-l
 
 | Field | Value |
 |-------|-------|
-| Locked on (date and time) | ____________________ |
-| Locked by | ____________________ |
+| Locked on (date and time) | 2026-11-18 11:35 |
+| Locked by | Rasmus |
 | Git commit with the locked plan, code and `configs/study.yaml` | ____________________ |
-| Heatmap display (`study.heatmap_display`, chosen in the pilot) | ____________________ (now: `contour`) |
-| Time limit per scan (`study.time_limit_min`) | ____________________ (now: 5 minutes) |
-| Study scans, block A / block B (`manifest.json`) | ____________________ (now, `study_kits_v2`: case_00045, case_00406, case_00260 / case_00470, case_00546, case_00184) |
-| Last day of sessions (stopping rule) | ____________________ (now: 2026-11-23) |
+| Heatmap display (`study.heatmap_display`, chosen in the pilot) | `contour` (`top_percent` 10, `contour_margin_mm` 3) |
+| Time limit per scan (`study.time_limit_min`) | 5 minutes |
+| Study scans, block A / block B (`manifest.json`) | `study_kits_v2`: case_00045, case_00406, case_00260 / case_00470, case_00546, case_00184 (practice: case_00236) |
+| Last day of sessions (stopping rule) | 2026-11-23 |
 
 ## Design in short
 
@@ -30,7 +30,8 @@ plan changes after that, except through [Changes after locking](#changes-after-l
   The number in the participant ID sets the type, so we recruit in groups of 4.
 - Time limit per scan (see Lock). When the time is up, the scan is locked and saved as it is.
 - Raw NASA-TLX after each condition block (`study.tlx: after_each_block`).
-- Participants are fellow students, not clinicians. Group members never take part as participants.
+- Participants are lay people without medical imaging training (e.g. students, friends, family) who have not seen
+  the project or the interface; no clinicians or radiographers. Group members never take part as participants.
 
 ## Hypotheses
 

@@ -2,7 +2,7 @@
 
 **Project:** Where to Look First: Prioritizing Human Review of AI Medical Image Segmentation\
 **Course:** DTU 02830 Advanced Project in Digital Media Engineering, group 2 (Bjørn, Otto, Rasmus, Frederik)\
-**Contact:** [contact e-mail]
+**Contact:** rasmusjensennj@gmail.com
 
 ## What the study is about
 
@@ -37,7 +37,7 @@ the course has ended (after the exam in December 2026).
 ## Taking part is voluntary
 
 You decide whether to take part. You can stop at any time during the session without giving a reason, and it has
-no consequences for you. After the session, you can ask us to delete your data until [date] by sending us the
+no consequences for you. After the session, you can ask us to delete your data until 2026-11-23 by sending us the
 participant ID on your slip.
 
 ## Consent
@@ -56,5 +56,5 @@ Signature: __________________________________        Date: _______________
 
 Participant ID: ___________
 
-If you want your data deleted, send this ID to [contact e-mail] before [date]. We cannot link the ID to your name,
+If you want your data deleted, send this ID to rasmusjensennj@gmail.com by 2026-11-23. We cannot link the ID to your name,
 so keep the slip.
