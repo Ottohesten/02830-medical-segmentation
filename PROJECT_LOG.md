@@ -983,6 +983,8 @@ and 2.3 GB of the GPU's memory (games closed). Seed 42.
   IDs in blocks of 4 per experimenter, stopping rule = complete ID blocks (keeps the balancing), computer/OS/input
   logged by hand, session folders in OneDrive `g2_sessions/`, consent and SUS as Google Forms. Recorded under
   "Changes after locking" in `docs/study/analysis_plan.md`.
+- `[decision]` (2026-11-23 21:22, G2, before anyone looked at results) Last session day 2026-11-23 → 2026-11-24: P03 was lost
+  to a server stop during scan 6 and could not be finished. Analysis 2026-11-24 evening or 2026-11-25 morning.
 
 ## 2026-10-27: G3 phase 2 starts — learning-curve design, merge, Smart App Control blocks torch
 

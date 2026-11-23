@@ -208,3 +208,7 @@ A new chat starts by reading this section.)*
   log, session folders in OneDrive `delte store filer/g2_sessions/`, usability problems with severity 0–4 in the
   log (for the report's version-2 list). Consent and SUS as Google Forms (links in the session guide). All in the
   analysis plan under "Changes after locking".
+- 2026-11-23 21:22: P01, P02 complete; P03 lost (server stopped during scan 6 on 2026-11-18, participant could not finish;
+  `excluded/P03_stopped/`, ID reused). Last session day moved to 2026-11-24 (analysis plan, "Changes after
+  locking"). Next action: run P03 and P04 on 2026-11-24 (server started by Rasmus in his own Terminal); ask about
+  P05–P08; analysis 2026-11-24 evening or 2026-11-25 morning.
