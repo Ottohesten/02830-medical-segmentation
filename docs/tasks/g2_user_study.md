@@ -6,7 +6,7 @@
 | **Contact / lead** | Bjørn (lead; not part of running the study) |
 | **Branch** | `rasmus/user-study` |
 | **Created** | 2026-10-20 |
-| **Status** | In progress (steps 6–7: recruiting and sessions) |
+| **Status** | Steps 1–8 done (analysis 2026-11-24); step 9: presentation 2026-11-25 |
 | **Way of working** | Independent: Rasmus runs the study and makes its decisions. The task is large enough to keep going without waiting for new instructions; questions to Bjørn or the group are welcome, and keep the group posted. |
 | **Deadlines** | Pilot run by **2026-10-28** · analysis plan locked before the first participant · study in weeks 9–10 (**2026-11-02 – 11-13**) · analysis done by **2026-11-18** (before the final presentation 2026-11-25) · **revised 2026-11-18:** sessions until 2026-11-23, analysis 2026-11-24, report notes 2026-11-20 |
 
@@ -142,7 +142,10 @@ Tick each box when done and write the date and a short note under it.
 
 ## 4. Results summary
 
-*(Filled in at step 8.)*
+2026-11-24, analysis run once as locked, n = 4 (P01–P04). H1 Dice gain per minute: 0.0066 with vs 0.0125 without
+heatmap, difference −0.0059 (95 % CI −0.0127 to −0.0013), r = −1.0, p = 0.125 → not supported (smallest possible p
+with 4). H2 NASA-TLX 32.1 vs 34.6, not tested. SUS 76.3 (CI 52.5–92.5). Files: `results/study_kits/`, figure
+`results/study_kits/figures/study_gain_per_min.png`. Details: report notes.
 
 ## 5. Decisions made in this task
 

@@ -1,0 +1,9 @@
+participant,which,mental,physical,temporal,performance,effort,frustration,raw_tlx,simulated
+P01,with_heatmap,5,0,70,10,0,15,16.666666666666668,False
+P01,without_heatmap,15,10,65,65,10,20,30.833333333333332,False
+P02,with_heatmap,20,25,65,55,25,20,35.0,False
+P02,without_heatmap,35,55,60,25,40,15,38.333333333333336,False
+P03,with_heatmap,75,0,60,80,25,20,43.333333333333336,False
+P03,without_heatmap,80,0,25,95,25,60,47.5,False
+P04,with_heatmap,45,0,20,50,35,50,33.333333333333336,False
+P04,without_heatmap,50,0,10,5,30,35,21.666666666666668,False

@@ -5,7 +5,7 @@
 | **Owner** | Rasmus |
 | **Branch** | `rasmus/user-study` |
 | **Where the details are** | [docs/tasks/g2_user_study.md](../tasks/g2_user_study.md), [docs/study/](../study/), `results/study_kits/` |
-| **Last updated** | 2026-11-18 (design, pilot and lock done; sessions running until 2026-11-23; results after the analysis on 2026-11-24) |
+| **Last updated** | 2026-11-24 (study done: 4 participants, analysis run once as locked) |
 
 How to fill this in: [README.md](README.md). Notes, not report text. Every number with its interval and file path.
 
@@ -30,8 +30,22 @@ Question: does showing the model's uncertainty heatmap help people correct the A
 
 ## 2. Results
 
-*(After the analysis on 2026-11-24: `results/study_kits/study_tests.csv`, `study_conditions.csv`,
-`study_sus_summary.csv`, `figures/study_gain_per_min.png`. Number of participants analyzed, H1, H2, SUS.)*
+Analysis run once on 2026-11-24 as locked; 4 participants (P01–P04, one complete block), 24 corrected scans, no
+exclusions (`results/study_kits/study_exclusions.csv` empty). All locked unless marked exploratory.
+
+- **H1, Dice gain per minute:** with heatmap 0.0066, without 0.0125; difference −0.0059, 95 % bootstrap CI
+  [−0.0127, −0.0013]; rank-biserial r = −1.0 (all 4 lower with the heatmap); exact Wilcoxon p = 0.125 (the smallest
+  possible with 4 pairs) → **not supported** (`results/study_kits/study_tests.csv`).
+- **H2, raw NASA-TLX:** 32.1 with vs 34.6 without, difference −2.5, CI [−11.5, 7.7]; **not tested** (H1 not
+  supported; fixed sequence) (`study_tests.csv`).
+- Exploratory: Dice after 0.853 vs 0.856; Dice gain per scan 0.012 vs 0.015; median minutes per scan 1.4 vs 0.9; no
+  timeouts; 1 unchanged scan (with heatmap); heatmap on for a median 99.9 % of the time (`study_conditions.csv`,
+  `study_tests.csv`).
+- Exploratory, SUS: mean 76.3, 95 % bootstrap CI [52.5, 92.5], median 85; per participant 95, 90, 80, 40
+  (`study_sus_summary.csv`, `study_sus.csv`).
+- Per participant difference (with − without): −0.0045, −0.0003, −0.0159, −0.0029 (`study_participants.csv`).
+- Note: the bootstrap CI excludes 0 while p = 0.125. With 4 participants the bootstrap interval is unreliable (it
+  can only resample 4 values); the locked test is the Wilcoxon p.
 
 Pilot (T01, 2026-11-03, not analyzed, old scans `study_kits_v1`; source: task document, step 3):
 
@@ -41,7 +55,13 @@ Pilot (T01, 2026-11-03, not analyzed, old scans `study_kits_v1`; source: task do
 
 ## 3. What it means, and what it does not show
 
-*(After 2026-11-24.)*
+- No sign that the heatmap helps lay people correct faster: all 4 gained less Dice per minute with it, and the
+  workload was about the same. With n = 4 this is not evidence that it hurts either: the test cannot reach
+  p < 0.05, and the result is reported descriptively, as the plan said before the data.
+- Possible reasons, from the comments (not tested): the blue line made one participant feel he "had to color it";
+  three did not understand the blue marks on the slice bar; red and blue together made details hard to see.
+- The interface itself was rated above average (SUS 76; ~68 is commonly read as average), with one low score (40).
+- This matches G1's finding that the heatmap mostly marks the edge of the outline (next point).
 
 Already clear from the design and the pilot:
 
@@ -99,15 +119,18 @@ Already clear from the design and the pilot:
 
 ## 7. Figures and tables for the report
 
-- `results/study_kits/figures/study_gain_per_min.png` (after 2026-11-24): one line per participant from without to
-  with the heatmap. **Pick this one if there is room for only one.**
+- `results/study_kits/figures/study_gain_per_min.png`: one line per participant from without to with the heatmap.
+  **Pick this one if there is room for only one.**
+- `results/study_kits/figures/study_gain_per_min_diff_strip.png`: the same data as one dot per participant
+  (with − without), wide format for the presentation slide (made 2026-11-24 for the slide; same numbers).
 - Table: H1/H2 from `results/study_kits/study_tests.csv` (n, mean difference with CI, r, p).
 - Optional: a screenshot of the interface with the `contour` display and the red outline.
 - Optional: the pilot table (task document, step 3) to show why the scans were changed.
 
 ## 8. Top 3 points for the report
 
-1. *(The H1 result, after 2026-11-24: does the heatmap raise Dice gain per minute, with n, CI and p.)*
+1. No sign that the heatmap helps: with 4 lay participants, Dice gain per minute was lower with the heatmap for all
+   4 (0.0066 vs 0.0125, difference −0.0059, p = 0.125, the smallest possible with n = 4); descriptive only.
 2. The pilot changed the study before any data: thin-edge errors were invisible to a lay person (scans replaced),
    and the mask fill and heatmap display were changed so people can see what they correct.
 3. The analysis was locked before the first participant; every change after that is dated and explained, and the
@@ -125,10 +148,16 @@ Already clear from the design and the pilot:
 - Pilots: one pilot (T01, Rasmus, 2026-11-03/04). Showed: time is enough; old scans had invisible thin-edge errors;
   red fill too strong; `full` heatmap hides the border; tumor instruction unclear at first. Changed: scans, mask
   fill, display, guide text (section 5). A short test run (T02, 3 of 6 scans) with the final scans showed no problems.
-- Participants: *(after 2026-11-23: number, how recruited, who ran which block, computers.)* Balancing: 4 types by
-  ID number, analyzed only in complete blocks of 4.
+- Participants: 4 analyzed (P01–P04), recruited by Rasmus; P01–P02 remotely on their own Windows PCs with a mouse
+  (P01 in Firefox, kept by a decision before any results), P03–P04 in person on Rasmus's MacBook in Chrome. One
+  earlier P03 was lost when the server stopped during scan 6 (excluded, ID reused); the last session day was moved
+  from 2026-11-23 to 2026-11-24 because of it (before any results). One more participant (P05) in the next block
+  was not analyzed (block incomplete). Balancing: 4 types by ID number, analyzed only in complete blocks of 4.
 - Feedback to changes: each change in section 5 came from a pilot observation; checked by the pilot looking at the
   same scans again (mask fill) or by comparing the three displays on the demo queue. Not checked with new
   participants (no round 2).
-- What participants said and did: *(from the session logs and the SUS comments after 2026-11-23, anonymous.)*
-  Usability problems with severity 0–4 are logged per session for the report's version-2 list.
+- What participants said (SUS comments, anonymous): the blue marks on the slice bar were not understood (3 of 4);
+  wish for a tool that fills a circled area instead of painting it (2); the NASA-TLX performance scale
+  ("perfect/failure") felt reversed (2); unclear what "Done" applies to; the blue line felt like pressure to paint
+  ("I had to color it, otherwise I made a mistake"); red/blue made details hard to see; one did not know zoom
+  existed; one thought only the first slice had to be checked. These are the version-2 list.
